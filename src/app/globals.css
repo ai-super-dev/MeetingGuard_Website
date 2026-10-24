@@ -171,6 +171,10 @@ body {
   html {
     scroll-behavior: auto;
   }
+  /* SMIL ignores the animation overrides below, so hide the moving streaks */
+  .hero-streaks {
+    display: none;
+  }
   *,
   *::before,
   *::after {
@@ -226,12 +230,6 @@ body {
   }
   100% {
     transform: translateX(330%) skewX(-18deg);
-  }
-}
-
-@keyframes hero-orbit {
-  to {
-    stroke-dashoffset: -1000;
   }
 }
 
@@ -312,15 +310,29 @@ body {
   }
 }
 
-@keyframes hero-base {
+/*
+ * Phone hover and base-wave pulse share one clock (HOVER in geometry.ts):
+ * at 50% the phone is highest and the wave is at its largest.
+ */
+@keyframes hero-hover {
   0%,
   100% {
-    opacity: 0.75;
-    transform: scale(0.97);
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3.6%);
+  }
+}
+
+@keyframes hero-wave-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(0.9);
   }
   50% {
     opacity: 1;
-    transform: scale(1.03);
+    transform: scale(1.1);
   }
 }
 

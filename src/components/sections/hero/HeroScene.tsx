@@ -3,80 +3,157 @@ import type { CSSProperties } from "react";
 import { icons, images } from "@/lib/assets";
 import { LockScreen } from "./LockScreen";
 import { PhoneMockup } from "./PhoneMockup";
-import { PHONE, PHONE_H, SCENE_H, SCENE_W, sceneBox, sceneSquare } from "./geometry";
+import {
+  HOVER,
+  PHONE,
+  PHONE_H,
+  SCENE_H,
+  SCENE_W,
+  WAVE,
+  WAVE_H,
+  sceneBox,
+  sceneSquare,
+} from "./geometry";
 
 /*
- * The right half of the hero: phone, orbiting rings and floating app icons.
- * Layers follow the pointer at different depths through the --px/--py
- * variables set by HeroStage (each ranges -0.5…0.5).
+ * The right half of the hero: phone, glowing orbit trails and floating app
+ * icons. Layers follow the pointer at different depths through the
+ * --px/--py variables set by HeroStage (each ranges -0.5…0.5).
  */
 const depth = (d: number): CSSProperties => ({
   transform: `translate3d(calc(var(--px, 0) * var(--u) * ${d}), calc(var(--py, 0) * var(--u) * ${d}), 0)`,
 });
 
-/* ---------- orbit rings ---------- */
+/* ---------- orbit trails (all behind the phone) ---------- */
 
-type Ring = { cx: number; cy: number; rx: number; ry: number; rot: number; w: number; dur: number; opacity: number };
+type Orbit = {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  rot: number;
+  /** seconds per lap */
+  dur: number;
+  /** where each light streak starts along the lap (0…1) */
+  streaks: number[];
+  opacity: number;
+};
 
-const RINGS: Ring[] = [
-  { cx: 1166, cy: 540, rx: 412, ry: 112, rot: -8, w: 2.6, dur: 8, opacity: 1 },
-  { cx: 1166, cy: 588, rx: 352, ry: 90, rot: -6, w: 1.8, dur: 11, opacity: 0.85 },
-  { cx: 1172, cy: 470, rx: 472, ry: 150, rot: -10, w: 1.2, dur: 15, opacity: 0.5 },
+const ORBITS: Orbit[] = [
+  { cx: 1166, cy: 540, rx: 396, ry: 132, rot: -9, dur: 7, streaks: [0, 0.5], opacity: 1 },
+  { cx: 1170, cy: 606, rx: 344, ry: 98, rot: -5, dur: 9.5, streaks: [0.22, 0.72], opacity: 0.9 },
+  { cx: 1176, cy: 462, rx: 440, ry: 168, rot: -13, dur: 12, streaks: [0.4], opacity: 0.65 },
 ];
 
-/**
- * One half of every ring. The back half is drawn before the phone and the
- * front half after it, so the rings — and the comets running along them —
- * pass behind and then in front of the device.
- */
-function RingHalf({ half }: { half: "back" | "front" }) {
-  const id = `ring-${half}`;
-  return (
-    <svg
-      viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
-      className="absolute inset-0 h-full w-full overflow-visible mix-blend-screen"
-      style={{ ...depth(1.4), opacity: half === "back" ? 0.7 : 1 }}
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id={`${id}-stroke`} gradientUnits="userSpaceOnUse" x1="700" y1="0" x2="1640" y2="0">
-          <stop offset="0" stopColor="#38d6ff" />
-          <stop offset="0.5" stopColor="#7a6dff" />
-          <stop offset="1" stopColor="#d46cff" />
-        </linearGradient>
-        <filter id={`${id}-blur`} x="-10%" y="-60%" width="120%" height="220%">
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
-        {RINGS.map((r, i) => (
-          <clipPath key={i} id={`${id}-clip-${i}`} clipPathUnits="userSpaceOnUse">
-            <rect
-              x={r.cx - r.rx - 60}
-              y={half === "back" ? r.cy - r.ry - 60 : r.cy}
-              width={r.rx * 2 + 120}
-              height={r.ry + 60}
-            />
-          </clipPath>
-        ))}
-      </defs>
+/** Full ellipse starting at its left point, running along the front first. */
+const orbitPath = (o: Orbit) =>
+  `M ${o.cx - o.rx} ${o.cy} a ${o.rx} ${o.ry} 0 1 0 ${o.rx * 2} 0 a ${o.rx} ${o.ry} 0 1 0 ${-o.rx * 2} 0`;
 
-      {RINGS.map((r, i) => {
-        const shape = { cx: r.cx, cy: r.cy, rx: r.rx, ry: r.ry, pathLength: 1000, fill: "none" };
-        const orbit = (delay: number): CSSProperties => ({ animation: `hero-orbit ${r.dur}s linear ${delay}s infinite` });
-        return (
-          <g key={i} transform={`rotate(${r.rot} ${r.cx} ${r.cy})`} clipPath={`url(#${id}-clip-${i})`} opacity={r.opacity}>
-            <ellipse {...shape} stroke={`url(#${id}-stroke)`} strokeWidth={r.w * 4} opacity="0.45" filter={`url(#${id}-blur)`} />
-            <ellipse {...shape} stroke={`url(#${id}-stroke)`} strokeWidth={r.w} />
-            {/* two comets per ring, half an orbit apart */}
-            {[0, -r.dur / 2].map((delay) => (
-              <g key={delay} strokeLinecap="round">
-                <ellipse {...shape} stroke="#9fe8ff" strokeWidth={r.w * 7} strokeDasharray="70 930" filter={`url(#${id}-blur)`} style={orbit(delay)} />
-                <ellipse {...shape} stroke="#ffffff" strokeWidth={r.w * 1.6} strokeDasharray="44 956" strokeDashoffset="-13" style={orbit(delay)} />
-              </g>
-            ))}
+/**
+ * A light streak: stacked dashes of growing length whose heads stay aligned,
+ * so the trail tapers from a hot white head into a soft coloured tail, plus a
+ * flare riding the head. Stacked strokes give the glow without animated blur
+ * filters, which would repaint the whole layer every frame.
+ */
+const TRAIL = [
+  { len: 420, width: 18, color: "url(#orbit-tone)", opacity: 0.1 },
+  { len: 300, width: 11, color: "url(#orbit-tone)", opacity: 0.22 },
+  { len: 190, width: 6.5, color: "url(#orbit-tone)", opacity: 0.5 },
+  { len: 110, width: 3.6, color: "url(#orbit-tone)", opacity: 0.9 },
+  { len: 52, width: 2.4, color: "#ffffff", opacity: 1 },
+];
+
+function Orbits() {
+  return (
+    <>
+      {/* static glow tracks — blurred once, never repainted */}
+      <svg
+        viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
+        className="absolute inset-0 h-full w-full overflow-visible mix-blend-screen"
+        style={depth(1.4)}
+        aria-hidden
+      >
+        <defs>
+          <linearGradient id="track-tone" gradientUnits="userSpaceOnUse" x1="720" y1="0" x2="1620" y2="0">
+            <stop offset="0" stopColor="#2fc8ff" />
+            <stop offset="0.45" stopColor="#4d63ff" />
+            <stop offset="1" stopColor="#c45bff" />
+          </linearGradient>
+          <filter id="track-blur" x="-10%" y="-50%" width="120%" height="200%">
+            <feGaussianBlur stdDeviation="10" />
+          </filter>
+          <filter id="track-blur-soft" x="-10%" y="-50%" width="120%" height="200%">
+            <feGaussianBlur stdDeviation="3" />
+          </filter>
+        </defs>
+        {ORBITS.map((o, i) => (
+          <g key={i} transform={`rotate(${o.rot} ${o.cx} ${o.cy})`} opacity={o.opacity} fill="none">
+            <path d={orbitPath(o)} stroke="url(#track-tone)" strokeWidth="26" opacity="0.5" filter="url(#track-blur)" />
+            <path d={orbitPath(o)} stroke="url(#track-tone)" strokeWidth="7" opacity="0.55" filter="url(#track-blur-soft)" />
+            <path d={orbitPath(o)} stroke="url(#track-tone)" strokeWidth="1.8" opacity="0.85" />
           </g>
-        );
-      })}
-    </svg>
+        ))}
+      </svg>
+
+      {/* moving light streaks */}
+      <svg
+        viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
+        className="hero-streaks absolute inset-0 h-full w-full overflow-visible mix-blend-screen"
+        style={depth(1.4)}
+        aria-hidden
+      >
+        <defs>
+          <linearGradient id="orbit-tone" gradientUnits="userSpaceOnUse" x1="720" y1="0" x2="1620" y2="0">
+            <stop offset="0" stopColor="#38d6ff" />
+            <stop offset="0.5" stopColor="#6f6bff" />
+            <stop offset="1" stopColor="#e06bff" />
+          </linearGradient>
+          <radialGradient id="orbit-flare">
+            <stop offset="0" stopColor="#ffffff" />
+            <stop offset="0.18" stopColor="#f3d9ff" stopOpacity="0.95" />
+            <stop offset="0.45" stopColor="#b56bff" stopOpacity="0.45" />
+            <stop offset="1" stopColor="#7a5cff" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {ORBITS.map((o, i) => {
+          const d = orbitPath(o);
+          return (
+            <g key={i} transform={`rotate(${o.rot} ${o.cx} ${o.cy})`} opacity={o.opacity} fill="none" strokeLinecap="round">
+              {o.streaks.map((phase) => {
+                const begin = `${-phase * o.dur}s`;
+                return (
+                  <g key={phase}>
+                    {TRAIL.map((t) => (
+                      <path
+                        key={t.len}
+                        d={d}
+                        pathLength={1000}
+                        stroke={t.color}
+                        strokeWidth={t.width}
+                        opacity={t.opacity}
+                        strokeDasharray={`${t.len} ${1000 - t.len}`}
+                      >
+                        {/* head = len − offset, so every layer's head moves in lockstep */}
+                        <animate
+                          attributeName="stroke-dashoffset"
+                          values={`${t.len};${t.len - 1000}`}
+                          dur={`${o.dur}s`}
+                          begin={begin}
+                          repeatCount="indefinite"
+                        />
+                      </path>
+                    ))}
+                    <circle r="34" fill="url(#orbit-flare)">
+                      <animateMotion path={d} dur={`${o.dur}s`} begin={begin} repeatCount="indefinite" />
+                    </circle>
+                  </g>
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+    </>
   );
 }
 
@@ -100,28 +177,36 @@ const SPARKLES = [
 ] as const;
 
 export function HeroScene() {
-  const phoneStyle = sceneBox(PHONE.x, PHONE.y, PHONE.w, PHONE_H);
-
   return (
     <div className="absolute inset-0">
-      {/* glowing base the phone stands on */}
-      <div className="absolute" style={{ ...sceneBox(712, 640, 820, 461), ...depth(0.8) }}>
-        <Image
-          src={images.waveEffect}
-          alt=""
-          fill
-          sizes="(min-width: 1024px) 56vw, 110vw"
-          className="object-contain mix-blend-screen"
-          style={{ animation: "hero-base 4.5s ease-in-out infinite" }}
-        />
+      <Orbits />
+
+      {/*
+       * Base wave: tilted to the phone's bottom edge, and pulsing on the same
+       * clock as the phone hover — it swells as the phone rises and shrinks
+       * as it settles. Same pointer depth as the phone so they stay together.
+       */}
+      <div
+        className="absolute"
+        style={{ ...sceneBox(WAVE.cx - WAVE.w / 2, WAVE.cy - WAVE_H * 0.53, WAVE.w, WAVE_H), ...depth(1) }}
+      >
+        <div className="h-full w-full" style={{ transform: `rotate(${WAVE.tilt}deg)`, transformOrigin: "50% 53%" }}>
+          <div className="h-full w-full origin-[50%_53%]" style={{ animation: `hero-wave-pulse ${HOVER}` }}>
+            <Image
+              src={images.waveEffect}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 40vw, 80vw"
+              className="object-contain mix-blend-screen"
+            />
+          </div>
+        </div>
       </div>
 
-      <RingHalf half="back" />
-
-      {/* phone */}
-      <div className="absolute" style={{ ...phoneStyle, ...depth(1) }}>
+      {/* phone — drawn after the orbits so it is never covered by them */}
+      <div className="absolute" style={{ ...sceneBox(PHONE.x, PHONE.y, PHONE.w, PHONE_H), ...depth(1) }}>
         <div className="h-full w-full [animation:hero-phone-in_1.3s_cubic-bezier(0.22,1,0.36,1)_both_0.25s]">
-          <div className="h-full w-full [animation:hero-float_7s_ease-in-out_1.6s_infinite]">
+          <div className="h-full w-full" style={{ animation: `hero-hover ${HOVER}` }}>
             <div
               className="relative h-full w-full"
               style={{
@@ -141,9 +226,7 @@ export function HeroScene() {
         </div>
       </div>
 
-      <RingHalf half="front" />
-
-      {/* app icons orbiting the phone */}
+      {/* app icons around the phone */}
       {FLOATERS.map((f, i) => (
         <div key={i} className="absolute" style={{ ...sceneSquare(f.cx, f.cy, f.size), ...depth(f.depth) }}>
           <div

@@ -29,9 +29,24 @@ export function sceneSquare(cx: number, cy: number, size: number): CSSProperties
 export const FRAME_W = 971;
 export const FRAME_H = 1619;
 
-/** Where the phone sits in the scene (scene px). Height follows the PNG's aspect. */
-export const PHONE = { x: 930, y: 98, w: 486 };
+/**
+ * Where the phone sits in the scene (scene px). Height follows the PNG's
+ * aspect. Sized so the phone, its hover and the base wave all stay inside
+ * the 941px scene — nothing is ever cropped at any breakpoint.
+ */
+export const PHONE = { x: 950, y: 110, w: 440 };
 export const PHONE_H = (PHONE.w * FRAME_H) / FRAME_W;
+
+/**
+ * Base wave under the phone. wave_effect.png's ring spans ~92% of its width
+ * and is centred at 53% of its height; it is rotated to match the phone's
+ * bottom edge, which slopes 7.6° in phone_border.png.
+ */
+export const WAVE = { cx: 1114, cy: 818, w: 652, tilt: 7.6 };
+export const WAVE_H = (WAVE.w * SCENE_H) / SCENE_W;
+
+/** One clock for the phone hover and the wave pulse so they move together. */
+export const HOVER = "6s ease-in-out 1.6s infinite both";
 
 /**
  * Corners of the transparent screen opening inside phone_border.png, found by
