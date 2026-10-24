@@ -2,7 +2,7 @@ import { Reveal } from "@/components/motion";
 import { MeetingAlarmScreen } from "@/components/phone/MeetingAlarmScreen";
 import { JoinScreen, PlanScreen } from "@/components/phone/screens";
 import { FramedPhone } from "@/components/phone/FramedPhone";
-import { PURPLE_FRAME, RED_FRAME, TEAL_FRAME } from "@/components/phone/geometry";
+import { PURPLE_FRAME, RED_FRAME, BLUE_FRAME } from "@/components/phone/geometry";
 import { StepShowcase, type Step } from "./StepShowcase";
 
 /** One meeting, followed from the moment it's planned to the moment you join. */
@@ -51,8 +51,8 @@ const SCREENS = [
   <FramedPhone key="alert" frame={RED_FRAME} bodyHeight={PHONE_BODY_H} mirror>
     <MeetingAlarmScreen theme="dark" height={RED_FRAME.screenH} />
   </FramedPhone>,
-  <FramedPhone key="join" frame={TEAL_FRAME} bodyHeight={PHONE_BODY_H} mirror>
-    <JoinScreen height={TEAL_FRAME.screenH} />
+  <FramedPhone key="join" frame={BLUE_FRAME} bodyHeight={PHONE_BODY_H} mirror>
+    <JoinScreen height={BLUE_FRAME.screenH} />
   </FramedPhone>,
 ];
 
@@ -74,7 +74,7 @@ export function HowItWorks() {
           <StepShowcase
             steps={STEPS}
             screens={SCREENS}
-            glows={["rgba(150,70,255,0.4)", "rgba(220,25,50,0.42)", "rgba(20,200,180,0.32)"]}
+            glows={["rgba(150,70,255,0.4)", "rgba(220,25,50,0.42)", "rgba(40,140,255,0.34)"]}
           />
         </Reveal>
       </div>

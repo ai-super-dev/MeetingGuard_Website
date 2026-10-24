@@ -1,4 +1,3 @@
-import { AiSection } from "@/components/sections/AiSection";
 import { Features } from "@/components/sections/Features";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Hero } from "@/components/sections/Hero";
@@ -30,7 +29,6 @@ export default function Home() {
       <Problem />
       <HowItWorks />
       <WhatsAppSection />
-      <AiSection />
       <Features />
       <FinalCta />
       <QrDownload />

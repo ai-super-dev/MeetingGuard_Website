@@ -87,7 +87,7 @@ export const CAL_FRAME: FrameSpec = {
 };
 
 /**
- * phone_purple.png, phone_red.png and phone_teal.png are the same phone model
+ * phone_purple.png, phone_red.png and phone_blue.png are the same phone model
  * in the same pose (different colours), so they share one screen quad.
  */
 const STEP_PHONE = {
@@ -111,7 +111,7 @@ export const PURPLE_FRAME: FrameSpec = { src: images.phonePurple, ...STEP_PHONE 
 /** "How it works" step 2 (Alert). */
 export const RED_FRAME: FrameSpec = { src: images.phoneRed, ...STEP_PHONE };
 /** "How it works" step 3 (Join). */
-export const TEAL_FRAME: FrameSpec = { src: images.phoneTeal, ...STEP_PHONE };
+export const BLUE_FRAME: FrameSpec = { src: images.phoneBlue, ...STEP_PHONE };
 
 /** phone_frame_str.png — front-facing silver phone (WhatsApp flow). */
 export const STRAIGHT_FRAME: FrameSpec = {

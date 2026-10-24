@@ -9,9 +9,9 @@ import phoneFrame from "../../public/images/phone_frame.png";
 import phoneFrameStraight from "../../public/images/phone_frame_str.png";
 import phonePurple from "../../public/images/phone_purple.png";
 import phoneRed from "../../public/images/phone_red.png";
-import phoneTeal from "../../public/images/phone_teal.png";
+import phoneBlue from "../../public/images/phone_blue.png";
 
-export const images = { phoneCal, phoneFrame, phoneFrameStraight, phonePurple, phoneRed, phoneTeal };
+export const images = { phoneCal, phoneFrame, phoneFrameStraight, phonePurple, phoneRed, phoneBlue };
 
 export const icons = {
   app: appIcon,
