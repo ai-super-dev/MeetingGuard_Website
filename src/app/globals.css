@@ -67,14 +67,6 @@ body {
   color: rgb(255 255 255 / 0.55);
 }
 
-/* One vertical rhythm for every section: the same gap between any two of them */
-@utility section-y {
-  padding-block: 3.5rem;
-  @media (width >= 40rem) {
-    padding-block: 4.25rem;
-  }
-}
-
 /* Dark card with a hairline border and a faint top highlight */
 @utility surface {
   background: linear-gradient(180deg, #0f0f13 0%, #0a0a0d 100%);

@@ -424,7 +424,7 @@ function PlatformsVisual() {
 
 export function Features() {
   return (
-    <section id="features" aria-labelledby="features-title" className="section-y relative">
+    <section id="features" aria-labelledby="features-title" className="relative py-14 sm:py-[4.5rem]">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">Features</p>

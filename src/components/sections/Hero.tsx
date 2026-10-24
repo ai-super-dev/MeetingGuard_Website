@@ -46,7 +46,7 @@ function TiltedRings() {
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-[4.25rem] lg:pt-28">
+    <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-[4.5rem] lg:pt-28">
       {/* crimson glow behind the phone */}
       <div
         aria-hidden

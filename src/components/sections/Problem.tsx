@@ -285,7 +285,7 @@ function LaneCard({ lane }: { lane: Lane }) {
 
 export function Problem() {
   return (
-    <section aria-labelledby="problem-title" className="section-y relative overflow-x-clip">
+    <section aria-labelledby="problem-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">Why MeetingGuard</p>

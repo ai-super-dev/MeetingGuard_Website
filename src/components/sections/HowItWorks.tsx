@@ -58,7 +58,7 @@ const SCREENS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" aria-labelledby="how-title" className="section-y relative overflow-x-clip">
+    <section id="how-it-works" aria-labelledby="how-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-xl text-center">
           <p className="eyebrow">How it works</p>
