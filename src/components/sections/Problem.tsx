@@ -176,7 +176,8 @@ function CalendarWeek() {
 /* ---------- the phone stepping in ---------- */
 
 /**
- * Glossy-floor reflection under the calendar and phone. The mask is laid over
+ * Glossy-floor reflection under the phone (the calendar gets the same one on
+ * desktop via a Tailwind class). The mask is laid over
  * the reflection before it's flipped, so its bottom (opaque) end sits right
  * at the object's edge and the reflection fades out as it goes down.
  */
@@ -318,7 +319,8 @@ export function Problem() {
           {/* the 3D tilt pushes the calendar's near edge out to the left; shift the pair back to centre */}
           <div className="relative grid items-center gap-4 lg:translate-x-[4.5%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
-              <div className="lg:[transform:perspective(800px)_rotateY(18deg)]" style={MIRROR}>
+              {/* reflection only when the calendar sits beside the phone; stacked (tablet/phone) it would show behind the phone */}
+              <div className="lg:[transform:perspective(800px)_rotateY(18deg)] lg:[-webkit-box-reflect:below_6px_linear-gradient(transparent_76%,rgba(255,255,255,0.24))]">
                 <CalendarWeek />
               </div>
             </Reveal>
