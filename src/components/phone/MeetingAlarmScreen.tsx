@@ -3,7 +3,7 @@ import { StatusBar } from "./Device";
 import { SCREEN_H, SCREEN_W } from "./geometry";
 
 /* Colours sampled from the app's real full-screen alarm (store screenshot). */
-const C = {
+const WINE = {
   bg: "#3d0a12",
   badge: "#e5484d",
   ring: "#ff8a8f",
@@ -16,12 +16,24 @@ const C = {
   track: "#643b41",
 };
 
+/* The same alarm on the app's dark theme (navy, as on its other dark screens). */
+const DARK = {
+  ...WINE,
+  bg: "#0e1524",
+  ring: "#f47d84",
+  soft: "#aeb6c8",
+  meta: "#d7dcea",
+  track: "#263048",
+};
+
 type MeetingAlarmScreenProps = {
   time?: string;
   title?: string;
   when?: string;
   where?: string;
   height?: number;
+  /** "wine" matches the store screenshot; "dark" uses the app's navy dark theme. */
+  theme?: "wine" | "dark";
 };
 
 /**
@@ -35,7 +47,9 @@ export function MeetingAlarmScreen({
   when = "10:00 AM - 10:45 AM",
   where = "Zoom",
   height = SCREEN_H,
+  theme = "wine",
 }: MeetingAlarmScreenProps) {
+  const C = theme === "dark" ? DARK : WINE;
   return (
     <div
       className="relative flex flex-col overflow-hidden rounded-[48px] text-center text-white"
