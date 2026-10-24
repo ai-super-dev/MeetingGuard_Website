@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import {
-  BellRing,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -8,7 +7,6 @@ import {
   CircleX,
   Menu,
   Search,
-  Vibrate,
 } from "lucide-react";
 import { GoogleCalendarIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
@@ -85,13 +83,6 @@ function EventBlock({ e }: { e: CalEvent }) {
         </p>
         <p className="truncate text-white/60">10:00 – 10:45 · Zoom</p>
       </div>
-      {/* "guarded" chip hanging off the event */}
-      <Reveal delay={1.5} className="absolute top-full left-0 mt-1.5 whitespace-nowrap">
-        <span className="inline-flex items-center gap-1 rounded-full border border-accent/40 bg-[#1a0b0e] px-2 py-0.5 text-[0.64rem] font-medium text-[#ff8a95]">
-          <BellRing className="h-3 w-3" aria-hidden />
-          Alarm ringing · 9:45
-        </span>
-      </Reveal>
     </div>
   );
 }
@@ -183,28 +174,6 @@ function CalendarWeek() {
 
 /* ---------- the phone stepping in ---------- */
 
-/** Floating glass card: the moment MeetingGuard acts. */
-function MomentBadge() {
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#121216]/80 py-2.5 pr-4 pl-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md">
-      <span className="relative grid h-10 w-10 place-items-center rounded-xl bg-accent/15">
-        <span className="absolute inset-0 rounded-xl bg-accent/25 [animation:glow-pulse_2s_ease-in-out_infinite]" />
-        <Vibrate className="relative h-5 w-5 text-[#ff8a95]" aria-hidden />
-      </span>
-      <span className="leading-tight">
-        <span className="flex items-baseline gap-2">
-          <span className="text-[1.35rem] font-semibold tabular-nums">9:45</span>
-          <span className="flex items-center gap-1 text-[0.68rem] font-medium tracking-wide text-[#ff8a95] uppercase">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent [animation:glow-pulse_1s_ease-in-out_infinite]" />
-            Now
-          </span>
-        </span>
-        <span className="block text-[0.72rem] whitespace-nowrap text-white/50">15 min before · Investor call</span>
-      </span>
-    </div>
-  );
-}
-
 function GuardPhone() {
   return (
     <div className="relative">
@@ -213,16 +182,10 @@ function GuardPhone() {
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
       {/* the phone itself vibrates instead of the bell ringing */}
-      <div className="relative [animation:phone-vibrate_2.2s_linear_infinite]">
+      <div className="relative [animation:phone-vibrate_1.8s_linear_infinite]">
         <StraightPhone width={360}>
           <AlertScreen time="9:45" ringing={false} height={STRAIGHT_SCREEN_H} />
         </StraightPhone>
-      </div>
-      {/* centred above the screen on phones; out over the calendar's empty afternoon on desktop */}
-      <div className="absolute top-[3%] left-1/2 -translate-x-1/2 lg:top-auto lg:bottom-[5%] lg:-left-28 lg:translate-x-0">
-        <div className="[animation:float_6s_ease-in-out_infinite]">
-          <MomentBadge />
-        </div>
       </div>
     </div>
   );
@@ -345,11 +308,13 @@ export function Problem() {
         <div className="mx-auto mt-14 max-w-[1040px]">
           <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
-              <CalendarWeek />
+              <div className="lg:[transform:perspective(800px)_rotateY(18deg)]">
+                <CalendarWeek />
+              </div>
             </Reveal>
 
             {/* MeetingGuard steps in front of the calendar (the PNG has ~62px of glow each side) */}
-            <Reveal delay={1.1} from="right" className="relative flex justify-center lg:-ml-[84px]">
+            <Reveal delay={1.1} from="right" className="relative flex justify-center lg:-ml-[136px]">
               <GuardPhone />
             </Reveal>
           </div>

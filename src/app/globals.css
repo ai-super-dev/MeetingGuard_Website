@@ -195,31 +195,35 @@ body {
   }
 }
 
-/* a phone on vibrate: two short buzzes, then a pause */
+/* a phone on vibrate: two strong buzzes, then a pause */
 @keyframes phone-vibrate {
   0%,
-  44%,
+  46%,
   100% {
     transform: translate(0, 0) rotate(0);
   }
   2%,
   6%,
   10%,
-  26%,
-  30%,
-  34% {
-    transform: translate(-2.5px, 0) rotate(-0.6deg);
+  14%,
+  28%,
+  32%,
+  36%,
+  40% {
+    transform: translate(-5px, 1px) rotate(-1.6deg);
   }
   4%,
   8%,
   12%,
-  28%,
-  32%,
-  36% {
-    transform: translate(2.5px, 0) rotate(0.6deg);
+  16%,
+  30%,
+  34%,
+  38%,
+  42% {
+    transform: translate(5px, -1px) rotate(1.6deg);
   }
-  14%,
-  24% {
+  18%,
+  26% {
     transform: translate(0, 0) rotate(0);
   }
 }
