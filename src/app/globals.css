@@ -146,7 +146,7 @@ body {
 
 /*
  * Hero alarm: one ring = a burst of fast shakes then a rest. The glow flares
- * on the same beat and two radio waves leave per ring (see Hero.tsx).
+ * and the phone buzzes on the same beat (see AlertScreen.tsx / Hero.tsx).
  */
 @keyframes bell-vibrate {
   0%,
@@ -195,17 +195,37 @@ body {
   }
 }
 
-@keyframes radio-wave {
-  0% {
-    opacity: 0;
-    transform: scale(0.14);
+/* the phone buzzes during the bell's shake (first ~40% of each ring) */
+@keyframes phone-buzz {
+  0%,
+  40%,
+  100% {
+    transform: translate(0, 0) rotate(0);
   }
-  12% {
-    opacity: 0.9;
+  3%,
+  11%,
+  19%,
+  27%,
+  35% {
+    transform: translate(-3px, 1px) rotate(-0.8deg);
   }
+  7%,
+  15%,
+  23%,
+  31% {
+    transform: translate(3px, -1px) rotate(0.8deg);
+  }
+}
+
+@keyframes buzz-marks {
+  0%,
+  42%,
   100% {
     opacity: 0;
-    transform: scale(1);
+  }
+  4%,
+  36% {
+    opacity: 1;
   }
 }
 
