@@ -2,16 +2,20 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { AlarmClock, Check, Link2, Mic, Plus, Video } from "lucide-react";
+import Image, { type StaticImageData } from "next/image";
+import { AlarmClock, Bell, BellRing, Check, Link2, Mic, Plus, Video } from "lucide-react";
 import {
+  AndroidIcon,
+  AppleIcon,
   GoogleCalendarIcon,
   GoogleMeetIcon,
   OutlookIcon,
-  PhoneCalendarIcon,
+  TeamsIcon,
   ZoomIcon,
 } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { AppMark } from "@/components/ui/Logo";
+import { people } from "@/lib/people";
 
 /* ---------- shared ---------- */
 
@@ -100,26 +104,72 @@ function Tile({
 
 /* ---------- visuals ---------- */
 
-const LEVELS = ["Gentle", "Standard", "Critical"] as const;
+const LEVELS = [
+  { name: "Gentle", note: "A quiet notification" },
+  { name: "Standard", note: "Sound and vibration" },
+  { name: "Critical", note: "Full-screen alarm with voice readout" },
+] as const;
+
+/** The alarm badge for each intensity: outline bell → ringing bell → shaking alarm clock. */
+function LevelBadge({ level }: { level: number }) {
+  if (level === 0) {
+    return (
+      <span className="grid h-16 w-16 place-items-center rounded-full border-2 border-[#e5484d]/70 bg-[#e5484d]/10">
+        <Bell className="h-7 w-7 text-[#f47d84]" strokeWidth={2} aria-hidden />
+      </span>
+    );
+  }
+  if (level === 1) {
+    return (
+      <span className="grid h-16 w-16 place-items-center rounded-full bg-[#e5484d] shadow-[0_0_0_3px_#f47d84]">
+        <BellRing
+          className="h-8 w-8 origin-[50%_15%] text-white [animation:bell-ring_2.4s_ease-in-out_infinite]"
+          strokeWidth={2.2}
+          aria-hidden
+        />
+      </span>
+    );
+  }
+  return (
+    <span className="relative grid h-16 w-16 place-items-center">
+      <span className="absolute inset-0 rounded-full bg-[#e5484d]/40 [animation:glow-pulse_1.2s_ease-in-out_infinite]" />
+      <span className="relative grid h-16 w-16 place-items-center rounded-full bg-[#e5484d] shadow-[0_0_0_3px_#ff8a8f,0_0_28px_rgba(229,72,77,0.7)]">
+        <AlarmClock
+          className="h-8 w-8 text-white [animation:bell-vibrate_1.2s_linear_infinite]"
+          strokeWidth={2.2}
+          aria-hidden
+        />
+      </span>
+    </span>
+  );
+}
 
 function AlarmVisual() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const level = useCycle(LEVELS.length, 2600, inView);
-  const strength = [0.35, 0.65, 1][level];
+  const level = useCycle(LEVELS.length, 2800, inView);
 
   return (
     <div ref={ref} className="w-full max-w-[340px] rounded-[24px] border border-white/[0.08] bg-[#0e1524] px-6 pt-8 pb-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
       <div className="relative mx-auto grid h-16 w-16 place-items-center">
         <motion.span
           aria-hidden
-          className="absolute inset-[-14px] rounded-full bg-[radial-gradient(closest-side,rgba(229,72,77,0.55),transparent)]"
-          animate={{ opacity: strength, scale: 0.75 + strength * 0.35 }}
+          className="absolute inset-[-16px] rounded-full bg-[radial-gradient(closest-side,rgba(229,72,77,0.55),transparent)]"
+          animate={{ opacity: [0.2, 0.55, 1][level], scale: [0.8, 0.95, 1.15][level] }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         />
-        <span className="relative grid h-16 w-16 place-items-center rounded-full bg-[#e5484d] shadow-[0_0_0_3px_#f47d84]">
-          <AlarmClock className="h-8 w-8 text-white" strokeWidth={2.2} aria-hidden />
-        </span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={level}
+            className="relative"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.3 }}
+          >
+            <LevelBadge level={level} />
+          </motion.span>
+        </AnimatePresence>
       </div>
       <p className="mt-4 text-[1.05rem] font-semibold">Investor call</p>
       <p className="text-[0.8rem] font-medium text-[#ffd9a0]">Starts in 15 minutes</p>
@@ -127,7 +177,7 @@ function AlarmVisual() {
       {/* intensity: Gentle / Standard / Critical */}
       <div className="relative mt-5 grid grid-cols-3 rounded-xl bg-white/[0.05] p-1 text-[0.72rem]">
         {LEVELS.map((l, i) => (
-          <span key={l} className={`relative z-10 py-1.5 transition-colors duration-500 ${i === level ? "text-white" : "text-white/40"}`}>
+          <span key={l.name} className={`relative z-10 py-1.5 transition-colors duration-500 ${i === level ? "text-white" : "text-white/40"}`}>
             {i === level && (
               <motion.span
                 layoutId="alarm-level"
@@ -135,27 +185,28 @@ function AlarmVisual() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            {l}
+            {l.name}
           </span>
         ))}
       </div>
+      <p className="mt-3 h-4 text-[0.72rem] text-white/45">{LEVELS[level].note}</p>
     </div>
   );
 }
 
 function SyncVisual() {
+  // tile centres sit at y = 28 and 92 in the 120px-tall column
   const sources = [
-    { key: "g", icon: <GoogleCalendarIcon className="h-5 w-5" />, y: 20 },
-    { key: "o", icon: <OutlookIcon className="h-5 w-5" />, y: 60 },
-    { key: "p", icon: <PhoneCalendarIcon className="h-5 w-5" />, y: 100 },
+    { key: "g", icon: <GoogleCalendarIcon className="h-8 w-8" />, y: 28 },
+    { key: "o", icon: <OutlookIcon className="h-8 w-8" />, y: 92 },
   ];
   const path = (y: number) => `M0 ${y} C 70 ${y}, 90 60, 160 60`;
 
   return (
     <div className="flex items-center justify-center">
-      <div className="flex flex-col gap-[14px]">
+      <div className="flex h-[120px] flex-col justify-between">
         {sources.map((s) => (
-          <span key={s.key} className="grid h-[26px] w-[26px] place-items-center rounded-lg bg-white/[0.06] ring-1 ring-white/[0.08]">
+          <span key={s.key} className="grid h-14 w-14 place-items-center rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.08]">
             {s.icon}
           </span>
         ))}
@@ -163,19 +214,19 @@ function SyncVisual() {
       <svg viewBox="0 0 160 120" className="h-[120px] w-[160px] shrink-0" aria-hidden>
         {sources.map((s, i) => (
           <g key={s.key}>
-            <path d={path(s.y)} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <path d={path(s.y)} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1" />
             {/* one dot each way: two-way sync */}
-            <circle r="2.2" fill="#6ea8ff">
-              <animateMotion path={path(s.y)} dur="2.8s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+            <circle r="2.4" fill="#6ea8ff">
+              <animateMotion path={path(s.y)} dur="2.8s" begin={`${i * 0.7}s`} repeatCount="indefinite" />
             </circle>
-            <circle r="2.2" fill="#c7d2fe">
-              <animateMotion path={path(s.y)} dur="2.8s" begin={`${1.4 + i * 0.5}s`} repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" />
+            <circle r="2.4" fill="#c7d2fe">
+              <animateMotion path={path(s.y)} dur="2.8s" begin={`${1.4 + i * 0.7}s`} repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" />
             </circle>
           </g>
         ))}
       </svg>
-      <span className="grid h-14 w-14 place-items-center rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.1]">
-        <AppMark className="h-9 w-9" sizes="72px" />
+      <span className="grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.1]">
+        <AppMark className="h-10 w-10" sizes="80px" />
       </span>
     </div>
   );
@@ -260,23 +311,29 @@ function JoinVisual() {
           Join now
         </span>
       </span>
-      <span className="flex items-center gap-3 text-[0.75rem] text-white/45">
-        <span className="flex items-center gap-1.5">
-          <ZoomIcon className="h-4 w-4" /> Zoom
-        </span>
-        <span className="h-3 w-px bg-white/15" />
-        <span className="flex items-center gap-1.5">
-          <GoogleMeetIcon className="h-4 w-4" /> Meet
-        </span>
+      <span className="flex items-center gap-2">
+        {[
+          { name: "Zoom", icon: <ZoomIcon className="h-6 w-6" /> },
+          { name: "Google Meet", icon: <GoogleMeetIcon className="h-6 w-6" /> },
+          { name: "Microsoft Teams", icon: <TeamsIcon className="h-6 w-6" /> },
+        ].map((a) => (
+          <span
+            key={a.name}
+            title={a.name}
+            className="grid h-10 w-10 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-white/[0.08]"
+          >
+            {a.icon}
+          </span>
+        ))}
       </span>
     </div>
   );
 }
 
-const PEOPLE = [
-  { initials: "AN", color: "#6ea8ff" },
-  { initials: "DL", color: "#34c27a" },
-  { initials: "MS", color: "#f59e0b" },
+const PEOPLE: { name: string; photo?: StaticImageData; initials?: string; color?: string }[] = [
+  { name: "Ana", photo: people.woman },
+  { name: "David", photo: people.man },
+  { name: "Mia", initials: "MS", color: "#f59e0b" },
 ];
 
 function ShareVisual() {
@@ -285,17 +342,16 @@ function ShareVisual() {
       <div className="flex items-center">
         {PEOPLE.map((p, i) => (
           <span
-            key={p.initials}
-            className={`grid h-10 w-10 place-items-center rounded-full text-[0.72rem] font-semibold ring-2 ring-[#0d0d11] transition-transform duration-500 ease-out ${
+            key={p.name}
+            className={`relative grid h-11 w-11 place-items-center overflow-hidden rounded-full text-[0.72rem] font-semibold ring-2 ring-[#0d0d11] transition-transform duration-500 ease-out ${
               i === 0 ? "group-hover:-translate-x-1.5" : i === 2 ? "group-hover:translate-x-1.5" : ""
             }`}
             style={{
-              background: `color-mix(in srgb, ${p.color} 22%, #0d0d11)`,
-              color: p.color,
-              marginLeft: i ? -10 : 0,
+              marginLeft: i ? -12 : 0,
+              ...(p.color ? { background: `color-mix(in srgb, ${p.color} 22%, #0d0d11)`, color: p.color } : null),
             }}
           >
-            {p.initials}
+            {p.photo ? <Image src={p.photo} alt="" fill sizes="44px" className="object-cover" /> : p.initials}
           </span>
         ))}
         <span className="ml-3 inline-flex items-center gap-1 rounded-full border border-white/10 px-3 py-1.5 text-[0.75rem] text-white/75">
@@ -325,7 +381,10 @@ function PlatformsVisual() {
             <span
               className={`absolute top-2 left-1/2 -translate-x-1/2 bg-white/15 ${i ? "h-1.5 w-1.5 rounded-full" : "h-1.5 w-6 rounded-full"}`}
             />
-            <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 text-center">
+            <span className="absolute top-7 left-1/2 -translate-x-1/2">
+              {i ? <AndroidIcon className="h-6 w-6" /> : <AppleIcon className="h-6 w-6 text-white" />}
+            </span>
+            <div className="absolute inset-x-2 top-[58%] -translate-y-1/2 text-center">
               <AnimatePresence mode="wait">
                 <motion.p
                   key={lang}
@@ -340,7 +399,7 @@ function PlatformsVisual() {
               </AnimatePresence>
             </div>
           </div>
-          <span className="text-[0.7rem] text-white/40">{os}</span>
+          <span className="text-[0.72rem] font-medium text-white/55">{os}</span>
         </div>
       ))}
       <div className="mb-7 flex flex-col gap-1.5">
@@ -388,14 +447,14 @@ export function Features() {
             accent="#4f8cff"
             className="md:col-span-2"
             title="Two-way calendar sync"
-            body="Google Calendar, Outlook and the calendars on your phone. Meetings you create appear everywhere, with invitations and video-call links."
+            body="Works with Google Calendar and Outlook. Meetings you create appear in both, with invitations and video-call links."
             visual={<SyncVisual />}
             delay={0.05}
           />
           <Tile
             accent="#22c55e"
             title="Instant join"
-            body="One tap into the Zoom or Google Meet call — the link is generated for you."
+            body="One tap into the Zoom, Google Meet or Teams call — the link is generated for you."
             visual={<JoinVisual />}
             delay={0.1}
           />

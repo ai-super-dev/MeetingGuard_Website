@@ -179,3 +179,17 @@ export function InstagramIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function AndroidIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="#3ddc84">
+      <path d="M6 9.5h12V17a1.5 1.5 0 0 1-1.5 1.5H15V21a1.25 1.25 0 0 1-2.5 0v-2.5h-1V21a1.25 1.25 0 0 1-2.5 0v-2.5H7.5A1.5 1.5 0 0 1 6 17z" />
+      <path d="M6 8.75a6 6 0 0 1 12 0z" />
+      <path d="M8.2 2.6 9.4 4.7M15.8 2.6l-1.2 2.1" stroke="#3ddc84" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="9.6" cy="6.7" r="0.75" fill="#0b0b0e" />
+      <circle cx="14.4" cy="6.7" r="0.75" fill="#0b0b0e" />
+      <rect x="3" y="10" width="2.2" height="6" rx="1.1" />
+      <rect x="18.8" y="10" width="2.2" height="6" rx="1.1" />
+    </svg>
+  );
+}
