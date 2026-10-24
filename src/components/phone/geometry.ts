@@ -41,6 +41,8 @@ export type FrameSpec = {
   /** Screen height (CSS px at SCREEN_W wide) that suits the opening's proportions. */
   screenH: number;
   matrix: string;
+  /** Bounding box of the opaque phone body (frame px); the rest of the PNG is empty margin. */
+  body?: { x: number; y: number; w: number; h: number };
 };
 
 /**
@@ -72,6 +74,7 @@ export const BLUE_FRAME: FrameSpec = {
   w: 1650,
   h: 1920,
   screenH: BLUE_SCREEN_H,
+  body: { x: 396, y: 196, w: 868, h: 1502 },
   matrix: quadMatrix(
     [
       [644.8, 230.9],
@@ -80,5 +83,59 @@ export const BLUE_FRAME: FrameSpec = {
       [416.7, 1588.2],
     ],
     BLUE_SCREEN_H,
+  ),
+};
+
+/** phone_purple.png — "How it works" step 1 (Plan). */
+export const PURPLE_FRAME: FrameSpec = {
+  src: images.phonePurple,
+  w: 1162,
+  h: 1353,
+  screenH: 946,
+  body: { x: 256, y: 88, w: 661, h: 1172 },
+  matrix: quadMatrix(
+    [
+      [304.2, 102.3],
+      [719.1, 196.3],
+      [896.9, 1218.7],
+      [464.5, 1147.3],
+    ],
+    946,
+  ),
+};
+
+/** phone_red.png — "How it works" step 2 (Alert). */
+export const RED_FRAME: FrameSpec = {
+  src: images.phoneRed,
+  w: 1650,
+  h: 1920,
+  screenH: 936,
+  body: { x: 489, y: 151, w: 707, h: 1553 },
+  matrix: quadMatrix(
+    [
+      [520.0, 274.2],
+      [1078.1, 170.6],
+      [1127.6, 1594.7],
+      [531.0, 1649.6],
+    ],
+    936,
+  ),
+};
+
+/** phone_teal.png — "How it works" step 3 (Join). */
+export const TEAL_FRAME: FrameSpec = {
+  src: images.phoneTeal,
+  w: 1650,
+  h: 1920,
+  screenH: 936,
+  body: { x: 301, y: 194, w: 1070, h: 1516 },
+  matrix: quadMatrix(
+    [
+      [772.2, 211.7],
+      [1332.4, 304.7],
+      [892.5, 1659.9],
+      [312.9, 1508.0],
+    ],
+    936,
   ),
 };

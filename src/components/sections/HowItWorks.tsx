@@ -1,7 +1,8 @@
 import { Reveal } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
 import { JoinScreen, PlanScreen } from "@/components/phone/screens";
-import { STRAIGHT_SCREEN_H, StraightPhone } from "@/components/phone/StraightPhone";
+import { FramedPhone } from "@/components/phone/FramedPhone";
+import { PURPLE_FRAME, RED_FRAME, TEAL_FRAME } from "@/components/phone/geometry";
 import { StepShowcase, type Step } from "./StepShowcase";
 
 /** One meeting, followed from the moment it's planned to the moment you join. */
@@ -41,10 +42,18 @@ const STEPS: Step[] = [
   },
 ];
 
+/** Plan, Alert and Join each get their own phone colour. */
+const PHONE_BODY_H = 500;
 const SCREENS = [
-  <PlanScreen key="plan" height={STRAIGHT_SCREEN_H} />,
-  <AlertScreen key="alert" time="9:45" height={STRAIGHT_SCREEN_H} />,
-  <JoinScreen key="join" height={STRAIGHT_SCREEN_H} />,
+  <FramedPhone key="plan" frame={PURPLE_FRAME} bodyHeight={PHONE_BODY_H}>
+    <PlanScreen height={PURPLE_FRAME.screenH} />
+  </FramedPhone>,
+  <FramedPhone key="alert" frame={RED_FRAME} bodyHeight={PHONE_BODY_H}>
+    <AlertScreen time="9:45" height={RED_FRAME.screenH} />
+  </FramedPhone>,
+  <FramedPhone key="join" frame={TEAL_FRAME} bodyHeight={PHONE_BODY_H}>
+    <JoinScreen height={TEAL_FRAME.screenH} />
+  </FramedPhone>,
 ];
 
 export function HowItWorks() {
@@ -64,11 +73,8 @@ export function HowItWorks() {
         <Reveal className="mx-auto mt-16 max-w-[1000px]">
           <StepShowcase
             steps={STEPS}
-            screens={SCREENS.map((screen) => (
-              <StraightPhone key={screen.key} width={360}>
-                {screen}
-              </StraightPhone>
-            ))}
+            screens={SCREENS}
+            glows={["rgba(150,70,255,0.4)", "rgba(220,25,50,0.42)", "rgba(20,200,180,0.32)"]}
           />
         </Reveal>
       </div>

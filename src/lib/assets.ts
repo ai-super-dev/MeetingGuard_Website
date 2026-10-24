@@ -6,9 +6,11 @@ import bellIcon from "../../public/icons/bell_icon.png";
 import playStoreIcon from "../../public/icons/play_store_icon.png";
 import phoneBlue from "../../public/images/phone_blue.png";
 import phoneFrame from "../../public/images/phone_frame.png";
-import phoneFrameStraight from "../../public/images/phone_frame_str.png";
+import phonePurple from "../../public/images/phone_purple.png";
+import phoneRed from "../../public/images/phone_red.png";
+import phoneTeal from "../../public/images/phone_teal.png";
 
-export const images = { phoneBlue, phoneFrame, phoneFrameStraight };
+export const images = { phoneBlue, phoneFrame, phonePurple, phoneRed, phoneTeal };
 
 export const icons = {
   app: appIcon,

@@ -12,7 +12,7 @@ import { GoogleCalendarIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
 import { BLUE_FRAME } from "@/components/phone/geometry";
-import { PhoneMockup } from "@/components/phone/PhoneMockup";
+import { FramedPhone } from "@/components/phone/FramedPhone";
 import { AppMark } from "@/components/ui/Logo";
 
 /* ---------- calendar week mock ---------- */
@@ -175,10 +175,6 @@ function CalendarWeek() {
 
 /* ---------- the phone stepping in ---------- */
 
-/** Phone body inside phone_blue.png (frame px) and the scale it's drawn at. */
-const BODY = { x: 395, y: 190, w: 875, h: 1515 };
-const PHONE_SCALE = 0.317;
-
 function GuardPhone() {
   return (
     <div className="relative lg:-translate-x-9">
@@ -186,16 +182,9 @@ function GuardPhone() {
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
-      {/* box sized to the phone body; the PNG's transparent margins hang outside it */}
-      <div className="relative" style={{ width: BODY.w * PHONE_SCALE, height: BODY.h * PHONE_SCALE }}>
-        <PhoneMockup
-          frame={BLUE_FRAME}
-          sizes="540px"
-          style={{ position: "absolute", left: -BODY.x * PHONE_SCALE, top: -BODY.y * PHONE_SCALE, width: BLUE_FRAME.w * PHONE_SCALE }}
-        >
-          <AlertScreen time="9:45" ringing={false} height={BLUE_FRAME.screenH} />
-        </PhoneMockup>
-      </div>
+      <FramedPhone frame={BLUE_FRAME} bodyHeight={476}>
+        <AlertScreen time="9:45" ringing={false} height={BLUE_FRAME.screenH} />
+      </FramedPhone>
     </div>
   );
 }

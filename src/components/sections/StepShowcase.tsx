@@ -69,7 +69,16 @@ function TrackNode({
  * when it arrives. Pausing (hover, off-screen) freezes the line mid-flow;
  * clicking a time glides the line there.
  */
-export function StepShowcase({ steps, screens }: { steps: Step[]; screens: ReactNode[] }) {
+export function StepShowcase({
+  steps,
+  screens,
+  glows,
+}: {
+  steps: Step[];
+  screens: ReactNode[];
+  /** Glow colour behind the phone for each step. */
+  glows: string[];
+}) {
   const [active, setActive] = useState(0);
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -153,14 +162,19 @@ export function StepShowcase({ steps, screens }: { steps: Step[]; screens: React
         {/* phone */}
         <div className="flex flex-col items-center">
           <div className="relative">
-            <motion.div
-              aria-hidden
-              className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.35),transparent)] blur-2xl"
-              animate={{ opacity: active === 1 ? 1 : 0.45 }}
-              transition={{ duration: 0.8 }}
-            />
+            {glows.map((g, i) => (
+              <motion.div
+                key={g}
+                aria-hidden
+                className="absolute top-1/2 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
+                style={{ background: `radial-gradient(closest-side, ${g}, transparent)` }}
+                initial={false}
+                animate={{ opacity: i === active ? 1 : 0 }}
+                transition={{ duration: 0.8 }}
+              />
+            ))}
             {/* all three screens stay mounted; only the active one is shown */}
-            <div className="relative grid">
+            <div className="relative -my-8 grid scale-[0.86] place-items-center sm:my-0 sm:scale-100">
               {screens.map((screen, i) => (
                 <motion.div
                   key={i}
