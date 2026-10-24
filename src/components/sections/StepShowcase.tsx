@@ -23,8 +23,8 @@ export type Step = {
 /** Seconds the timeline takes to flow from one step to the next. */
 const DWELL = 4;
 const ease = [0.22, 1, 0.36, 1] as const;
-/** Seconds for the table to turn one phone to the front. */
-const TURN = 1.3;
+/** Seconds for one phone to fade out as the next fades in. */
+const FADE = 1.4;
 /** Slow in, slow out — for the glow and text crossfades between steps. */
 const SOFT = [0.45, 0, 0.25, 1] as const;
 
@@ -66,46 +66,6 @@ function TrackNode({
   );
 }
 
-/** Distance from the table's centre to each phone (px). */
-const RADIUS = 300;
-
-/** One phone standing on the turning table; fades as it goes round the back. */
-function TablePhone({
-  index,
-  count,
-  table,
-  active,
-  children,
-}: {
-  index: number;
-  count: number;
-  table: MotionValue<number>;
-  active: boolean;
-  children: ReactNode;
-}) {
-  const seat = (index * 360) / count;
-  const opacity = useTransform(table, (t) => {
-    const rel = ((((seat + t) % 360) + 540) % 360) - 180; // −180…180, 0 = facing front
-    return Math.max(0, (Math.cos((rel * Math.PI) / 180) - 0.25) / 0.75);
-  });
-  return (
-    <motion.div
-      className="col-start-1 row-start-1"
-      style={{
-        // seat angle first, then out to the table's edge (order matters)
-        transform: `rotateY(${seat}deg) translateZ(${RADIUS}px)`,
-        opacity,
-        filter: "none",
-        backfaceVisibility: "hidden",
-        pointerEvents: active ? "auto" : "none",
-      }}
-      aria-hidden={!active}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 /**
  * Plan → Alert → Join as one interactive story: the phone on the left and the
  * explanation on the right change together. It advances on its own while in
@@ -138,15 +98,6 @@ export function StepShowcase({
   const head = useTransform(fill, (v) => `${v * 100}%`);
   const snap = useRef(false);
 
-  /** Table angle (deg). Step i faces front at −i·120°; always turns the short way round. */
-  const table = useMotionValue(0);
-  useEffect(() => {
-    const target = (-active * 360) / steps.length;
-    const cur = table.get();
-    const to = target + 360 * Math.round((cur - target) / 360);
-    const controls = animate(table, to, { duration: TURN, ease: [0.65, 0, 0.35, 1] });
-    return () => controls.stop();
-  }, [active, steps.length, table]);
 
   const select = (i: number) => {
     snap.current = true;
@@ -224,28 +175,24 @@ export function StepShowcase({
                 style={{ background: `radial-gradient(closest-side, ${g}, transparent)` }}
                 initial={false}
                 animate={{ opacity: i === active ? 1 : 0 }}
-                transition={{ duration: 1.4, ease: SOFT }}
+                transition={{ duration: FADE, ease: SOFT }}
               />
             ))}
-            {/*
-              Carousel: the three phones stand 120° apart around a round table
-              that turns to bring the active one to the front.
-            */}
-            <div
-              className="relative -my-8 grid scale-[0.86] place-items-center sm:my-0 sm:scale-100"
-              style={{ perspective: 1600 }}
-            >
-              {/* the table sits RADIUS back, so the front phone lands on the screen plane at 1:1 (sharp) */}
-              <motion.div
-                className="col-start-1 row-start-1 grid place-items-center"
-                style={{ rotateY: table, z: -RADIUS, transformStyle: "preserve-3d" }}
-              >
-                {screens.map((screen, i) => (
-                  <TablePhone key={i} index={i} count={screens.length} table={table} active={i === active}>
-                    {screen}
-                  </TablePhone>
-                ))}
-              </motion.div>
+            {/* all three phones stay mounted; the active one fades in as the last fades out */}
+            <div className="relative -my-8 grid scale-[0.86] place-items-center sm:my-0 sm:scale-100">
+              {screens.map((screen, i) => (
+                <motion.div
+                  key={i}
+                  className="col-start-1 row-start-1"
+                  initial={false}
+                  animate={i === active ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.98 }}
+                  transition={{ duration: FADE, ease: SOFT }}
+                  style={{ filter: "none", pointerEvents: i === active ? "auto" : "none" }}
+                  aria-hidden={i !== active}
+                >
+                  {screen}
+                </motion.div>
+              ))}
             </div>
           </div>
 
