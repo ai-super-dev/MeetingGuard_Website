@@ -14,7 +14,7 @@ export function AppIcon({ className = "h-20 w-20" }: { className?: string }) {
         aria-hidden
         className="absolute -inset-[70%] rounded-full bg-[radial-gradient(closest-side,rgba(60,130,255,0.4),rgba(60,110,255,0.1)_55%,transparent)] [animation:glow-pulse_4s_ease-in-out_infinite]"
       />
-      <AppMark className="relative h-full w-full" sizes="200px" />
+      <AppMark className="relative h-full w-full" sizes="184px" />
     </span>
   );
 }
