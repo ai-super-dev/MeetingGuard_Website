@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -175,6 +175,15 @@ function CalendarWeek() {
 
 /* ---------- the phone stepping in ---------- */
 
+/**
+ * Glossy-floor reflection under the calendar and phone. The mask is laid over
+ * the reflection before it's flipped, so its bottom (opaque) end sits right
+ * at the object's edge and the reflection fades out as it goes down.
+ */
+const MIRROR: CSSProperties = {
+  WebkitBoxReflect: "below 6px linear-gradient(transparent 76%, rgba(255,255,255,0.24))",
+};
+
 function GuardPhone() {
   return (
     <div className="relative lg:-translate-x-9">
@@ -182,9 +191,11 @@ function GuardPhone() {
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
-      <FramedPhone frame={BLUE_FRAME} bodyHeight={476}>
+      <div className="relative" style={MIRROR}>
+        <FramedPhone frame={BLUE_FRAME} bodyHeight={476}>
         <AlertScreen time="9:45" ringing={false} height={BLUE_FRAME.screenH} />
-      </FramedPhone>
+        </FramedPhone>
+      </div>
     </div>
   );
 }
@@ -307,7 +318,7 @@ export function Problem() {
           {/* the 3D tilt pushes the calendar's near edge out to the left; shift the pair back to centre */}
           <div className="relative grid items-center gap-4 lg:translate-x-[4.5%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
-              <div className="lg:[transform:perspective(800px)_rotateY(18deg)]">
+              <div className="lg:[transform:perspective(800px)_rotateY(18deg)]" style={MIRROR}>
                 <CalendarWeek />
               </div>
             </Reveal>
@@ -318,7 +329,7 @@ export function Problem() {
             </Reveal>
           </div>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-2 lg:mt-16">
+          <div className="mt-16 grid gap-5 md:grid-cols-2 lg:mt-20">
             {LANES.map((lane, i) => (
               <Reveal key={lane.title} delay={i * 0.12} className="h-full">
                 <LaneCard lane={lane} />
