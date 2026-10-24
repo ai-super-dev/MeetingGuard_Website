@@ -4,10 +4,11 @@ import appIcon from "../../public/icons/app_icon.png";
 import appStoreIcon from "../../public/icons/app_store_icon.png";
 import bellIcon from "../../public/icons/bell_icon.png";
 import playStoreIcon from "../../public/icons/play_store_icon.png";
+import phoneBlue from "../../public/images/phone_blue.png";
 import phoneFrame from "../../public/images/phone_frame.png";
 import phoneFrameStraight from "../../public/images/phone_frame_str.png";
 
-export const images = { phoneFrame, phoneFrameStraight };
+export const images = { phoneBlue, phoneFrame, phoneFrameStraight };
 
 export const icons = {
   app: appIcon,

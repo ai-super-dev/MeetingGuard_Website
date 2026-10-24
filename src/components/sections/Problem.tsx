@@ -11,7 +11,8 @@ import {
 import { GoogleCalendarIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
-import { STRAIGHT_SCREEN_H, StraightPhone } from "@/components/phone/StraightPhone";
+import { BLUE_FRAME } from "@/components/phone/geometry";
+import { PhoneMockup } from "@/components/phone/PhoneMockup";
 import { AppMark } from "@/components/ui/Logo";
 
 /* ---------- calendar week mock ---------- */
@@ -174,17 +175,26 @@ function CalendarWeek() {
 
 /* ---------- the phone stepping in ---------- */
 
+/** Phone body inside phone_blue.png (frame px) and the scale it's drawn at. */
+const BODY = { x: 395, y: 190, w: 875, h: 1515 };
+const PHONE_SCALE = 0.317;
+
 function GuardPhone() {
   return (
-    <div className="relative">
+    <div className="relative lg:-translate-x-9">
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
-      <div className="relative">
-        <StraightPhone width={360}>
-          <AlertScreen time="9:45" ringing={false} height={STRAIGHT_SCREEN_H} />
-        </StraightPhone>
+      {/* box sized to the phone body; the PNG's transparent margins hang outside it */}
+      <div className="relative" style={{ width: BODY.w * PHONE_SCALE, height: BODY.h * PHONE_SCALE }}>
+        <PhoneMockup
+          frame={BLUE_FRAME}
+          sizes="540px"
+          style={{ position: "absolute", left: -BODY.x * PHONE_SCALE, top: -BODY.y * PHONE_SCALE, width: BLUE_FRAME.w * PHONE_SCALE }}
+        >
+          <AlertScreen time="9:45" ringing={false} height={BLUE_FRAME.screenH} />
+        </PhoneMockup>
       </div>
     </div>
   );
@@ -306,20 +316,20 @@ export function Problem() {
 
         <div className="mx-auto mt-14 max-w-[1040px]">
           {/* the 3D tilt pushes the calendar's near edge out to the left; shift the pair back to centre */}
-          <div className="relative grid items-center gap-4 lg:translate-x-[4.2%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
+          <div className="relative grid items-center gap-4 lg:translate-x-[4.5%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
               <div className="lg:[transform:perspective(800px)_rotateY(18deg)]">
                 <CalendarWeek />
               </div>
             </Reveal>
 
-            {/* MeetingGuard steps in front of the calendar (the PNG has ~62px of glow each side) */}
-            <Reveal delay={1.1} from="right" className="relative flex justify-center lg:-ml-[136px]">
+            {/* MeetingGuard steps in front of the calendar, overlapping its far edge */}
+            <Reveal delay={1.1} from="right" className="relative flex justify-center lg:-ml-[74px]">
               <GuardPhone />
             </Reveal>
           </div>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
+          <div className="mt-8 grid gap-5 md:grid-cols-2 lg:mt-16">
             {LANES.map((lane, i) => (
               <Reveal key={lane.title} delay={i * 0.12} className="h-full">
                 <LaneCard lane={lane} />
