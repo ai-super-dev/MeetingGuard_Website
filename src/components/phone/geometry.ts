@@ -50,7 +50,7 @@ export type FrameSpec = {
  * intersecting lines fitted to the straight runs of the bezel edges.
  */
 
-/** phone_frame.png — the tilted silver phone (hero, and beside the calendar). */
+/** phone_frame.png — the tilted silver phone in the hero. */
 export const SILVER_FRAME: FrameSpec = {
   src: images.phoneFrame,
   w: 1024,
@@ -65,6 +65,24 @@ export const SILVER_FRAME: FrameSpec = {
       [88.6, 1364.8],
     ],
     SCREEN_H,
+  ),
+};
+
+/** phone-purple_cal.png — the purple phone beside the calendar. */
+export const CAL_FRAME: FrameSpec = {
+  src: images.phoneCal,
+  w: 1650,
+  h: 1920,
+  screenH: 930,
+  body: { x: 396, y: 196, w: 868, h: 1502 },
+  matrix: quadMatrix(
+    [
+      [643.4, 231.8],
+      [1210.9, 227.6],
+      [1012.9, 1637.5],
+      [415.8, 1588.2],
+    ],
+    930,
   ),
 };
 
