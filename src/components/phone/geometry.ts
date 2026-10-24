@@ -89,18 +89,18 @@ export const BLUE_FRAME: FrameSpec = {
 /** phone_purple.png — "How it works" step 1 (Plan). */
 export const PURPLE_FRAME: FrameSpec = {
   src: images.phonePurple,
-  w: 1650,
-  h: 1920,
-  screenH: 915,
-  body: { x: 481, y: 167, w: 759, h: 1498 },
+  w: 1162,
+  h: 1353,
+  screenH: 940,
+  body: { x: 278, y: 76, w: 632, h: 1154 },
   matrix: quadMatrix(
     [
-      [542.2, 195.0],
-      [1086.4, 255.1],
-      [1195.0, 1598.2],
-      [610.3, 1516.5],
+      [336.1, 96.0],
+      [731.8, 165.9],
+      [870.9, 1182.5],
+      [464.7, 1136.8],
     ],
-    915,
+    940,
   ),
 };
 
