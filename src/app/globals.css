@@ -171,10 +171,6 @@ body {
   html {
     scroll-behavior: auto;
   }
-  /* SMIL ignores the animation overrides below, so hide the moving streaks */
-  .hero-streaks {
-    display: none;
-  }
   *,
   *::before,
   *::after {
@@ -273,19 +269,6 @@ body {
   }
 }
 
-@keyframes hero-phone-in {
-  from {
-    opacity: 0;
-    transform: translateY(14%) rotate(6deg) scale(0.92);
-    filter: blur(12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
-
 @keyframes hero-pop {
   from {
     opacity: 0;
@@ -311,28 +294,62 @@ body {
 }
 
 /*
- * Phone hover and base-wave pulse share one clock (HOVER in geometry.ts):
- * at 50% the phone is highest and the wave is at its largest.
+ * Dive cycle (HOVER clock in geometry.ts): at 0%/100% the phone is up out of
+ * the hole and the wave/galaxy are at their largest; at 50% it has sunk into
+ * the hole and they have contracted. --dive-x/y point down the phone's axis.
  */
-@keyframes hero-hover {
+@keyframes hero-dive {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate(0, 0);
   }
   50% {
-    transform: translateY(-3.6%);
+    transform: translate(var(--dive-x), var(--dive-y));
   }
 }
 
 @keyframes hero-wave-pulse {
   0%,
   100% {
-    opacity: 0.8;
-    transform: scale(0.9);
+    opacity: 1;
+    transform: scale(1.08);
   }
   50% {
+    opacity: 0.75;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes hero-hole-pulse {
+  0%,
+  100% {
     opacity: 1;
-    transform: scale(1.1);
+    transform: scale(1.03);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(0.96);
+  }
+}
+
+/* phone rises out of the hole on load */
+@keyframes hero-emerge {
+  from {
+    opacity: 0;
+    transform: translate(var(--emerge-x), var(--emerge-y));
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-spin {
+  to {
+    transform: rotate(-360deg);
   }
 }
 
