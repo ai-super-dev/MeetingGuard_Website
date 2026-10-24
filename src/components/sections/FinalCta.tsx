@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export function FinalCta() {
   return (
-    <section aria-labelledby="cta-title" className="relative overflow-hidden py-28 sm:py-36">
+    <section aria-labelledby="cta-title" className="relative overflow-x-clip pt-16 pb-28 sm:pt-20 sm:pb-36">
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[480px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(190,20,40,0.28),transparent)] blur-2xl"
