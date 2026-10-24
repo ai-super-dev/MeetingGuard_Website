@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode, SVGProps } from "react";
-import { AudioLines, Bell, CalendarDays, Paperclip, Search, SlidersHorizontal, Sparkles, Video } from "lucide-react";
-import { GoogleMeetIcon, OutlookIcon, TeamsIcon, ZoomIcon } from "@/components/icons/brand";
-import { ShieldMark } from "@/components/ui/Logo";
+import { AlarmClock, CalendarDays, Mic, Search, Share2, SlidersHorizontal, Sparkles } from "lucide-react";
+import { GoogleCalendarIcon, OutlookIcon, PhoneCalendarIcon } from "@/components/icons/brand";
+import { AppMark } from "@/components/ui/Logo";
 import { SCREEN_H, SCREEN_W } from "./geometry";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement> & { strokeWidth?: number }>;
@@ -27,23 +27,18 @@ export function StatusBar({ className = "" }: { className?: string }) {
 }
 
 const ACTIONS: { label: string; icon: Icon; color: string; tint: string }[] = [
-  { label: "AI", icon: Sparkles, color: "#ff6b78", tint: "rgba(255,77,94,0.16)" },
-  { label: "Alerts", icon: Bell, color: "#ff8a5c", tint: "rgba(255,138,92,0.14)" },
-  { label: "Calendar", icon: CalendarDays, color: "#6ea8ff", tint: "rgba(110,168,255,0.14)" },
-  { label: "Join", icon: Video, color: "#a78bfa", tint: "rgba(167,139,250,0.16)" },
+  { label: "Assistant", icon: Sparkles, color: "#ff6b78", tint: "rgba(255,77,94,0.16)" },
+  { label: "Alarms", icon: AlarmClock, color: "#ff8a5c", tint: "rgba(255,138,92,0.14)" },
+  { label: "Calendars", icon: CalendarDays, color: "#6ea8ff", tint: "rgba(110,168,255,0.14)" },
+  { label: "Share", icon: Share2, color: "#a78bfa", tint: "rgba(167,139,250,0.16)" },
 ];
 
-const UP_NEXT: { title: string; meta: string; icon: ReactNode; critical?: boolean }[] = [
-  {
-    title: "Investor Call",
-    meta: "10:00 · in 15 min",
-    icon: <ShieldMark className="h-[18px] w-[18px]" />,
-    critical: true,
-  },
-  { title: "Team Standup", meta: "11:30 · Google Meet", icon: <GoogleMeetIcon className="h-[18px] w-[18px]" /> },
-  { title: "Design Review", meta: "14:00 · Zoom", icon: <ZoomIcon className="h-[18px] w-[18px]" /> },
-  { title: "Client Sync", meta: "16:00 · Teams", icon: <TeamsIcon className="h-[18px] w-[18px]" /> },
-  { title: "Weekly 1:1", meta: "17:30 · Outlook", icon: <OutlookIcon className="h-[18px] w-[18px]" /> },
+/** Today's meetings, each tagged with the calendar it was synced from. */
+const UP_NEXT: { title: string; meta: string; icon: ReactNode; alarm?: boolean }[] = [
+  { title: "Investor Call", meta: "10:00 · Google Calendar", icon: <GoogleCalendarIcon className="h-[18px] w-[18px]" />, alarm: true },
+  { title: "Team Standup", meta: "11:30 · Outlook", icon: <OutlookIcon className="h-[18px] w-[18px]" /> },
+  { title: "Dentist", meta: "14:00 · Phone calendar", icon: <PhoneCalendarIcon className="h-[18px] w-[18px]" /> },
+  { title: "Client Sync", meta: "16:00 · Google Calendar", icon: <GoogleCalendarIcon className="h-[18px] w-[18px]" /> },
 ];
 
 /**
@@ -89,36 +84,51 @@ export function HomeScreen() {
         ))}
       </div>
 
-      {/* up next */}
-      <p className="relative mt-[30px] px-[22px] text-[13px] text-white/40">Up next</p>
-      <ul className="relative mt-[8px] px-[12px]">
+      {/* today */}
+      <p className="relative mt-[28px] px-[22px] text-[13px] text-white/40">Today</p>
+      <ul className="relative mt-[6px] px-[12px]">
         {UP_NEXT.map((m) => (
-          <li key={m.title} className="flex items-center gap-[12px] rounded-[12px] px-[10px] py-[11px]">
+          <li key={m.title} className="flex items-center gap-[12px] rounded-[12px] px-[10px] py-[10px]">
             <span className="grid h-[32px] w-[32px] place-items-center rounded-[9px] bg-white/[0.06]">{m.icon}</span>
             <span className="flex-1 leading-tight">
               <span className="block text-[15px] font-medium">{m.title}</span>
               <span className="block text-[12px] text-white/40">{m.meta}</span>
             </span>
-            {m.critical && (
-              <span className="rounded-full border border-accent/40 bg-accent/15 px-[8px] py-[3px] text-[11px] font-medium text-[#ff8a95]">
-                Critical
+            {m.alarm && (
+              <span className="flex items-center gap-[4px] rounded-full border border-accent/40 bg-accent/15 px-[8px] py-[3px] text-[11px] font-medium text-[#ff8a95]">
+                <AlarmClock className="h-[11px] w-[11px]" aria-hidden />
+                Alarm on
               </span>
             )}
           </li>
         ))}
       </ul>
 
-      {/* AI ask bar */}
+      {/* AI proposal — nothing changes until the user confirms */}
+      <div className="absolute inset-x-[12px] bottom-[150px] rounded-[18px] border border-white/[0.07] bg-white/[0.04] p-[12px]">
+        <p className="flex items-center gap-[6px] text-[12px] text-white/50">
+          <Sparkles className="h-[13px] w-[13px] text-[#ff6b78]" aria-hidden />
+          Suggested change
+        </p>
+        <p className="mt-[4px] text-[14px]">Move Client Sync to 16:30 and share with Mia?</p>
+        <div className="mt-[10px] flex gap-[8px] text-[13px] font-medium">
+          <span className="flex h-[32px] flex-1 items-center justify-center rounded-[10px] bg-accent">Confirm</span>
+          <span className="flex h-[32px] flex-1 items-center justify-center rounded-[10px] bg-white/[0.08] text-white/75">
+            Edit
+          </span>
+        </div>
+      </div>
+
+      {/* assistant bar: plain text or voice */}
       <div className="absolute inset-x-[12px] bottom-[34px] rounded-[22px] border border-white/[0.06] bg-[linear-gradient(160deg,rgba(255,77,94,0.16),rgba(30,20,24,0.9)_45%,rgba(20,20,24,0.95))] p-[12px]">
         <span className="inline-flex items-center gap-[6px] rounded-[8px] bg-white/[0.06] px-[8px] py-[4px] text-[12px] text-white/80">
-          <ShieldMark className="h-[14px] w-[14px]" />
+          <AppMark className="h-[16px] w-[16px]" sizes="32px" />
           MeetingGuard AI
         </span>
         <div className="mt-[10px] flex items-center gap-[10px] text-[14px] text-white/40">
-          <Paperclip className="h-[16px] w-[16px]" aria-hidden />
-          <span className="flex-1">Ask MeetingGuard AI…</span>
+          <span className="flex-1">Type or speak to schedule…</span>
           <span className="grid h-[36px] w-[48px] place-items-center rounded-[12px] bg-white/[0.08]">
-            <AudioLines className="h-[18px] w-[18px] text-white/80" aria-hidden />
+            <Mic className="h-[18px] w-[18px] text-white/80" aria-hidden />
           </span>
         </div>
       </div>

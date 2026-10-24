@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "MeetingGuard",
   tagline: "Plan, Alert, Join. Your AI meeting companion.",
   description:
-    "Plan, Alert, Join. MeetingGuard is your AI meeting companion — critical alerts, calendar sync, AI scheduling and one-tap joins on iPhone and Android.",
+    "MeetingGuard AI keeps your meetings in one place, syncs Google Calendar, Outlook and your phone's calendars, and rings alarms you can't miss — even when the app is closed. Create, move and share meetings by text or voice. For iPhone and Android.",
   // TODO: replace with the production domain once it is live.
   url: "https://meetingguard.app",
   // TODO: replace with the real store listings.
