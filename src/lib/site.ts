@@ -26,9 +26,6 @@ export const navLinks: NavLink[] = [
 ];
 
 export const footerLinks: NavLink[] = [
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "WhatsApp", href: "/#whatsapp" },
-  { label: "Features", href: "/#features" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },
 ];
