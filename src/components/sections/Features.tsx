@@ -95,7 +95,7 @@ function Tile({
         <div className="relative flex min-h-[150px] flex-1 items-center justify-center px-6 pt-8">{visual}</div>
         <div className="relative px-6 pt-5 pb-6">
           <h3 className="text-[1rem] font-semibold text-white">{title}</h3>
-          <p className="mt-1.5 max-w-md text-[0.86rem] leading-relaxed text-white/50">{body}</p>
+          <p className="mt-1.5 max-w-md text-[0.86rem] leading-relaxed text-white/60">{body}</p>
         </div>
       </article>
     </Reveal>
@@ -150,7 +150,7 @@ function AlarmVisual() {
   const level = useCycle(LEVELS.length, 2800, inView);
 
   return (
-    <div ref={ref} className="w-full max-w-[340px] rounded-[24px] border border-white/[0.08] bg-[#0e1524] px-6 pt-8 pb-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+    <div ref={ref} className="w-full max-w-[340px] rounded-[24px] border border-white/[0.08] bg-[#131316] px-6 pt-8 pb-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
       <div className="relative mx-auto grid h-16 w-16 place-items-center">
         <motion.span
           aria-hidden
@@ -177,7 +177,7 @@ function AlarmVisual() {
       {/* intensity: Gentle / Standard / Critical */}
       <div className="relative mt-5 grid grid-cols-3 rounded-xl bg-white/[0.05] p-1 text-[0.72rem]">
         {LEVELS.map((l, i) => (
-          <span key={l.name} className={`relative z-10 py-1.5 transition-colors duration-500 ${i === level ? "text-white" : "text-white/40"}`}>
+          <span key={l.name} className={`relative z-10 py-1.5 transition-colors duration-500 ${i === level ? "text-white" : "text-white/50"}`}>
             {i === level && (
               <motion.span
                 layoutId="alarm-level"
@@ -189,7 +189,7 @@ function AlarmVisual() {
           </span>
         ))}
       </div>
-      <p className="mt-3 h-4 text-[0.72rem] text-white/45">{LEVELS[level].note}</p>
+      <p className="mt-3 h-4 text-[0.72rem] text-white/55">{LEVELS[level].note}</p>
     </div>
   );
 }
@@ -358,7 +358,7 @@ function ShareVisual() {
           <Plus className="h-3.5 w-3.5" aria-hidden /> Invite
         </span>
       </div>
-      <span className="flex items-center gap-1.5 text-[0.72rem] text-white/40 transition-colors duration-500 group-hover:text-white/70">
+      <span className="flex items-center gap-1.5 text-[0.72rem] text-white/55 transition-colors duration-500 group-hover:text-white/75">
         <Link2 className="h-3.5 w-3.5" aria-hidden />
         zoom.us/j/84629371054
       </span>
@@ -374,7 +374,8 @@ function PlatformsVisual() {
   const lang = useCycle(TAGLINES.length, 3200, inView);
 
   return (
-    <div ref={ref} className="flex items-end gap-6">
+    <div ref={ref} className="flex flex-col items-center gap-3">
+      <div className="flex items-end gap-6">
       {["iPhone", "Android"].map((os, i) => (
         <div key={os} className="flex flex-col items-center gap-2">
           <div className={`relative h-[132px] w-[78px] border border-white/15 bg-white/[0.03] ${i ? "rounded-[14px]" : "rounded-[20px]"}`}>
@@ -402,12 +403,13 @@ function PlatformsVisual() {
           <span className="text-[0.72rem] font-medium text-white/55">{os}</span>
         </div>
       ))}
-      <div className="mb-7 flex flex-col gap-1.5">
+      </div>
+      <div className="flex gap-1.5">
         {["EN", "ES"].map((l, i) => (
           <span
             key={l}
             className={`rounded-md px-2 py-0.5 font-mono text-[0.65rem] transition-colors duration-500 ${
-              i === lang ? "bg-white/[0.1] text-white" : "text-white/35"
+              i === lang ? "bg-white/[0.1] text-white" : "text-white/50"
             }`}
           >
             {l}
@@ -422,16 +424,17 @@ function PlatformsVisual() {
 
 export function Features() {
   return (
-    <section id="features" aria-labelledby="features-title" className="relative py-20 sm:py-28">
+    <section id="features" aria-labelledby="features-title" className="section-y relative">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">Features</p>
           <h2
             id="features-title"
-            className="text-shine mt-3 text-[1.9rem] leading-[1.2] font-semibold tracking-[-0.02em] sm:text-[2.4rem]"
+            className="mt-3 text-[1.9rem] leading-[1.2] font-semibold text-balance tracking-[-0.02em] sm:text-[2.4rem]"
           >
             Everything it takes
-            <br className="hidden sm:block" /> to show up on time.
+            <br />
+            <span className="text-white/50">to show up on time.</span>
           </h2>
         </Reveal>
 

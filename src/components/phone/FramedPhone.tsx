@@ -7,7 +7,7 @@ import type { FrameSpec } from "./geometry";
  * flipped, so its bottom (opaque) end sits right at the phone's edge and the
  * reflection fades out as it goes down.
  */
-const MIRROR_REFLECT = "below 6px linear-gradient(transparent 76%, rgba(255,255,255,0.24))";
+const MIRROR_REFLECT = "below 6px linear-gradient(transparent 84%, rgba(255,255,255,0.14))";
 const MIRROR: CSSProperties = { WebkitBoxReflect: MIRROR_REFLECT };
 
 /**

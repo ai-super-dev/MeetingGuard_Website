@@ -46,7 +46,7 @@ function TiltedRings() {
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 pb-24 sm:pt-32">
+    <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-[4.25rem] lg:pt-28">
       {/* crimson glow behind the phone */}
       <div
         aria-hidden
@@ -61,11 +61,11 @@ export function Hero() {
         <ScrollDrift y={-90} scale={0.94} className="relative">
           <TiltedRings />
           <div className="rise relative" style={rise(100)}>
-            <TiltPhone className="w-[260px] sm:w-[330px] lg:w-[360px]">
+            <TiltPhone className="w-[260px] sm:w-[330px] lg:w-[clamp(290px,36vh,350px)]">
               <div className="relative">
                 <div className="[mask-image:linear-gradient(180deg,#000_78%,transparent_100%)] [-webkit-mask-image:linear-gradient(180deg,#000_78%,transparent_100%)]">
                   <PhoneMockup className="w-full">
-                    <AlertScreen />
+                    <AlertScreen time="9:45" />
                   </PhoneMockup>
                 </div>
               </div>
@@ -75,12 +75,12 @@ export function Hero() {
 
         <h1
           id="hero-title"
-          className="rise text-shine relative mt-2 text-[2.75rem] leading-[1.06] font-semibold tracking-[-0.03em] sm:text-[3.6rem] lg:text-[4rem]"
+          className="rise relative mt-2 text-[2.75rem] leading-[1.06] font-semibold tracking-[-0.03em] sm:text-[3.6rem] lg:text-[4rem]"
           style={rise(250)}
         >
           Never miss
           <br />
-          what matters.
+          <span className="text-white/50">what matters.</span>
         </h1>
         <p className="rise mt-4 text-[1.02rem] font-medium text-white/60 sm:text-[1.1rem]" style={rise(380)}>
           {siteConfig.tagline}

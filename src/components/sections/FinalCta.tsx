@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export function FinalCta() {
   return (
-    <section aria-labelledby="cta-title" className="relative overflow-x-clip pt-16 pb-28 sm:pt-20 sm:pb-36">
+    <section aria-labelledby="cta-title" className="relative overflow-x-clip pt-14 pb-28 sm:pt-[4.25rem] sm:pb-36">
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[480px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(190,20,40,0.28),transparent)] blur-2xl"
@@ -14,11 +14,13 @@ export function FinalCta() {
         <AppIcon className="h-[140px] w-[140px] sm:h-[184px] sm:w-[184px]" />
         <h2
           id="cta-title"
-          className="text-shine mt-12 text-[2.2rem] leading-[1.1] font-semibold tracking-[-0.03em] sm:text-[3rem]"
+          className="mt-12 text-[2rem] leading-[1.1] text-balance font-semibold tracking-[-0.03em] sm:text-[3rem]"
         >
-          Never miss what matters.
+          Your next meeting
+          <br />
+          <span className="text-white/50">is already covered.</span>
         </h2>
-        <p className="mt-3 font-medium text-white/55">{siteConfig.tagline}</p>
+        <p className="mt-4 font-medium text-white/60">{siteConfig.tagline}</p>
         <StoreButtons className="mt-8 justify-center" />
       </Reveal>
     </section>

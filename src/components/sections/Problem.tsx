@@ -61,7 +61,7 @@ function EventBlock({ e }: { e: CalEvent }) {
         style={{ top: y(e.start) + 1, height: height - 2, borderColor: e.color, background: `${e.color}26` }}
       >
         <p className="truncate font-medium text-white/85">{e.title}</p>
-        {height > 40 && <p className="text-white/45">{fmt(e.start)}</p>}
+        {height > 40 && <p className="text-white/55">{fmt(e.start)}</p>}
       </div>
     );
   }
@@ -117,7 +117,7 @@ function CalendarWeek() {
             key={d.name}
             className={`${dayVisibility(d.wide)} border-b border-l border-white/[0.06] py-2.5 text-center`}
           >
-            <p className={`text-[0.62rem] tracking-wide ${d.today ? "text-[#8ab4ff]" : "text-white/40"}`}>{d.name}</p>
+            <p className={`text-[0.62rem] tracking-wide ${d.today ? "text-[#8ab4ff]" : "text-white/50"}`}>{d.name}</p>
             <p
               className={`mx-auto mt-1 grid h-8 w-8 place-items-center rounded-full text-[1rem] ${
                 d.today ? "bg-[#4f8cff] font-semibold text-white" : "text-white/75"
@@ -133,7 +133,7 @@ function CalendarWeek() {
           {Array.from({ length: HOURS }, (_, i) => (
             <span
               key={i}
-              className="absolute right-1.5 -translate-y-1/2 text-[0.6rem] text-white/35"
+              className="absolute right-1.5 -translate-y-1/2 text-[0.6rem] text-white/45"
               style={{ top: i * ROW }}
             >
               {i === 0 ? "" : `${((START_HOUR + i - 1) % 12) + 1} ${START_HOUR + i < 12 ? "AM" : "PM"}`}
@@ -240,7 +240,7 @@ function LaneCard({ lane }: { lane: Lane }) {
         </span>
         <span
           className={`ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.72rem] font-medium ${
-            lane.good ? "bg-emerald-400/12 text-emerald-300" : "bg-white/[0.06] text-white/45"
+            lane.good ? "bg-emerald-400/12 text-emerald-300" : "bg-white/[0.06] text-white/55"
           }`}
         >
           {lane.good ? (
@@ -261,7 +261,7 @@ function LaneCard({ lane }: { lane: Lane }) {
         />
         {lane.steps.map(([time, text], i) => (
           <li key={time} className="relative grid grid-cols-[44px_12px_minmax(0,1fr)] items-start gap-x-3">
-            <span className={`pt-px font-mono text-[0.74rem] ${lane.good ? "text-[#ff8a95]" : "text-white/35"}`}>
+            <span className={`pt-px font-mono text-[0.74rem] ${lane.good ? "text-[#ff8a95]" : "text-white/50"}`}>
               {time}
             </span>
             <span
@@ -273,7 +273,7 @@ function LaneCard({ lane }: { lane: Lane }) {
                     : "border-white/20 bg-ink-950"
               }`}
             />
-            <span className={`text-[0.9rem] leading-snug ${lane.good ? "text-white/85" : "text-white/40"}`}>
+            <span className={`text-[0.9rem] leading-snug ${lane.good ? "text-white/85" : "text-white/55"}`}>
               {text}
             </span>
           </li>
@@ -285,19 +285,21 @@ function LaneCard({ lane }: { lane: Lane }) {
 
 export function Problem() {
   return (
-    <section aria-labelledby="problem-title" className="relative overflow-x-clip py-20 sm:py-28">
+    <section aria-labelledby="problem-title" className="section-y relative overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">Why MeetingGuard</p>
           <h2
             id="problem-title"
-            className="text-shine mt-3 text-[1.9rem] leading-[1.2] font-semibold tracking-[-0.02em] sm:text-[2.4rem]"
+            className="mt-3 text-[1.9rem] leading-[1.2] font-semibold text-balance tracking-[-0.02em] sm:text-[2.4rem]"
           >
-            Your calendar organizes time.
+            Your calendar stores time.
             <br />
-            MeetingGuard protects your commitments.
+            <span className="text-white/50">
+              MeetingGuard <span className="whitespace-nowrap">protects it.</span>
+            </span>
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[0.98rem] leading-relaxed text-white/50">
+          <p className="mx-auto mt-4 max-w-xl text-[0.98rem] leading-relaxed text-white/60">
             Calendars only store dates. When your day gets busy, passive notifications get ignored. MeetingGuard reads
             the same calendar — and makes sure you’re in the right meeting, right on time.
           </p>
@@ -308,7 +310,7 @@ export function Problem() {
           <div className="relative grid items-center gap-4 lg:translate-x-[4.5%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
               {/* reflection only when the calendar sits beside the phone; stacked (tablet/phone) it would show behind the phone */}
-              <div className="lg:[transform:perspective(800px)_rotateY(18deg)] lg:[-webkit-box-reflect:below_6px_linear-gradient(transparent_76%,rgba(255,255,255,0.24))]">
+              <div className="lg:[transform:perspective(800px)_rotateY(18deg)] lg:[-webkit-box-reflect:below_6px_linear-gradient(transparent_84%,rgba(255,255,255,0.14))]">
                 <CalendarWeek />
               </div>
             </Reveal>

@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
+import { people } from "@/lib/people";
 import {
   ArrowLeft,
   Bot,
@@ -12,7 +14,6 @@ import {
   Search,
   Sun,
   Timer,
-  User,
   Video,
 } from "lucide-react";
 import { Screen } from "./Device";
@@ -253,9 +254,14 @@ export function JoinScreen({ height }: ScreenProps) {
         </Card>
 
         <Label>1 participant</Label>
-        <Card className="flex items-center gap-[12px] px-[14px] py-[12px] text-[15px]">
-          <User className="h-[20px] w-[20px]" style={{ color: APP.muted }} aria-hidden />
-          ana@example.com
+        <Card className="flex items-center gap-[12px] px-[14px] py-[10px]">
+          <Image src={people.woman} alt="" width={36} height={36} className="h-[36px] w-[36px] rounded-full object-cover" />
+          <span className="leading-tight">
+            <span className="block text-[15px]">Ana García</span>
+            <span className="block text-[13px]" style={{ color: APP.muted }}>
+              ana.garcia@northwind.co
+            </span>
+          </span>
         </Card>
 
         <Label>Alerts</Label>

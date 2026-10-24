@@ -18,14 +18,14 @@ export function Footer() {
           <Link href="/" aria-label="MeetingGuard home">
             <Logo />
           </Link>
-          <p className="text-xs whitespace-nowrap text-white/35">© 2026 MeetingGuard. All rights reserved.</p>
+          <p className="text-xs whitespace-nowrap text-white/50">© 2026 MeetingGuard. All rights reserved.</p>
         </div>
 
         <nav aria-label="Footer">
           <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
             {footerLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="text-xs text-white/55 transition-colors hover:text-white">
+                <Link href={l.href} className="text-xs text-white/65 transition-colors hover:text-white">
                   {l.label}
                 </Link>
               </li>

@@ -18,15 +18,15 @@ export function LegalPage({ title, updated, sections }: LegalPageProps) {
         className="absolute -top-40 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(190,20,40,0.22),transparent)] blur-2xl"
       />
       <div className="container-page relative max-w-3xl pb-24">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white">
           <ArrowLeft className="h-4 w-4" /> Back to home
         </Link>
         <Reveal>
           <p className="eyebrow mt-10">MeetingGuard</p>
-          <h1 id="legal-title" className="text-shine mt-3 text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
+          <h1 id="legal-title" className="mt-3 text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-3 text-sm text-white/40">Last updated: {updated}</p>
+          <p className="mt-3 text-sm text-white/55">Last updated: {updated}</p>
         </Reveal>
         <Reveal delay={0.1}>
           <div className="surface mt-10 space-y-8 rounded-2xl p-6 sm:p-10">

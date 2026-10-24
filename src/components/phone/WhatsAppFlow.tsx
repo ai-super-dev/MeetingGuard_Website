@@ -313,17 +313,17 @@ export function WhatsAppFlow() {
         <li key={p.title} className="flex flex-col items-center text-center">
           <p className="flex items-center gap-2 font-mono text-[0.72rem] tracking-[0.06em] uppercase">
             <span className="text-[#25D366]">0{i + 1}</span>
-            <span className="text-white/40">{p.where}</span>
+            <span className="text-white/55">{p.where}</span>
           </p>
           <h3 className="mt-2 text-[1.1rem] font-semibold">{p.title}</h3>
-          <p className="mt-1.5 max-w-[320px] text-[0.86rem] leading-relaxed text-white/50">{p.body}</p>
+          <p className="mt-1.5 max-w-[320px] text-[0.86rem] leading-relaxed text-white/60">{p.body}</p>
           {/* mt-auto: phones line up even when the captions wrap to different heights */}
           <div className="relative mt-auto mb-24 pt-8">
             <div
               aria-hidden
               className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
               style={{
-                background: `radial-gradient(closest-side, ${i === 0 ? "rgba(140,150,255,0.18)" : "rgba(37,211,102,0.16)"}, transparent)`,
+                background: `radial-gradient(closest-side, ${i === 0 ? "rgba(140,150,255,0.12)" : "rgba(37,211,102,0.11)"}, transparent)`,
               }}
             />
             <FlowPhone index={i} canStart={done >= i} onDone={() => setDone((d) => Math.max(d, i + 1))}>

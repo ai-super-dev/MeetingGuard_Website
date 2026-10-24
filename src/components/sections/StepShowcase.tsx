@@ -59,8 +59,11 @@ function TrackNode({
         style={{ opacity: label }}
         className="mt-3 flex items-baseline gap-1.5 font-mono text-[0.66rem] tracking-[0.06em] whitespace-nowrap group-hover:!opacity-100 sm:gap-2 sm:text-[0.72rem]"
       >
-        <span className="text-white/45 uppercase">{step.day}</span>
+        <span className="text-white/55 uppercase">{step.day}</span>
         <span className="text-[0.85rem] text-white tabular-nums sm:text-[0.95rem]">{step.time}</span>
+      </motion.span>
+      <motion.span style={{ opacity: label }} className="mt-1 text-[0.8rem] font-medium text-white group-hover:!opacity-100">
+        {step.title}
       </motion.span>
     </button>
   );
@@ -165,7 +168,7 @@ export function StepShowcase({
         onPointerLeave={() => setHovered(false)}
       >
         {/* phone */}
-        <div className="mb-16 flex flex-col items-center md:mb-0">
+        <div className="mb-16 flex flex-col items-center md:mb-20">
           <div className="relative">
             {glows.map((g, i) => (
               <motion.div
@@ -209,14 +212,14 @@ export function StepShowcase({
             >
               <p className="flex items-baseline justify-center gap-3 font-mono text-[0.75rem] tracking-[0.06em] md:justify-start">
                 <span className="text-[#ff8a95]">0{active + 1}</span>
-                <span className="text-white/40 uppercase">
+                <span className="text-white/55 uppercase">
                   {step.day} · {step.time}
                 </span>
               </p>
-              <h3 className="text-shine mt-3 text-[2.4rem] leading-none font-semibold tracking-[-0.03em] sm:text-[3rem]">
+              <h3 className="mt-3 text-[2.4rem] leading-none font-semibold tracking-[-0.03em] sm:text-[3rem]">
                 {step.title}
               </h3>
-              <p className="mx-auto mt-5 max-w-md text-[1.02rem] leading-relaxed text-white/55 md:mx-0">{step.body}</p>
+              <p className="mx-auto mt-5 max-w-md text-[1.02rem] leading-relaxed text-white/60 md:mx-0">{step.body}</p>
               <ul className="mt-7 space-y-3 text-left">
                 {step.points.map((p, i) => (
                   <motion.li

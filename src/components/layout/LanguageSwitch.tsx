@@ -31,7 +31,7 @@ export function LanguageSwitch() {
             aria-pressed={active}
             onClick={() => setLang(code)}
             className={`relative flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[0.8rem] font-medium transition-colors duration-300 ${
-              active ? "text-white" : "text-white/50 hover:text-white/80"
+              active ? "text-white" : "text-white/55 hover:text-white/85"
             }`}
           >
             {active && (
