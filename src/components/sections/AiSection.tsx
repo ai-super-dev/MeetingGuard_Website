@@ -5,7 +5,6 @@ import {
   GoogleMeetIcon,
   OutlookIcon,
   PhoneCalendarIcon,
-  TeamsIcon,
   WhatsAppIcon,
   ZoomIcon,
 } from "@/components/icons/brand";
@@ -13,10 +12,9 @@ import { Reveal } from "@/components/motion";
 
 const INTEGRATIONS: { name: string; icon: ReactNode }[] = [
   { name: "WhatsApp", icon: <WhatsAppIcon className="h-6 w-6" /> },
-  { name: "Microsoft Teams", icon: <TeamsIcon className="h-6 w-6" /> },
   { name: "Google Meet", icon: <GoogleMeetIcon className="h-6 w-6" /> },
   { name: "Zoom", icon: <ZoomIcon className="h-6 w-6" /> },
-  { name: "Apple Calendar", icon: <PhoneCalendarIcon className="h-6 w-6" /> },
+  { name: "Phone calendar", icon: <PhoneCalendarIcon className="h-6 w-6" /> },
   { name: "Outlook", icon: <OutlookIcon className="h-6 w-6" /> },
   { name: "Google Calendar", icon: <GoogleCalendarIcon className="h-6 w-6" /> },
 ];
@@ -37,7 +35,7 @@ function IsoPanel() {
           <div className="absolute inset-0 rounded-[28px] bg-[radial-gradient(60%_50%_at_60%_40%,rgba(255,60,80,0.18),transparent_70%)]" />
           {/* prompt bar on the near edge */}
           <div className="absolute inset-x-5 bottom-5 flex h-14 items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.04] px-4 text-[0.9rem] text-white/35">
-            <span className="flex-1">Ask MeetingGuard AI…</span>
+            <span className="flex-1 truncate">Lunch with Ana tomorrow at 2 pm</span>
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-white/[0.07]">
               <AudioLines className="h-4 w-4 text-white/60" aria-hidden />
             </span>
@@ -77,9 +75,13 @@ export function AiSection() {
             Every calendar.
           </h2>
           <p className="mt-4 text-[0.98rem] leading-relaxed text-white/50">
-            Tell it what you need in plain language. MeetingGuard finds the best time across Google, Outlook and Apple
-            calendars, then sets up the call in Zoom, Meet or Teams.
+            Create, move, cancel and share meetings in plain words — in the app or over WhatsApp, by text or voice. Say
+            &ldquo;Lunch with Ana tomorrow at 2 pm&rdquo; and it handles the rest.
           </p>
+          <p className="mt-4 text-[0.98rem] leading-relaxed text-white/50">
+            It always shows you what it understood, and only saves after you confirm.
+          </p>
+          <p className="eyebrow mt-6">English &amp; Español</p>
         </Reveal>
         <IsoPanel />
       </div>

@@ -114,30 +114,3 @@ export function ScrollDrift({
     </motion.div>
   );
 }
-
-/**
- * Slides in horizontally from `from` px as the element scrolls into view and
- * settles once it reaches the middle of the screen (overview side cards).
- */
-export function ScrollSlide({
-  children,
-  className,
-  from = 120,
-  opacity = 1,
-}: {
-  children: ReactNode;
-  className?: string;
-  from?: number;
-  /** Resting opacity once settled. */
-  opacity?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
-  const x = useTransform(scrollYProgress, [0, 1], [from, 0]);
-  const o = useTransform(scrollYProgress, [0, 1], [0, opacity]);
-  return (
-    <motion.div ref={ref} className={className} style={{ x, opacity: o }}>
-      {children}
-    </motion.div>
-  );
-}

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { BellRing, RefreshCw, Sparkles, Video } from "lucide-react";
 import { ScrollDrift, TiltPhone } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
 import { PhoneMockup } from "@/components/phone/PhoneMockup";
@@ -6,6 +7,13 @@ import { StoreButtons } from "@/components/ui/StoreButtons";
 import { siteConfig } from "@/lib/site";
 
 const rise = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
+
+const PILLS = [
+  { label: "AI Scheduling", icon: Sparkles },
+  { label: "Smart Alerts", icon: BellRing },
+  { label: "Calendar Sync", icon: RefreshCw },
+  { label: "Instant Join", icon: Video },
+];
 
 /** Centre of the phone body inside phone_frame.png (mean of the screen corners). */
 const PHONE_CENTER = { left: "49.3%", top: "47.5%" };
@@ -76,7 +84,18 @@ export function Hero() {
         <p className="rise mt-4 text-[1.02rem] font-medium text-white/60 sm:text-[1.1rem]" style={rise(380)}>
           {siteConfig.tagline}
         </p>
-        <div className="rise mt-7" style={rise(500)}>
+        <ul className="rise mt-6 flex max-w-md flex-wrap justify-center gap-2" style={rise(440)}>
+          {PILLS.map((p) => (
+            <li
+              key={p.label}
+              className="flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[0.78rem] text-white/70"
+            >
+              <p.icon className="h-3.5 w-3.5 text-[#ff8a95]" aria-hidden />
+              {p.label}
+            </li>
+          ))}
+        </ul>
+        <div className="rise mt-7" style={rise(540)}>
           <StoreButtons className="justify-center" />
         </div>
         <p className="rise eyebrow mt-6" style={rise(620)}>

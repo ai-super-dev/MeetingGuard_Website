@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { ZoomIcon } from "@/components/icons/brand";
 import { icons } from "@/lib/assets";
-import { StatusBar } from "./HomeScreen";
+import { StatusBar } from "./Device";
 import { SCREEN_H, SCREEN_W } from "./geometry";
 
-/** One ring of the alarm: the bell shakes and the phone buzzes on this beat. */
-export const RING = "2.4s";
+/** One ring of the alarm: the bell shakes, then rests. */
+const RING = "2.4s";
 
 /**
  * The 15-minute meeting alarm, laid out at SCREEN_W×SCREEN_H CSS px and

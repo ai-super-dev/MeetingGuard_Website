@@ -13,15 +13,16 @@ export const siteConfig = {
 export type NavLink = { label: string; href: string };
 
 export const navLinks: NavLink[] = [
-  { label: "Overview", href: "/#overview" },
+  { label: "How it works", href: "/#how-it-works" },
   { label: "AI", href: "/#ai" },
+  { label: "WhatsApp", href: "/#whatsapp" },
   { label: "Features", href: "/#features" },
-  { label: "Privacy", href: "/privacy" },
 ];
 
 export const footerLinks: NavLink[] = [
-  { label: "Overview", href: "/#overview" },
+  { label: "How it works", href: "/#how-it-works" },
   { label: "AI", href: "/#ai" },
+  { label: "WhatsApp", href: "/#whatsapp" },
   { label: "Features", href: "/#features" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },

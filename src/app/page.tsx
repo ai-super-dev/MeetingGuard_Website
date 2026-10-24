@@ -2,7 +2,9 @@ import { AiSection } from "@/components/sections/AiSection";
 import { Features } from "@/components/sections/Features";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Hero } from "@/components/sections/Hero";
-import { Overview } from "@/components/sections/Overview";
+import { HowItWorks } from "@/components/sections/HowItWorks";
+import { Problem } from "@/components/sections/Problem";
+import { WhatsAppSection } from "@/components/sections/WhatsAppSection";
 import { QrDownload } from "@/components/ui/QrDownload";
 import { siteConfig } from "@/lib/site";
 
@@ -25,8 +27,10 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <Hero />
-      <Overview />
+      <Problem />
+      <HowItWorks />
       <AiSection />
+      <WhatsAppSection />
       <Features />
       <FinalCta />
       <QrDownload />

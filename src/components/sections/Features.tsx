@@ -6,9 +6,10 @@ import {
   Clock,
   Copy,
   Link2,
-  MessageSquare,
   Plus,
+  Share2,
   Video,
+  Volume2,
   X,
 } from "lucide-react";
 import {
@@ -16,11 +17,10 @@ import {
   GoogleMeetIcon,
   OutlookIcon,
   PhoneCalendarIcon,
-  TeamsIcon,
   ZoomIcon,
 } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
-import { StatusBar } from "@/components/phone/HomeScreen";
+import { StatusBar } from "@/components/phone/Device";
 
 function FeatureCard({
   title,
@@ -53,7 +53,7 @@ function FeatureCard({
 
 function AlertVisual() {
   return (
-    <div className="mx-auto h-[250px] w-full max-w-[270px] rounded-t-[36px] border border-b-0 border-white/10 bg-[#0b0b0e] px-5 pt-3 [mask-image:linear-gradient(180deg,#000_70%,transparent)]">
+    <div className="mx-auto h-[318px] w-full max-w-[270px] rounded-t-[36px] border border-b-0 border-white/10 bg-[#0b0b0e] px-5 pt-3 [mask-image:linear-gradient(180deg,#000_88%,transparent)]">
       <StatusBar className="px-3 text-[13px]" />
       <div className="mt-5 flex flex-col items-center text-center">
         <span className="relative grid h-16 w-16 place-items-center">
@@ -66,6 +66,10 @@ function AlertVisual() {
         </span>
         <p className="mt-3 text-[1rem] font-semibold">Investor Call</p>
         <p className="text-[0.78rem] text-white/50">starts in 15 minutes</p>
+        <p className="mt-2 flex items-center gap-1.5 text-[0.7rem] text-white/40">
+          <Volume2 className="h-3.5 w-3.5" aria-hidden />
+          &ldquo;Investor call starts in 15 minutes&rdquo;
+        </p>
         <div className="mt-4 flex w-full gap-2">
           <span className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl bg-accent text-[0.78rem] font-semibold">
             <Video className="h-3.5 w-3.5" aria-hidden />
@@ -76,6 +80,11 @@ function AlertVisual() {
             Snooze
           </span>
         </div>
+        <div className="mt-3 grid w-full grid-cols-3 rounded-xl bg-white/[0.05] p-1 text-[0.7rem]">
+          <span className="py-1.5 text-white/45">Gentle</span>
+          <span className="py-1.5 text-white/45">Standard</span>
+          <span className="rounded-lg bg-white/[0.1] py-1.5 font-semibold text-white">Critical</span>
+        </div>
       </div>
     </div>
   );
@@ -85,13 +94,13 @@ function CalendarsVisual() {
   const rows = [
     { name: "Google Calendar", icon: <GoogleCalendarIcon className="h-5 w-5" /> },
     { name: "Outlook", icon: <OutlookIcon className="h-5 w-5" /> },
-    { name: "Apple Calendar", icon: <PhoneCalendarIcon className="h-5 w-5" /> },
+    { name: "Phone calendar", icon: <PhoneCalendarIcon className="h-5 w-5" /> },
   ];
   return (
     <div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-[22px] border border-white/10 bg-[#0b0b0e]">
       <div className="relative h-[86px] bg-[radial-gradient(80%_120%_at_80%_0%,rgba(255,60,80,0.22),transparent_70%)] px-4 pt-4">
         <p className="text-[0.75rem] text-white/45">Connected calendars</p>
-        <p className="mt-1 text-[1.05rem] font-semibold">3 calendars · 24 events today</p>
+        <p className="mt-1 text-[1.05rem] font-semibold">Two-way sync · up to date</p>
       </div>
       <ul className="divide-y divide-white/[0.06]">
         {rows.map((r) => (
@@ -116,7 +125,7 @@ function VoiceVisual() {
   return (
     <div className="mx-auto w-full max-w-[300px]">
       <p className="px-2 text-[0.82rem] leading-relaxed text-white/25">
-        Schedule a design review with Mia tomorrow at 2pm and remind me ten minutes before…
+        Lunch with Ana tomorrow at 2 pm, and remind me ten minutes before…
       </p>
       <div className="mt-4 flex h-12 items-center gap-3 rounded-2xl border border-accent/30 bg-[linear-gradient(90deg,rgba(255,77,94,0.25),rgba(255,77,94,0.1))] px-4">
         <span className="flex-1 text-[0.85rem] text-white/70">Listening…</span>
@@ -140,11 +149,10 @@ function JoinVisual() {
   const actions = [
     { label: "Join with Zoom", icon: <ZoomIcon className="h-4 w-4" /> },
     { label: "Join with Google Meet", icon: <GoogleMeetIcon className="h-4 w-4" /> },
-    { label: "Join with Microsoft Teams", icon: <TeamsIcon className="h-4 w-4" /> },
     { label: "Copy meeting link", icon: <Copy className="h-4 w-4 text-white/60" /> },
     { label: "Snooze 5 minutes", icon: <BellOff className="h-4 w-4 text-white/60" /> },
     { label: "Add to calendar", icon: <CalendarPlus className="h-4 w-4 text-white/60" /> },
-    { label: "Message attendees", icon: <MessageSquare className="h-4 w-4 text-white/60" /> },
+    { label: "Share meeting", icon: <Share2 className="h-4 w-4 text-white/60" /> },
   ];
   return (
     <div className="h-[330px] [perspective:1200px]">
@@ -188,38 +196,38 @@ export function Features() {
         <div className="mx-auto mt-14 grid max-w-[920px] grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-[repeat(2,minmax(0,1fr))]">
           <div className="flex flex-col gap-5">
             <FeatureCard
-              title="Critical Alerts"
-              body="Full-screen alerts for the meetings you can't miss, with smart timing based on the rest of your day."
+              title="Alarms you can't miss"
+              body="Full-screen alarms with sound and voice readout, gentle reminders, snooze and follow-ups — even when the app is closed. You choose the intensity for every meeting."
               visual={<AlertVisual />}
             />
             <FeatureCard
-              title="Voice Scheduling"
-              body="Just say what you need. MeetingGuard turns it into a meeting, with the right people and the right time."
+              title="Speak or type"
+              body="Tell the assistant what you need, in the app or by WhatsApp. It shows what it understood and only saves after you confirm."
               visual={<VoiceVisual />}
               delay={0.05}
             />
             <FeatureCard
-              title="iPhone ↔ Android"
-              body="Your alerts, calendars and AI chats stay in sync on every phone you use."
+              title="iPhone & Android · English & Español"
+              body="The same assistant and alarms on every phone, in English and Spanish."
               delay={0.1}
             />
           </div>
           <div className="flex flex-col gap-5">
             <FeatureCard
-              title="Calendar Sync"
-              body="Google, Outlook and Apple calendars in one unified view, updated in real time."
+              title="Two-way calendar sync"
+              body="Google Calendar, Outlook and the calendars on your phone. Meetings you create in MeetingGuard appear everywhere, with invitations and video-call links included."
               visual={<CalendarsVisual />}
               delay={0.08}
             />
             <FeatureCard
-              title="One-Tap Join"
-              body="Zoom, Google Meet or Teams — join straight from the alert. No more hunting for links."
+              title="Instant join"
+              body="One tap into the Zoom or Google Meet call — the link is generated for you. No more hunting for links."
               visual={<JoinVisual />}
               delay={0.12}
             />
             <FeatureCard
-              title="Private by design"
-              body="Calendar access uses each provider's official, revocable permissions. We never sell your data."
+              title="Share and invite"
+              body="Share any meeting in a tap. Invitations and the call link go to everyone, so the whole team lands in the same room."
               delay={0.16}
             />
           </div>
