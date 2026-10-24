@@ -45,27 +45,11 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-[#00081a]">
       <HeroStage background={<HeroBackground />} scene={<HeroScene />}>
-        <div className="px-5 pt-28 sm:px-8 lg:absolute lg:top-[calc(var(--u)*12)] lg:left-[calc(var(--u)*7.3)] lg:w-[calc(var(--u)*42)] lg:p-0">
-          {/* badge */}
-          <p
-            className="hero-rise inline-flex h-9 items-center gap-2 rounded-full border border-[#3a5fc4]/45 bg-[#0a1634]/70 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-sm lg:h-[calc(var(--u)*2.4)] lg:gap-[calc(var(--u)*0.85)] lg:pr-[calc(var(--u)*1.2)] lg:pl-[calc(var(--u)*1.05)]"
-            style={rise(150)}
-          >
-            <Image
-              src={icons.lightning}
-              alt=""
-              sizes="40px"
-              className="h-4 w-4 object-contain lg:h-[calc(var(--u)*1.3)] lg:w-[calc(var(--u)*1.3)]"
-            />
-            <span className="hero-badge-text text-[0.72rem] font-semibold tracking-[0.2em] uppercase lg:text-[max(11px,calc(var(--u)*0.93))]">
-              Your AI meeting assistant
-            </span>
-          </p>
-
+        <div className="px-5 pt-28 sm:px-8 lg:absolute lg:top-[calc(var(--u)*14)] lg:left-[calc(var(--u)*7.3)] lg:w-[calc(var(--u)*42)] lg:p-0">
           {/* headline */}
           <h1
             id="hero-title"
-            className="mt-5 text-[2.7rem] leading-[0.95] min-[400px]:text-[2.95rem] font-extrabold tracking-[-0.015em] sm:text-[4.6rem] lg:mt-[calc(var(--u)*1.25)] lg:text-[calc(var(--u)*5.75)]"
+            className="text-[2.7rem] leading-[0.95] min-[400px]:text-[2.95rem] font-extrabold tracking-[-0.015em] sm:text-[4.6rem] lg:text-[calc(var(--u)*5.75)]"
           >
             <span className="hero-rise block text-[#f8f9fa]" style={rise(250)}>
               Never miss

@@ -9,7 +9,6 @@ import appStoreIcon from "../../public/icons/app_store_icon.png";
 import calendarIcon from "../../public/icons/calendar_icon.png";
 import calendarSyncIcon from "../../public/icons/calendar_sync_icon.png";
 import googlePlayIcon from "../../public/icons/google_play_store_icon.png";
-import lightningIcon from "../../public/icons/lightning_icon.png";
 import meetingIcon from "../../public/icons/meeting_icon.png";
 import phoneBellIcon from "../../public/icons/phone_bell_icon.png";
 import robotIcon from "../../public/icons/robot_icon.png";
@@ -26,7 +25,6 @@ export const icons = {
   calendar: calendarIcon,
   calendarSync: calendarSyncIcon,
   googlePlay: googlePlayIcon,
-  lightning: lightningIcon,
   meeting: meetingIcon,
   phoneBell: phoneBellIcon,
   robot: robotIcon,
