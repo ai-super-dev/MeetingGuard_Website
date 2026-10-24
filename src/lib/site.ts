@@ -10,6 +10,12 @@ export const siteConfig = {
   playStoreUrl: "#",
   // The MeetingGuard WhatsApp bot (number shown in the app's WhatsApp linking screen).
   whatsappNumberRaw: "+447403693109",
+  // Support contact (from the original site's footer).
+  contactPhone: "+447400752170",
+  contactPhoneLabel: "+44 7400 752170",
+  contactEmail: "hello@meetingguard.ai",
+  // TODO: endpoint that accepts { email } for update subscriptions; the form says "opening soon" until it's set.
+  newsletterEndpoint: "",
 } as const;
 
 export type NavLink = { label: string; href: string };
@@ -28,8 +34,10 @@ export const footerLinks: NavLink[] = [
 ];
 
 export const socialLinks = [
+  { label: "Facebook", href: "#", icon: "facebook" },
+  { label: "Instagram", href: "#", icon: "instagram" },
+  { label: "TikTok", href: "#", icon: "tiktok" },
   { label: "X", href: "#", icon: "x" },
   { label: "LinkedIn", href: "#", icon: "linkedin" },
   { label: "YouTube", href: "#", icon: "youtube" },
-  { label: "Instagram", href: "#", icon: "instagram" },
 ] as const;
