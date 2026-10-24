@@ -29,75 +29,13 @@ export function sceneSquare(cx: number, cy: number, size: number): CSSProperties
 export const FRAME_W = 971;
 export const FRAME_H = 1619;
 
-/* ---------- the shared tilted axis ---------- */
-
 /**
- * The phone's long axis leans 11.9° clockwise: it runs through the centres of
- * the screen opening's top (621, 96) and bottom (332, 1466) edges in
- * phone_border.png. The phone moves along this axis, and the hole, galaxy
- * and wave beneath it are discs perpendicular to it — so all of them share
- * one axis and the phone dives straight into the hole's centre.
+ * Where the phone sits in the scene (scene px); height follows the PNG's
+ * aspect. Its hover range stays inside the 941px scene, so the whole phone
+ * is visible at every breakpoint.
  */
-export const AXIS_DEG = 11.9;
-const AX = Math.sin((AXIS_DEG * Math.PI) / 180); // x step per unit along the axis (downwards = −AX)
-const AY = Math.cos((AXIS_DEG * Math.PI) / 180); // y step per unit along the axis (downwards = +AY)
-
-/** Centre of the hole (scene px) and its radius; `flat` is the disc's apparent height/width. */
-export const HOLE = { cx: 1110, cy: 760, r: 360, flat: 0.3 };
-
-/** Where the phone's axis leaves the bottom of the frame (frame px). */
-const FRAME_AXIS_BOTTOM = [306, 1590] as const;
-
-/** Phone width in scene px; height follows the PNG's aspect. */
-const PHONE_W = 400;
-export const PHONE_H = (PHONE_W * FRAME_H) / FRAME_W;
-const PHONE_SCALE = PHONE_W / FRAME_W;
-/** Gap between the phone's bottom and the hole's centre at the top of the hover. */
-const REST_GAP = 20;
-
-/** Phone box positioned so its axis passes exactly through the hole's centre. */
-export const PHONE = {
-  x: HOLE.cx + REST_GAP * AX - FRAME_AXIS_BOTTOM[0] * PHONE_SCALE,
-  y: HOLE.cy - REST_GAP * AY - FRAME_AXIS_BOTTOM[1] * PHONE_SCALE,
-  w: PHONE_W,
-};
-
-/** Offset (as % of the phone box) for sinking `px` scene px down the axis. */
-function alongAxis(px: number) {
-  return { x: `${((-AX * px) / PHONE_W) * 100}%`, y: `${((AY * px) / PHONE_H) * 100}%` };
-}
-/** How deep the phone dives into the hole each cycle, and where it emerges from on load. */
-export const DIVE = alongAxis(84);
-export const EMERGE = alongAxis(330);
-
-/**
- * The phone sits in a fixed box masked along the hole's surface (the line
- * through the hole centre, perpendicular to the axis), so whatever goes
- * below the surface disappears into the hole.
- */
-export const PORTAL_BOX = { x: 880, y: 40, w: 600, h: 900 };
-export const PORTAL_MASK = (() => {
-  const a = (AXIS_DEG * Math.PI) / 180;
-  const { w, h } = PORTAL_BOX;
-  const len = Math.abs(w * Math.sin(a)) + Math.abs(h * Math.cos(a));
-  const cx = PORTAL_BOX.x + w / 2;
-  const cy = PORTAL_BOX.y + h / 2;
-  // CSS gradient line runs bottom-left → top-right through the box centre
-  const along = (HOLE.cx - cx) * Math.sin(a) - (HOLE.cy - cy) * Math.cos(a);
-  const p = (0.5 + along / len) * 100;
-  return `linear-gradient(${AXIS_DEG}deg, transparent ${p.toFixed(2)}%, #000 ${(p + 0.8).toFixed(2)}%)`;
-})();
-
-/**
- * Base wave: wave_effect.png's ring spans ~92% of its width, is centred at
- * 53% of its height and is drawn very flat (~0.143), so it is stretched to
- * the hole's flatness and rotated onto the axis.
- */
-export const WAVE = { w: 860, stretch: HOLE.flat / 0.143 };
-export const WAVE_H = (WAVE.w * SCENE_H) / SCENE_W;
-
-/** One clock for the dive, wave and galaxy so they move together. */
-export const HOVER = "6s ease-in-out 1.6s infinite both";
+export const PHONE = { x: 985, y: 120, w: 400 };
+export const PHONE_H = (PHONE.w * FRAME_H) / FRAME_W;
 
 /**
  * Corners of the transparent screen opening inside phone_border.png, found by

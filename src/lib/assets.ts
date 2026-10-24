@@ -2,7 +2,6 @@
 // AVIF/WebP versions instead of the 1–2 MB source PNGs in /public.
 import heroBackground from "../../public/images/Neon MeetingGuard Lock Screen.png";
 import phoneBorder from "../../public/images/phone_border.png";
-import waveEffect from "../../public/images/wave_effect.png";
 import aiAssistantIcon from "../../public/icons/ai_assistant_icon.png";
 import aiSchedulingIcon from "../../public/icons/ai_scheduling_icon.png";
 import appIcon from "../../public/icons/app_icon.png";
@@ -17,7 +16,7 @@ import robotIcon from "../../public/icons/robot_icon.png";
 import smartAlertIcon from "../../public/icons/smart_alert_icon.png";
 import whatsappIcon from "../../public/icons/whatsapp_icon.png";
 
-export const images = { heroBackground, phoneBorder, waveEffect };
+export const images = { heroBackground, phoneBorder };
 
 export const icons = {
   aiAssistant: aiAssistantIcon,

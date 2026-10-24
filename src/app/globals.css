@@ -293,63 +293,27 @@ body {
   }
 }
 
-/*
- * Dive cycle (HOVER clock in geometry.ts): at 0%/100% the phone is up out of
- * the hole and the wave/galaxy are at their largest; at 50% it has sunk into
- * the hole and they have contracted. --dive-x/y point down the phone's axis.
- */
-@keyframes hero-dive {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(var(--dive-x), var(--dive-y));
-  }
-}
-
-@keyframes hero-wave-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-  50% {
-    opacity: 0.75;
-    transform: scale(0.9);
-  }
-}
-
-@keyframes hero-hole-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1.03);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(0.96);
-  }
-}
-
-/* phone rises out of the hole on load */
-@keyframes hero-emerge {
+@keyframes hero-phone-in {
   from {
     opacity: 0;
-    transform: translate(var(--emerge-x), var(--emerge-y));
-  }
-  35% {
-    opacity: 1;
+    transform: translateY(12%) rotate(4deg) scale(0.94);
+    filter: blur(12px);
   }
   to {
     opacity: 1;
     transform: none;
+    filter: none;
   }
 }
 
-@keyframes hero-spin {
-  to {
-    transform: rotate(-360deg);
+/* gentle idle float of the phone */
+@keyframes hero-hover {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.6%);
   }
 }
 
