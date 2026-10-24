@@ -317,7 +317,8 @@ export function WhatsAppFlow() {
           </p>
           <h3 className="mt-2 text-[1.1rem] font-semibold">{p.title}</h3>
           <p className="mt-1.5 max-w-[320px] text-[0.86rem] leading-relaxed text-white/50">{p.body}</p>
-          <div className="relative mt-8 mb-24">
+          {/* mt-auto: phones line up even when the captions wrap to different heights */}
+          <div className="relative mt-auto mb-24 pt-8">
             <div
               aria-hidden
               className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
