@@ -71,18 +71,18 @@ export const SILVER_FRAME: FrameSpec = {
 /** phone-purple_cal.png — the purple phone beside the calendar. */
 export const CAL_FRAME: FrameSpec = {
   src: images.phoneCal,
-  w: 1650,
-  h: 1920,
-  screenH: 930,
-  body: { x: 396, y: 196, w: 868, h: 1502 },
+  w: 1086,
+  h: 1448,
+  screenH: 905,
+  body: { x: 129, y: 38, w: 794, h: 1384 },
   matrix: quadMatrix(
     [
-      [643.4, 231.8],
-      [1210.9, 227.6],
-      [1012.9, 1637.5],
-      [415.8, 1588.2],
+      [353.8, 81.1],
+      [873.0, 67.1],
+      [694.1, 1359.8],
+      [152.3, 1323.1],
     ],
-    930,
+    905,
   ),
 };
 
