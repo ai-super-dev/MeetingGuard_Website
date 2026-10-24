@@ -4,9 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { Menu, X } from "lucide-react";
-import Image from "next/image";
 import { Logo } from "@/components/ui/Logo";
-import { icons } from "@/lib/assets";
+import { AppleIcon } from "@/components/icons/brand";
 import { navLinks, siteConfig } from "@/lib/site";
 
 /** Floating, rounded navigation bar that firms up once the page scrolls. */
@@ -47,7 +46,7 @@ export function Header() {
               href={siteConfig.appStoreUrl}
               className="hidden h-9 items-center gap-2 rounded-lg bg-[#f4f4f5] px-3.5 text-[0.85rem] font-medium text-[#0b0b0e] transition hover:bg-white sm:inline-flex"
             >
-              <Image src={icons.appStore} alt="" sizes="40px" className="-mx-0.5 h-5 w-5 object-contain" />
+              <AppleIcon className="h-4 w-4" />
               Download
             </a>
             <button
@@ -90,7 +89,7 @@ export function Header() {
                     href={siteConfig.appStoreUrl}
                     className="flex h-11 items-center justify-center gap-2 rounded-lg bg-[#f4f4f5] font-medium text-[#0b0b0e]"
                   >
-                    <Image src={icons.appStore} alt="" sizes="40px" className="-mx-0.5 h-5 w-5 object-contain" />
+                    <AppleIcon className="h-4 w-4" />
                     Download
                   </a>
                 </li>
