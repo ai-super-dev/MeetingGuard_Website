@@ -18,12 +18,15 @@ export function FramedPhone({
   frame,
   bodyHeight,
   mirror = false,
+  rotate = 0,
   children,
 }: {
   frame: FrameSpec;
   bodyHeight: number;
   /** Reflect the phone on a glossy floor beneath it. */
   mirror?: boolean;
+  /** Extra clockwise turn in degrees, around the phone body's centre. */
+  rotate?: number;
   children: ReactNode;
 }) {
   const body = frame.body ?? { x: 0, y: 0, w: frame.w, h: frame.h };
@@ -33,7 +36,18 @@ export function FramedPhone({
       <PhoneMockup
         frame={frame}
         sizes={`${Math.ceil(frame.w * k)}px`}
-        style={{ position: "absolute", left: -body.x * k, top: -body.y * k, width: frame.w * k }}
+        style={{
+          position: "absolute",
+          left: -body.x * k,
+          top: -body.y * k,
+          width: frame.w * k,
+          ...(rotate
+            ? {
+                transform: `rotate(${rotate}deg)`,
+                transformOrigin: `${(body.x + body.w / 2) * k}px ${(body.y + body.h / 2) * k}px`,
+              }
+            : null),
+        }}
       >
         {children}
       </PhoneMockup>
