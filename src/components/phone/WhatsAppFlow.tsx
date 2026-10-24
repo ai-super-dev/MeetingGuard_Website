@@ -255,7 +255,7 @@ const PHONES: { where: string; title: string; body: string }[] = [
   {
     where: "In MeetingGuard",
     title: "Generate a code",
-    body: "Tap Generate code, then copy it or open WhatsApp. It works once and expires after a few minutes.",
+    body: "Tap Generate code, then copy it or open WhatsApp. One-time use, expires in minutes.",
   },
   {
     where: "In WhatsApp",
