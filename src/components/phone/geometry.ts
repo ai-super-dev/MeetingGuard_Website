@@ -86,27 +86,11 @@ export const BLUE_FRAME: FrameSpec = {
   ),
 };
 
-/** phone_purple.png — "How it works" step 1 (Plan). */
-export const PURPLE_FRAME: FrameSpec = {
-  src: images.phonePurple,
-  w: 1650,
-  h: 1920,
-  screenH: 940,
-  body: { x: 389, y: 127, w: 900, h: 1602 },
-  matrix: quadMatrix(
-    [
-      [406.2, 337.2],
-      [937.3, 139.0],
-      [1233.2, 1532.0],
-      [654.8, 1690.6],
-    ],
-    940,
-  ),
-};
-
-/** phone_red.png — "How it works" step 2 (Alert). */
-export const RED_FRAME: FrameSpec = {
-  src: images.phoneRed,
+/**
+ * phone_purple.png, phone_red.png and phone_teal.png are the same phone model
+ * in the same pose (different colours), so they share one screen quad.
+ */
+const STEP_PHONE = {
   w: 1650,
   h: 1920,
   screenH: 936,
@@ -122,25 +106,14 @@ export const RED_FRAME: FrameSpec = {
   ),
 };
 
-/** phone_teal.png — "How it works" step 3 (Join); same model as the blue phone. */
-export const TEAL_FRAME: FrameSpec = {
-  src: images.phoneTeal,
-  w: 1650,
-  h: 1920,
-  screenH: 930,
-  body: { x: 396, y: 196, w: 868, h: 1502 },
-  matrix: quadMatrix(
-    [
-      [643.4, 231.8],
-      [1210.9, 227.6],
-      [1012.9, 1637.5],
-      [415.8, 1588.2],
-    ],
-    930,
-  ),
-};
+/** "How it works" step 1 (Plan). */
+export const PURPLE_FRAME: FrameSpec = { src: images.phonePurple, ...STEP_PHONE };
+/** "How it works" step 2 (Alert). */
+export const RED_FRAME: FrameSpec = { src: images.phoneRed, ...STEP_PHONE };
+/** "How it works" step 3 (Join). */
+export const TEAL_FRAME: FrameSpec = { src: images.phoneTeal, ...STEP_PHONE };
 
-/** phone_frame_str.png — front-facing silver phone (WhatsApp demo). */
+/** phone_frame_str.png — front-facing silver phone (WhatsApp flow). */
 export const STRAIGHT_FRAME: FrameSpec = {
   src: images.phoneFrameStraight,
   w: 1024,
