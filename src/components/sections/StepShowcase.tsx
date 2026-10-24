@@ -21,8 +21,10 @@ export type Step = {
 };
 
 /** Seconds the timeline takes to flow from one step to the next. */
-const DWELL = 6;
+const DWELL = 5;
 const ease = [0.22, 1, 0.36, 1] as const;
+/** Slow in, slow out — for the crossfades between steps. */
+const SOFT = [0.45, 0, 0.25, 1] as const;
 
 function TrackNode({
   step,
@@ -170,7 +172,7 @@ export function StepShowcase({
                 style={{ background: `radial-gradient(closest-side, ${g}, transparent)` }}
                 initial={false}
                 animate={{ opacity: i === active ? 1 : 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 1.4, ease: SOFT }}
               />
             ))}
             {/* all three screens stay mounted; only the active one is shown */}
@@ -183,9 +185,9 @@ export function StepShowcase({
                   animate={
                     i === active
                       ? { opacity: 1, scale: 1, x: 0, filter: "blur(0px)" }
-                      : { opacity: 0, scale: 0.96, x: i < active ? -24 : 24, filter: "blur(6px)" }
+                      : { opacity: 0, scale: 0.98, x: i < active ? -10 : 10, filter: "blur(4px)" }
                   }
-                  transition={{ duration: 0.7, ease }}
+                  transition={{ duration: 1.4, ease: SOFT }}
                   style={{ pointerEvents: i === active ? "auto" : "none" }}
                   aria-hidden={i !== active}
                 >
@@ -202,10 +204,9 @@ export function StepShowcase({
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
-              initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -12, filter: "blur(6px)" }}
-              transition={{ duration: 0.45, ease }}
+              initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: SOFT } }}
+              exit={{ opacity: 0, y: -6, filter: "blur(4px)", transition: { duration: 0.55, ease: SOFT } }}
             >
               <p className="flex items-baseline justify-center gap-3 font-mono text-[0.75rem] tracking-[0.06em] md:justify-start">
                 <span className="text-[#ff8a95]">0{active + 1}</span>
@@ -221,9 +222,9 @@ export function StepShowcase({
                 {step.points.map((p, i) => (
                   <motion.li
                     key={p}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.15 + i * 0.08 }}
+                    transition={{ duration: 0.7, delay: 0.25 + i * 0.12, ease: SOFT }}
                     className="mx-auto flex max-w-md items-start gap-3 text-[0.95rem] text-white/80 md:mx-0"
                   >
                     <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent shadow-[0_0_8px_rgba(255,77,94,0.8)]" />

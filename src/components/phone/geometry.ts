@@ -122,20 +122,20 @@ export const RED_FRAME: FrameSpec = {
   ),
 };
 
-/** phone_teal.png — "How it works" step 3 (Join). */
+/** phone_teal.png — "How it works" step 3 (Join); same model as the blue phone. */
 export const TEAL_FRAME: FrameSpec = {
   src: images.phoneTeal,
   w: 1650,
   h: 1920,
-  screenH: 936,
-  body: { x: 301, y: 194, w: 1070, h: 1516 },
+  screenH: 930,
+  body: { x: 396, y: 196, w: 868, h: 1502 },
   matrix: quadMatrix(
     [
-      [772.2, 211.7],
-      [1332.4, 304.7],
-      [892.5, 1659.9],
-      [312.9, 1508.0],
+      [643.4, 231.8],
+      [1210.9, 227.6],
+      [1012.9, 1637.5],
+      [415.8, 1588.2],
     ],
-    936,
+    930,
   ),
 };
