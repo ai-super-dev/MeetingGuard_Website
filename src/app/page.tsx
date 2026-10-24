@@ -1,14 +1,9 @@
-import { CallToAction } from "@/components/sections/CallToAction";
-import {
-  AISchedulingSection,
-  CalendarSyncSection,
-  CriticalAlertsSection,
-  SmartRemindersSection,
-} from "@/components/sections/Features";
+import { AiSection } from "@/components/sections/AiSection";
+import { Features } from "@/components/sections/Features";
+import { FinalCta } from "@/components/sections/FinalCta";
 import { Hero } from "@/components/sections/Hero";
-import { HowItWorks } from "@/components/sections/HowItWorks";
-import { Integrations } from "@/components/sections/Integrations";
-import { Reviews } from "@/components/sections/Reviews";
+import { Overview } from "@/components/sections/Overview";
+import { QrDownload } from "@/components/ui/QrDownload";
 import { siteConfig } from "@/lib/site";
 
 const jsonLd = {
@@ -20,7 +15,6 @@ const jsonLd = {
   description: siteConfig.description,
   url: siteConfig.url,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", bestRating: "5", ratingCount: "10000" },
 };
 
 export default function Home() {
@@ -31,14 +25,11 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <Hero />
-      <CalendarSyncSection />
-      <CriticalAlertsSection />
-      <AISchedulingSection />
-      <SmartRemindersSection />
-      <HowItWorks />
-      <Integrations />
-      <Reviews />
-      <CallToAction />
+      <Overview />
+      <AiSection />
+      <Features />
+      <FinalCta />
+      <QrDownload />
     </>
   );
 }

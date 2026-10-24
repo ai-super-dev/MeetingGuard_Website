@@ -2,38 +2,20 @@
 
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-outfit), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
-  /* Night-sky palette sampled from the design */
-  --color-night-950: #02051a;
-  --color-night-900: #040a26;
-  --color-night-800: #071238;
-  --color-night-700: #0b1a4d;
-  --color-night-600: #12256b;
+  /* Near-black surfaces */
+  --color-ink-950: #07070a;
+  --color-ink-900: #0b0b0e;
+  --color-ink-850: #0f0f13;
+  --color-ink-800: #141418;
+  --color-ink-700: #1c1c21;
 
-  --color-neon-blue: #2f7dff;
-  --color-neon-azure: #4aa3ff;
-  --color-neon-cyan: #22d8f5;
-  --color-neon-violet: #8b5cf6;
-  --color-neon-purple: #b45cff;
-  --color-neon-pink: #f07ce8;
-  --color-neon-red: #ff3355;
+  /* The single brand accent — crimson, the colour of a critical alert */
+  --color-accent: #ff4d5e;
+  --color-accent-deep: #c4162b;
 
   --animate-twinkle: twinkle 4s ease-in-out infinite;
-  --animate-flow: flow 2.4s linear infinite;
-  --animate-rise: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-
-  /* CSS-only entrance so above-the-fold content paints before hydration */
-  @keyframes rise {
-    from {
-      opacity: 0;
-      transform: translateY(28px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
 
   @keyframes twinkle {
     0%,
@@ -44,45 +26,31 @@
       opacity: 1;
     }
   }
-
-  @keyframes flow {
-    to {
-      stroke-dashoffset: -40;
-    }
-  }
-}
-
-:root {
-  /*
-   * Hero design unit: 1u = 1% of the 1672px-wide "First page" reference,
-   * frozen once the viewport passes ~1777px so the composition stops growing.
-   */
-  --u: min(1vw, 17.77px);
 }
 
 html {
-  background-color: var(--color-night-950);
+  background-color: var(--color-ink-950);
   color-scheme: dark;
   scroll-behavior: smooth;
-  scroll-padding-top: 4.5rem;
+  scroll-padding-top: 6rem;
 }
 
 body {
-  background-color: var(--color-night-950);
+  background-color: var(--color-ink-950);
   color: #fff;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgb(47 125 255 / 0.45);
+  background: rgb(255 77 94 / 0.35);
 }
 
-/* ---------- Reusable visual utilities ---------- */
+/* ---------- Reusable utilities ---------- */
 
 @utility container-page {
   width: 100%;
-  max-width: 76rem;
+  max-width: 75rem;
   margin-inline: auto;
   padding-inline: 1.25rem;
   @media (width >= 40rem) {
@@ -90,81 +58,100 @@ body {
   }
 }
 
+/* Small mono label above section titles */
 @utility eyebrow {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.42em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-neon-cyan);
-  text-shadow: 0 0 12px rgb(34 216 245 / 0.65);
+  color: rgb(255 255 255 / 0.45);
 }
 
-/* Glassy navy panel with a thin neon edge */
-@utility glass-panel {
-  background: linear-gradient(160deg, rgb(20 40 110 / 0.55), rgb(6 14 52 / 0.72));
-  border: 1px solid rgb(77 140 255 / 0.38);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.06),
-    0 0 0 1px rgb(30 80 200 / 0.12),
-    0 0 28px rgb(37 99 235 / 0.22);
-  backdrop-filter: blur(10px);
-}
-
-@utility text-gradient-hero {
-  background-image: linear-gradient(92deg, #5ff2ff 0%, #7fb6ff 38%, #c9a2ff 70%, #f59cf0 100%);
+/* Headline lettering: bright at the top, falling off to grey */
+@utility text-shine {
+  background-image: linear-gradient(180deg, #ffffff 15%, #a1a1aa 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
 }
 
-@utility text-gradient-soft {
-  background-image: linear-gradient(92deg, #ffffff 0%, #ffffff 45%, #eccbff 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+/* Dark card with a hairline border and a faint top highlight */
+@utility surface {
+  background: linear-gradient(180deg, #0f0f13 0%, #0a0a0d 100%);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
 
-@utility text-gradient-pink {
-  background-image: linear-gradient(92deg, #c7a6ff 0%, #f093ec 60%, #ff9fd8 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+/* ---------- Motion ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
 }
 
-@utility text-gradient-cyan {
-  background-image: linear-gradient(92deg, #4cf0ff 0%, #61a8ff 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+/* CSS entrance so above-the-fold content paints before hydration */
+.rise {
+  animation: rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Bright neon blue CTA button */
-@utility btn-neon {
-  background: linear-gradient(180deg, #3a8bff 0%, #1d5fe6 100%);
-  border: 1px solid rgb(140 190 255 / 0.75);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.3),
-    0 0 18px rgb(47 125 255 / 0.65),
-    0 0 42px rgb(47 125 255 / 0.3);
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
 }
 
-/* Horizontal neon seam between landscape bands */
-@utility neon-seam {
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgb(56 120 255 / 0.9) 12%,
-    rgb(200 120 255 / 0.95) 30%,
-    rgb(90 170 255 / 1) 50%,
-    rgb(200 120 255 / 0.95) 70%,
-    rgb(56 120 255 / 0.9) 88%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 10px rgb(80 140 255 / 0.9),
-    0 0 26px rgb(150 90 255 / 0.55);
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes bell-ring {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0);
+  }
+  8% {
+    transform: rotate(-12deg);
+  }
+  16% {
+    transform: rotate(10deg);
+  }
+  24% {
+    transform: rotate(-7deg);
+  }
+  32% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes listen-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -178,242 +165,3 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
-
-/* ---------- Hero ("First page") ---------- */
-
-@keyframes hero-rise {
-  from {
-    opacity: 0;
-    transform: translateY(26px);
-    filter: blur(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: blur(0);
-  }
-}
-
-@keyframes hero-shine {
-  0%,
-  35% {
-    background-position:
-      -60% 0,
-      0 0;
-  }
-  70%,
-  100% {
-    background-position:
-      160% 0,
-      0 0;
-  }
-}
-
-@keyframes hero-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.012);
-  }
-}
-
-@keyframes hero-drift {
-  0% {
-    opacity: 0;
-    transform: translateY(0);
-  }
-  20%,
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(calc(var(--u) * -6));
-  }
-}
-
-@keyframes hero-cta-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 calc(var(--u) * 1.2) rgb(80 120 255 / 0.55),
-      inset 0 1px 0 rgb(255 255 255 / 0.25);
-  }
-  50% {
-    box-shadow:
-      0 0 calc(var(--u) * 2.4) rgb(150 90 255 / 0.85),
-      inset 0 1px 0 rgb(255 255 255 / 0.25);
-  }
-}
-
-@keyframes hero-bg-in {
-  from {
-    opacity: 0;
-    transform: scale(1.06);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes hero-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.4);
-    filter: blur(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
-
-/* idle hover; --tilt gives each icon its own resting angle */
-@keyframes hero-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(var(--tilt, 0deg));
-  }
-  50% {
-    transform: translateY(-5%) rotate(calc(var(--tilt, 0deg) * -0.6));
-  }
-}
-
-@keyframes hero-phone-in {
-  from {
-    opacity: 0;
-    transform: translateY(12%) rotate(4deg) scale(0.94);
-    filter: blur(12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
-
-/* gentle idle float of the phone */
-@keyframes hero-hover {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2.6%);
-  }
-}
-
-/* lock screen */
-@keyframes lock-glow {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(0.9);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-}
-
-@keyframes lock-ring {
-  0%,
-  55%,
-  100% {
-    transform: rotate(0);
-  }
-  6% {
-    transform: rotate(-13deg);
-  }
-  14% {
-    transform: rotate(11deg);
-  }
-  22% {
-    transform: rotate(-8deg);
-  }
-  30% {
-    transform: rotate(6deg);
-  }
-  38% {
-    transform: rotate(-3deg);
-  }
-}
-
-@keyframes lock-notify {
-  from {
-    opacity: 0;
-    transform: translateY(-36px) scale(0.94);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/*
- * Slider: knob, trail and label share the SLIDE timeline (LockScreen.tsx)
- * and the same stops — the knob slides out over 20–45%, holds, returns by
- * 100%; the trail glows only while it slides out; the label dims meanwhile.
- */
-@keyframes lock-knob {
-  0%,
-  20%,
-  100% {
-    transform: translateX(0);
-  }
-  45%,
-  60% {
-    transform: translateX(58px);
-  }
-}
-
-@keyframes lock-trail {
-  0%,
-  20%,
-  100% {
-    opacity: 0;
-  }
-  32%,
-  45% {
-    opacity: 1;
-  }
-  60% {
-    opacity: 0;
-  }
-}
-
-@keyframes lock-label {
-  0%,
-  20%,
-  100% {
-    opacity: 1;
-  }
-  45%,
-  60% {
-    opacity: 0.3;
-  }
-}
-
-.hero-rise {
-  animation: hero-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* "what matters." — cyan → blue → violet with a periodic light sweep */
-.hero-gradient-text {
-  background-image:
-    linear-gradient(100deg, transparent 40%, rgb(255 255 255 / 0.55) 50%, transparent 60%),
-    linear-gradient(90deg, #3edaf5 0%, #39b5f8 24%, #4c8af8 44%, #7a6cf6 66%, #a45ef4 86%, #bb5cf1 100%);
-  background-size:
-    60% 100%,
-    100% 100%;
-  background-repeat: no-repeat;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: hero-shine 7s ease-in-out 1.6s infinite;
-}
-

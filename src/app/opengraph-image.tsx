@@ -13,22 +13,23 @@ export default async function Image() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
-          padding: "80px",
+          textAlign: "center",
           color: "white",
           background:
-            "radial-gradient(60% 60% at 80% 20%, rgba(130,80,255,0.55), transparent 70%), radial-gradient(60% 60% at 15% 70%, rgba(40,110,255,0.5), transparent 70%), linear-gradient(180deg, #030820, #0a1550)",
+            "radial-gradient(50% 55% at 50% 40%, rgba(190,20,40,0.45), transparent 70%), #07070a",
         }}
       >
-        <div style={{ fontSize: 26, letterSpacing: 10, color: "#22d8f5", textTransform: "uppercase" }}>
-          Smarter meetings. A brighter you.
+        <div style={{ fontSize: 22, letterSpacing: 4, color: "rgba(255,255,255,0.45)", textTransform: "uppercase" }}>
+          MeetingGuard
         </div>
-        <div style={{ display: "flex", flexDirection: "column", fontSize: 104, fontWeight: 800, lineHeight: 1, marginTop: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", fontSize: 96, fontWeight: 700, lineHeight: 1.05, marginTop: 24 }}>
           <span>Never miss</span>
-          <span style={{ color: "#c9a2ff" }}>what matters.</span>
+          <span style={{ color: "#a1a1aa" }}>what matters.</span>
         </div>
-        <div style={{ fontSize: 34, marginTop: 36, color: "#cbd5e1" }}>
-          MeetingGuard — AI scheduling, critical alerts, one-tap join.
+        <div style={{ fontSize: 32, marginTop: 32, color: "rgba(255,255,255,0.6)" }}>
+          Plan, Alert, Join. Your AI meeting companion.
         </div>
       </div>
     ),

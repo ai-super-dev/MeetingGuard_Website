@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import {
   MotionConfig,
-  animate,
   motion,
-  useInView,
   useMotionValue,
   useReducedMotion,
+  useScroll,
   useSpring,
   useTransform,
   type HTMLMotionProps,
@@ -26,22 +25,22 @@ type RevealProps = HTMLMotionProps<"div"> & {
 };
 
 /** Fades + slides its children in the first time they scroll into view. */
-export function Reveal({ delay = 0, from = "up", distance = 36, children, ...rest }: RevealProps) {
+export function Reveal({ delay = 0, from = "up", distance = 28, children, ...rest }: RevealProps) {
   const offset =
     from === "left"
       ? { x: -distance }
       : from === "right"
         ? { x: distance }
         : from === "scale"
-          ? { scale: 0.92 }
+          ? { scale: 0.94 }
           : { y: distance };
 
   return (
     <motion.div
-      initial={{ opacity: 0, ...offset }}
-      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      initial={{ opacity: 0, filter: "blur(6px)", ...offset }}
+      whileInView={{ opacity: 1, filter: "blur(0px)", x: 0, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "0px 0px -80px 0px" }}
-      transition={{ duration: 0.8, delay, ease }}
+      transition={{ duration: 0.9, delay, ease }}
       {...rest}
     >
       {children}
@@ -49,43 +48,23 @@ export function Reveal({ delay = 0, from = "up", distance = 36, children, ...res
   );
 }
 
-type TiltPhoneProps = {
-  children: ReactNode;
-  className?: string;
-  /** Resting pose of the device, in degrees. */
-  rotate?: number;
-  rotateY?: number;
-  rotateX?: number;
-  /** How strongly the phone follows the pointer. */
-  intensity?: number;
-  float?: number;
-  delay?: number;
-  /** Set false above the fold, where a CSS entrance keeps it visible pre-hydration. */
-  entrance?: boolean;
-};
-
-/**
- * Wraps a phone so it enters with a 3D swing, floats idly, and leans toward
- * the pointer while the cursor is over it — the "interactive phone movement".
- */
+/** Leans its children toward the pointer (3D) while the cursor is over them. */
 export function TiltPhone({
   children,
   className,
-  rotate = 0,
-  rotateY = 0,
-  rotateX = 0,
-  intensity = 14,
-  float = 12,
-  delay = 0,
-  entrance = true,
-}: TiltPhoneProps) {
+  intensity = 12,
+}: {
+  children: ReactNode;
+  className?: string;
+  intensity?: number;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const px = useMotionValue(0);
   const py = useMotionValue(0);
-  const spring = { stiffness: 120, damping: 14, mass: 0.6 };
-  const ry = useSpring(useTransform(px, (v) => rotateY + v * intensity), spring);
-  const rx = useSpring(useTransform(py, (v) => rotateX - v * intensity), spring);
+  const spring = { stiffness: 110, damping: 16, mass: 0.6 };
+  const ry = useSpring(useTransform(px, (v) => v * intensity), spring);
+  const rx = useSpring(useTransform(py, (v) => -v * intensity), spring);
 
   function onMove(e: React.PointerEvent<HTMLDivElement>) {
     if (reduce || e.pointerType !== "mouse" || !ref.current) return;
@@ -94,68 +73,71 @@ export function TiltPhone({
     py.set((e.clientY - r.top) / r.height - 0.5);
   }
 
-  function onLeave() {
-    px.set(0);
-    py.set(0);
-  }
-
   return (
     <motion.div
       ref={ref}
       className={className}
-      style={{ perspective: 1200, ...(entrance ? null : { rotateZ: rotate }) }}
+      style={{ perspective: 1400 }}
       onPointerMove={onMove}
-      onPointerLeave={onLeave}
-      {...(entrance && {
-        initial: { opacity: 0, y: 70, rotateZ: rotate - 8 },
-        whileInView: { opacity: 1, y: 0, rotateZ: rotate },
-        viewport: { once: true, margin: "0px 0px -60px 0px" },
-        transition: { duration: 1.1, delay, ease },
-      })}
+      onPointerLeave={() => {
+        px.set(0);
+        py.set(0);
+      }}
     >
-      <motion.div
-        animate={reduce ? undefined : { y: [0, -float, 0] }}
-        transition={{ duration: 6.5, delay: delay + 1.1, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <motion.div style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}>{children}</motion.div>
-      </motion.div>
+      <motion.div style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}>{children}</motion.div>
     </motion.div>
   );
 }
 
-/** Counts a number up when it first appears; keeps prefix/suffix formatting. */
-export function CountUp({ value, decimals = 0, suffix = "" }: { value: number; decimals?: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -40px 0px" });
-  const format = (n: number) =>
-    n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
-
-  useEffect(() => {
-    if (!inView || !ref.current) return;
-    const node = ref.current;
-    const controls = animate(0, value, {
-      duration: 1.8,
-      ease: "easeOut",
-      onUpdate: (n) => {
-        node.textContent = format(n);
-      },
-    });
-    return () => controls.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView, value]);
-
-  return <span ref={ref}>{format(value)}</span>;
+/**
+ * Scroll-linked drift: while the element passes through the viewport it moves
+ * by `y` px and scales from 1 to `scale` (used for the hero phone).
+ */
+export function ScrollDrift({
+  children,
+  className,
+  y = -80,
+  scale = 1,
+}: {
+  children: ReactNode;
+  className?: string;
+  y?: number;
+  scale?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const ty = useTransform(scrollYProgress, [0, 1], [0, y]);
+  const s = useTransform(scrollYProgress, [0, 1], [1, scale]);
+  return (
+    <motion.div ref={ref} className={className} style={{ y: ty, scale: s }}>
+      {children}
+    </motion.div>
+  );
 }
 
-/** Pulsing ring used behind alert bells and check marks. */
-export function PulseRing({ className, delay = 0 }: { className?: string; delay?: number }) {
+/**
+ * Slides in horizontally from `from` px as the element scrolls into view and
+ * settles once it reaches the middle of the screen (overview side cards).
+ */
+export function ScrollSlide({
+  children,
+  className,
+  from = 120,
+  opacity = 1,
+}: {
+  children: ReactNode;
+  className?: string;
+  from?: number;
+  /** Resting opacity once settled. */
+  opacity?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
+  const x = useTransform(scrollYProgress, [0, 1], [from, 0]);
+  const o = useTransform(scrollYProgress, [0, 1], [0, opacity]);
   return (
-    <motion.span
-      aria-hidden
-      className={className}
-      initial={{ scale: 0.8, opacity: 0.7 }}
-      animate={{ scale: 1.6, opacity: 0 }}
-      transition={{ duration: 2.2, delay, repeat: Infinity, ease: "easeOut" }}
-    />
+    <motion.div ref={ref} className={className} style={{ x, opacity: o }}>
+      {children}
+    </motion.div>
   );
 }
