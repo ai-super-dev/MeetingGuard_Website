@@ -29,8 +29,8 @@ export default function Home() {
       <Hero />
       <Problem />
       <HowItWorks />
-      <AiSection />
       <WhatsAppSection />
+      <AiSection />
       <Features />
       <FinalCta />
       <QrDownload />

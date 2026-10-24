@@ -24,8 +24,6 @@ export function WhatsAppSection() {
             className="mt-3 text-[1.9rem] leading-[1.2] font-semibold tracking-[-0.02em] sm:text-[2.25rem]"
           >
             Schedule straight from WhatsApp.
-            <br />
-            <span className="text-white/55">In plain words.</span>
           </h2>
           <p className="mt-4 text-[0.98rem] leading-relaxed text-white/50">
             No forms, no switching between apps. Send a quick voice note or a text, and your assistant creates the
