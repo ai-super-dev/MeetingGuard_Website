@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { ScrollDrift, TiltPhone } from "@/components/motion";
-import { AlertScreen, RING } from "@/components/phone/AlertScreen";
+import { AlertScreen } from "@/components/phone/AlertScreen";
 import { PhoneMockup } from "@/components/phone/PhoneMockup";
 import { StoreButtons } from "@/components/ui/StoreButtons";
 import { siteConfig } from "@/lib/site";
@@ -53,8 +53,7 @@ export function Hero() {
           <TiltedRings />
           <div className="rise relative" style={rise(100)}>
             <TiltPhone className="w-[260px] sm:w-[330px] lg:w-[360px]">
-              {/* the whole phone buzzes on each ring of the alarm */}
-              <div className="relative" style={{ animation: `phone-buzz ${RING} linear infinite` }}>
+              <div className="relative">
                 <div className="[mask-image:linear-gradient(180deg,#000_78%,transparent_100%)] [-webkit-mask-image:linear-gradient(180deg,#000_78%,transparent_100%)]">
                   <PhoneMockup className="w-full">
                     <AlertScreen />
