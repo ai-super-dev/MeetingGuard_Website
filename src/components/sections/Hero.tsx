@@ -88,9 +88,6 @@ export function Hero() {
         <div className="rise mt-7" style={rise(500)}>
           <StoreButtons className="justify-center" />
         </div>
-        <p className="rise eyebrow mt-6" style={rise(620)}>
-          iPhone &amp; Android · English &amp; Español
-        </p>
       </div>
     </section>
   );
