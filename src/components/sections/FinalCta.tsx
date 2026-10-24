@@ -1,9 +1,12 @@
+"use client";
+
 import { Reveal } from "@/components/motion";
 import { AppIcon } from "@/components/ui/Logo";
 import { StoreButtons } from "@/components/ui/StoreButtons";
-import { siteConfig } from "@/lib/site";
+import { useT } from "@/lib/language";
 
 export function FinalCta() {
+  const t = useT();
   return (
     <section aria-labelledby="cta-title" className="relative overflow-x-clip pt-14 pb-28 sm:pt-[4.5rem] sm:pb-36">
       <div
@@ -16,11 +19,11 @@ export function FinalCta() {
           id="cta-title"
           className="mt-12 text-[2rem] leading-[1.1] text-balance font-semibold tracking-[-0.03em] sm:text-[3rem]"
         >
-          Your next meeting
+          {t.cta.line1}
           <br />
-          <span className="text-white/50">is already covered.</span>
+          <span className="text-white/50">{t.cta.line2}</span>
         </h2>
-        <p className="mt-4 font-medium text-white/60">{siteConfig.tagline}</p>
+        <p className="mt-4 font-medium text-white/60">{t.tagline}</p>
         <StoreButtons className="mt-8 justify-center" />
       </Reveal>
     </section>

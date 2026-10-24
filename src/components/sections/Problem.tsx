@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import {
   ChevronDown,
@@ -14,6 +16,8 @@ import { MeetingAlarmScreen } from "@/components/phone/MeetingAlarmScreen";
 import { CAL_FRAME } from "@/components/phone/geometry";
 import { FramedPhone } from "@/components/phone/FramedPhone";
 import { AppMark } from "@/components/ui/Logo";
+import { useT } from "@/lib/language";
+import type { Dict } from "@/lib/i18n";
 
 /* ---------- calendar week mock ---------- */
 
@@ -22,27 +26,34 @@ const HOURS = 6; // 8 AM – 1 PM
 const ROW = 56; // px per hour
 
 const DAYS = [
-  { name: "MON", date: 26, wide: true },
-  { name: "TUE", date: 27 },
-  { name: "WED", date: 28, today: true },
-  { name: "THU", date: 29 },
-  { name: "FRI", date: 30, wide: true },
+  { date: 26, wide: true },
+  { date: 27 },
+  { date: 28, today: true },
+  { date: 29 },
+  { date: 30, wide: true },
 ];
 
-type CalEvent = { day: number; start: number; end: number; title: string; color: string; guarded?: boolean };
+type CalEvent = {
+  day: number;
+  start: number;
+  end: number;
+  title: keyof Dict["problem"]["events"];
+  color: string;
+  guarded?: boolean;
+};
 
 const EVENTS: CalEvent[] = [
-  { day: 0, start: 9, end: 9.5, title: "Team standup", color: "#4f8cff" },
-  { day: 0, start: 11, end: 12, title: "Product sync", color: "#2fb8a8" },
-  { day: 1, start: 9, end: 9.5, title: "Team standup", color: "#4f8cff" },
-  { day: 1, start: 12, end: 13, title: "Lunch with Ana", color: "#f59e0b" },
-  { day: 2, start: 9, end: 9.5, title: "Team standup", color: "#4f8cff" },
-  { day: 2, start: 10, end: 10.75, title: "Investor call", color: "#ff4d5e", guarded: true },
-  { day: 2, start: 11.5, end: 12.5, title: "Design review", color: "#a78bfa" },
-  { day: 3, start: 9, end: 9.5, title: "Team standup", color: "#4f8cff" },
-  { day: 3, start: 10.5, end: 11.5, title: "Client sync", color: "#34c27a" },
-  { day: 4, start: 9, end: 9.5, title: "Team standup", color: "#4f8cff" },
-  { day: 4, start: 12, end: 12.5, title: "1:1 with Mia", color: "#4f8cff" },
+  { day: 0, start: 9, end: 9.5, title: "standup", color: "#4f8cff" },
+  { day: 0, start: 11, end: 12, title: "product", color: "#2fb8a8" },
+  { day: 1, start: 9, end: 9.5, title: "standup", color: "#4f8cff" },
+  { day: 1, start: 12, end: 13, title: "lunch", color: "#f59e0b" },
+  { day: 2, start: 9, end: 9.5, title: "standup", color: "#4f8cff" },
+  { day: 2, start: 10, end: 10.75, title: "investor", color: "#ff4d5e", guarded: true },
+  { day: 2, start: 11.5, end: 12.5, title: "design", color: "#a78bfa" },
+  { day: 3, start: 9, end: 9.5, title: "standup", color: "#4f8cff" },
+  { day: 3, start: 10.5, end: 11.5, title: "client", color: "#34c27a" },
+  { day: 4, start: 9, end: 9.5, title: "standup", color: "#4f8cff" },
+  { day: 4, start: 12, end: 12.5, title: "oneOnOne", color: "#4f8cff" },
 ];
 
 const y = (h: number) => (h - START_HOUR) * ROW;
@@ -52,7 +63,7 @@ const fmt = (h: number) => `${Math.floor(h)}:${String(Math.round((h % 1) * 60)).
 /** Mon and Fri drop out on small screens so the week still reads clearly. */
 const dayVisibility = (wide?: boolean) => (wide ? "hidden sm:block" : "block");
 
-function EventBlock({ e }: { e: CalEvent }) {
+function EventBlock({ e, title }: { e: CalEvent; title: string }) {
   const height = y(e.end) - y(e.start);
   if (!e.guarded) {
     return (
@@ -60,7 +71,7 @@ function EventBlock({ e }: { e: CalEvent }) {
         className="absolute inset-x-1 overflow-hidden rounded-md border-l-[3px] px-1.5 py-1 text-[0.68rem] leading-tight"
         style={{ top: y(e.start) + 1, height: height - 2, borderColor: e.color, background: `${e.color}26` }}
       >
-        <p className="truncate font-medium text-white/85">{e.title}</p>
+        <p className="truncate font-medium text-white/85">{title}</p>
         {height > 40 && <p className="text-white/55">{fmt(e.start)}</p>}
       </div>
     );
@@ -80,7 +91,7 @@ function EventBlock({ e }: { e: CalEvent }) {
       >
         <p className="flex items-center gap-1 truncate font-semibold text-white">
           <AppMark className="h-3 w-3 shrink-0" sizes="24px" />
-          {e.title}
+          {title}
         </p>
         <p className="truncate text-white/60">10:00 – 10:45 · Zoom</p>
       </div>
@@ -89,6 +100,10 @@ function EventBlock({ e }: { e: CalEvent }) {
 }
 
 function CalendarWeek() {
+  const t = useT();
+  const p = t.problem;
+  // 9 AM … 1 PM in English, 9:00 … 13:00 in Spanish
+  const hour = (h: number) => (t.lang === "es" ? `${h}:00` : `${((h - 1) % 12) + 1} ${h < 12 ? "AM" : "PM"}`);
   return (
     <div
       className="overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#0f0f13,#0a0a0d)] shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
@@ -98,26 +113,26 @@ function CalendarWeek() {
       <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3 text-white/70 sm:gap-3 lg:pr-9">
         <Menu className="hidden h-4 w-4 sm:block" aria-hidden />
         <GoogleCalendarIcon className="h-6 w-6" />
-        <span className="text-[0.95rem] text-white/85">Calendar</span>
-        <span className="ml-2 hidden rounded-full border border-white/15 px-3 py-1 text-[0.72rem] sm:inline">Today</span>
+        <span className="hidden text-[0.95rem] text-white/85 sm:inline">{p.calendar}</span>
+        <span className="ml-2 hidden rounded-full border border-white/15 px-3 py-1 text-[0.72rem] sm:inline">{p.today}</span>
         <ChevronLeft className="hidden h-4 w-4 sm:block" aria-hidden />
         <ChevronRight className="hidden h-4 w-4 sm:block" aria-hidden />
-        <span className="text-[0.88rem] text-white/85 sm:text-[0.95rem]">October 2026</span>
+        <span className="text-[0.88rem] whitespace-nowrap text-white/85 sm:text-[0.95rem]">{p.month}</span>
         <Search className="ml-auto hidden h-4 w-4 sm:block" aria-hidden />
         <span className="ml-auto flex items-center gap-1 rounded-full border border-white/15 px-3 py-1 text-[0.72rem] sm:ml-0">
-          Week <ChevronDown className="h-3 w-3" aria-hidden />
+          {p.week} <ChevronDown className="h-3 w-3" aria-hidden />
         </span>
       </div>
 
       <div className="grid grid-cols-[40px_repeat(3,minmax(0,1fr))] sm:grid-cols-[48px_repeat(5,minmax(0,1fr))]">
         {/* day headers */}
         <div className="border-b border-white/[0.06]" />
-        {DAYS.map((d) => (
+        {DAYS.map((d, di) => (
           <div
-            key={d.name}
+            key={d.date}
             className={`${dayVisibility(d.wide)} border-b border-l border-white/[0.06] py-2.5 text-center`}
           >
-            <p className={`text-[0.62rem] tracking-wide ${d.today ? "text-[#8ab4ff]" : "text-white/50"}`}>{d.name}</p>
+            <p className={`text-[0.62rem] tracking-wide ${d.today ? "text-[#8ab4ff]" : "text-white/50"}`}>{p.days[di]}</p>
             <p
               className={`mx-auto mt-1 grid h-8 w-8 place-items-center rounded-full text-[1rem] ${
                 d.today ? "bg-[#4f8cff] font-semibold text-white" : "text-white/75"
@@ -136,7 +151,7 @@ function CalendarWeek() {
               className="absolute right-1.5 -translate-y-1/2 text-[0.6rem] text-white/45"
               style={{ top: i * ROW }}
             >
-              {i === 0 ? "" : `${((START_HOUR + i - 1) % 12) + 1} ${START_HOUR + i < 12 ? "AM" : "PM"}`}
+              {i === 0 ? "" : hour(START_HOUR + i)}
             </span>
           ))}
         </div>
@@ -144,7 +159,7 @@ function CalendarWeek() {
         {/* day columns */}
         {DAYS.map((d, di) => (
           <div
-            key={d.name}
+            key={d.date}
             className={`${dayVisibility(d.wide)} relative border-l border-white/[0.06]`}
             style={{
               height: HOURS * ROW,
@@ -152,7 +167,7 @@ function CalendarWeek() {
             }}
           >
             {EVENTS.filter((e) => e.day === di).map((e) => (
-              <EventBlock key={e.title + e.start} e={e} />
+              <EventBlock key={e.title + e.start} e={e} title={p.events[e.title]} />
             ))}
             {d.today && (
               /* the "now" line glides down to 9:45 as the section comes into view */
@@ -191,38 +206,13 @@ function GuardPhone() {
 
 /* ---------- with vs. without ---------- */
 
-type Lane = {
-  title: string;
-  icon: ReactNode;
-  outcome: string;
-  good: boolean;
-  steps: [string, string][];
-};
+type Lane = Dict["problem"]["lanes"][number] & { icon: ReactNode; good: boolean };
 
-const LANES: Lane[] = [
-  {
-    title: "Calendar alone",
-    icon: <GoogleCalendarIcon className="h-5 w-5" />,
-    outcome: "Late for the call",
-    good: false,
-    steps: [
-      ["9:45", "Nothing happens."],
-      ["9:50", "One small banner — swiped away with everything else."],
-      ["10:00", "The call starts without you."],
-    ],
-  },
-  {
-    title: "With MeetingGuard",
-    icon: <AppMark className="h-5 w-5" sizes="40px" />,
-    outcome: "On time",
-    good: true,
-    steps: [
-      ["9:45", "Your phone vibrates and a full-screen alarm takes over — even with the app closed."],
-      ["9:50", "Follow-ups keep going until you respond."],
-      ["10:00", "One tap on Join now — you’re in the Zoom call."],
-    ],
-  },
+const LANE_LOOK = [
+  { icon: <GoogleCalendarIcon className="h-5 w-5" />, good: false },
+  { icon: <AppMark className="h-5 w-5" sizes="40px" />, good: true },
 ];
+const LANE_TIMES = ["9:45", "9:50", "10:00"];
 
 function LaneCard({ lane }: { lane: Lane }) {
   return (
@@ -259,10 +249,10 @@ function LaneCard({ lane }: { lane: Lane }) {
             lane.good ? "bg-[linear-gradient(180deg,#ff4d5e,rgba(255,77,94,0.15))]" : "bg-white/10"
           }`}
         />
-        {lane.steps.map(([time, text], i) => (
-          <li key={time} className="relative grid grid-cols-[44px_12px_minmax(0,1fr)] items-start gap-x-3">
+        {lane.steps.map((text, i) => (
+          <li key={LANE_TIMES[i]} className="relative grid grid-cols-[44px_12px_minmax(0,1fr)] items-start gap-x-3">
             <span className={`pt-px font-mono text-[0.74rem] ${lane.good ? "text-[#ff8a95]" : "text-white/50"}`}>
-              {time}
+              {LANE_TIMES[i]}
             </span>
             <span
               className={`mt-1 h-3 w-3 rounded-full border-2 ${
@@ -284,24 +274,25 @@ function LaneCard({ lane }: { lane: Lane }) {
 }
 
 export function Problem() {
+  const t = useT();
+  const p = t.problem;
   return (
     <section aria-labelledby="problem-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">Why MeetingGuard</p>
+          <p className="eyebrow">{p.eyebrow}</p>
           <h2
             id="problem-title"
             className="mt-3 text-[1.9rem] leading-[1.2] font-semibold text-balance tracking-[-0.02em] sm:text-[2.4rem]"
           >
-            Your calendar stores time.
+            {p.line1}
             <br />
             <span className="text-white/50">
-              MeetingGuard <span className="whitespace-nowrap">protects it.</span>
+              {p.line2a} <span className="whitespace-nowrap">{p.line2b}</span>
             </span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[0.98rem] leading-relaxed text-white/60">
-            Calendars only store dates. When your day gets busy, passive notifications get ignored. MeetingGuard reads
-            the same calendar — and makes sure you’re in the right meeting, right on time.
+            {p.body}
           </p>
         </Reveal>
 
@@ -322,9 +313,9 @@ export function Problem() {
           </div>
 
           <div className="mt-16 grid gap-5 md:grid-cols-2 lg:mt-20">
-            {LANES.map((lane, i) => (
-              <Reveal key={lane.title} delay={i * 0.12} className="h-full">
-                <LaneCard lane={lane} />
+            {p.lanes.map((lane, i) => (
+              <Reveal key={i} delay={i * 0.12} className="h-full">
+                <LaneCard lane={{ ...lane, ...LANE_LOOK[i] }} />
               </Reveal>
             ))}
           </div>

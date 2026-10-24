@@ -11,13 +11,14 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { useT } from "@/lib/language";
 
 export type Step = {
   day: string;
   time: string;
   title: string;
   body: string;
-  points: string[];
+  points: readonly string[];
 };
 
 /** Seconds the timeline takes to flow from one step to the next. */
@@ -39,6 +40,7 @@ function TrackNode({
   progress: MotionValue<number>;
   onSelect: () => void;
 }) {
+  const t = useT();
   const lit = useTransform(progress, [index - 0.04, index], [0, 1]);
   const label = useTransform(lit, [0, 1], [0.45, 1]);
   return (
@@ -46,7 +48,7 @@ function TrackNode({
       type="button"
       onClick={onSelect}
       className="group flex flex-col items-center focus-visible:outline-none"
-      aria-label={`Show step ${index + 1}: ${step.title}`}
+      aria-label={`${t.how.show} ${index + 1}: ${step.title}`}
     >
       <span className="relative grid h-4 w-4 place-items-center">
         <span className="absolute inset-0 rounded-full border border-white/15 bg-ink-950 group-focus-visible:ring-2 group-focus-visible:ring-accent" />
@@ -86,6 +88,7 @@ export function StepShowcase({
   /** Glow colour behind the phone for each step. */
   glows: string[];
 }) {
+  const t = useT();
   const [active, setActive] = useState(0);
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -140,7 +143,7 @@ export function StepShowcase({
   return (
     <div ref={ref}>
       {/* timeline: the line itself is the timer, flowing from one time to the next */}
-      <div className="relative mx-auto max-w-[760px]" role="group" aria-label="How it works steps">
+      <div className="relative mx-auto max-w-[760px]" role="group" aria-label={t.how.group}>
         <div className="absolute top-[7px] right-[16.66%] left-[16.66%]">
           <span aria-hidden className="absolute inset-x-0 h-px bg-white/10" />
           <motion.span
@@ -157,7 +160,7 @@ export function StepShowcase({
         </div>
         <div className="grid grid-cols-3">
           {steps.map((s, i) => (
-            <TrackNode key={s.title} step={s} index={i} progress={progress} onSelect={() => select(i)} />
+            <TrackNode key={i} step={s} index={i} progress={progress} onSelect={() => select(i)} />
           ))}
         </div>
       </div>

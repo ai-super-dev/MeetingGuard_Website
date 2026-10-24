@@ -1,16 +1,14 @@
-import type { ReactNode } from "react";
+"use client";
+
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Reveal } from "@/components/motion";
-
-type LegalPageProps = {
-  title: string;
-  updated: string;
-  sections: { heading: string; body: ReactNode }[];
-};
+import { useT } from "@/lib/language";
 
 /** Shared shell for Terms / Privacy so they match the landing page's look. */
-export function LegalPage({ title, updated, sections }: LegalPageProps) {
+export function LegalPage({ doc }: { doc: "privacy" | "terms" }) {
+  const t = useT();
+  const { title, sections } = t.legal[doc];
   return (
     <section aria-labelledby="legal-title" className="relative min-h-screen overflow-hidden pt-28">
       <div
@@ -19,14 +17,14 @@ export function LegalPage({ title, updated, sections }: LegalPageProps) {
       />
       <div className="container-page relative max-w-3xl pb-24">
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white">
-          <ArrowLeft className="h-4 w-4" /> Back to home
+          <ArrowLeft className="h-4 w-4" /> {t.legal.back}
         </Link>
         <Reveal>
           <p className="eyebrow mt-10">MeetingGuard</p>
           <h1 id="legal-title" className="mt-3 text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-3 text-sm text-white/55">Last updated: {updated}</p>
+          <p className="mt-3 text-sm text-white/55">{t.legal.updated}</p>
         </Reveal>
         <Reveal delay={0.1}>
           <div className="surface mt-10 space-y-8 rounded-2xl p-6 sm:p-10">

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { motion } from "motion/react";
 import { SpainFlag, UsFlag } from "@/components/icons/flags";
-import { type Lang, useLanguage } from "@/lib/language";
+import { type Lang, useLanguage, useT } from "@/lib/language";
 
 const LANGS: { code: Lang; label: string; name: string; Flag: typeof UsFlag }[] = [
   { code: "en", label: "EN", name: "English", Flag: UsFlag },
@@ -13,13 +13,14 @@ const LANGS: { code: Lang; label: string; name: string; Flag: typeof UsFlag }[] 
 /** EN / ES segmented switch with country flags. */
 export function LanguageSwitch() {
   const [lang, setLang] = useLanguage();
+  const t = useT();
 
   useEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
 
   return (
-    <div role="group" aria-label="Language" className="flex gap-0.5">
+    <div role="group" aria-label={t.header.language} className="flex gap-0.5">
       {LANGS.map(({ code, label, name, Flag }) => {
         const active = code === lang;
         return (

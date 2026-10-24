@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Inter } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { SkipLink } from "@/components/layout/SkipLink";
 import { MotionProvider } from "@/components/motion";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
@@ -54,12 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${mono.variable}`}>
       <body className="min-h-screen overflow-x-clip">
-        <a
-          href="#main"
-          className="sr-only z-[60] rounded-md bg-accent px-4 py-2 focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
-        >
-          Skip to content
-        </a>
+        <SkipLink />
         <MotionProvider>
           <Header />
           <main id="main">{children}</main>

@@ -15,6 +15,7 @@ import {
 } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { AppMark } from "@/components/ui/Logo";
+import { useT } from "@/lib/language";
 import { people } from "@/lib/people";
 
 /* ---------- shared ---------- */
@@ -104,12 +105,6 @@ function Tile({
 
 /* ---------- visuals ---------- */
 
-const LEVELS = [
-  { name: "Gentle", note: "A quiet notification" },
-  { name: "Standard", note: "Sound and vibration" },
-  { name: "Critical", note: "Full-screen alarm with voice readout" },
-] as const;
-
 /** The alarm badge for each intensity: outline bell → ringing bell → shaking alarm clock. */
 function LevelBadge({ level }: { level: number }) {
   if (level === 0) {
@@ -145,9 +140,11 @@ function LevelBadge({ level }: { level: number }) {
 }
 
 function AlarmVisual() {
+  const t = useT();
+  const levels = t.features.levels;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const level = useCycle(LEVELS.length, 2800, inView);
+  const level = useCycle(levels.length, 2800, inView);
 
   return (
     <div ref={ref} className="w-full max-w-[340px] rounded-[24px] border border-white/[0.08] bg-[#131316] px-6 pt-8 pb-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
@@ -171,13 +168,13 @@ function AlarmVisual() {
           </motion.span>
         </AnimatePresence>
       </div>
-      <p className="mt-4 text-[1.05rem] font-semibold">Investor call</p>
-      <p className="text-[0.8rem] font-medium text-[#ffd9a0]">Starts in 15 minutes</p>
+      <p className="mt-4 text-[1.05rem] font-semibold">{t.alarm.title}</p>
+      <p className="text-[0.8rem] font-medium text-[#ffd9a0]">{t.alarm.startsIn}</p>
 
       {/* intensity: Gentle / Standard / Critical */}
       <div className="relative mt-5 grid grid-cols-3 rounded-xl bg-white/[0.05] p-1 text-[0.72rem]">
-        {LEVELS.map((l, i) => (
-          <span key={l.name} className={`relative z-10 py-1.5 transition-colors duration-500 ${i === level ? "text-white" : "text-white/50"}`}>
+        {levels.map((l, i) => (
+          <span key={i} className={`relative z-10 py-1.5 transition-colors duration-500 ${i === level ? "text-white" : "text-white/50"}`}>
             {i === level && (
               <motion.span
                 layoutId="alarm-level"
@@ -189,7 +186,7 @@ function AlarmVisual() {
           </span>
         ))}
       </div>
-      <p className="mt-3 h-4 text-[0.72rem] text-white/55">{LEVELS[level].note}</p>
+      <p className="mt-3 h-4 text-[0.72rem] text-white/55">{levels[level].note}</p>
     </div>
   );
 }
@@ -232,9 +229,9 @@ function SyncVisual() {
   );
 }
 
-const PHRASE = "Lunch with Ana tomorrow at 2 pm";
-
 function SpeakVisual() {
+  const t = useT();
+  const phrase = t.features.phrase;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
   const reduce = useReducedMotion();
@@ -246,7 +243,7 @@ function SpeakVisual() {
     if (!inView || reduce) return;
     let t: ReturnType<typeof setTimeout>;
     if (phase === 0) t = setTimeout(() => setPhase(1), 1800);
-    else if (phase === 1 && chars < PHRASE.length) t = setTimeout(() => setChars((c) => c + 1), 45);
+    else if (phase === 1 && chars < phrase.length) t = setTimeout(() => setChars((c) => c + 1), 45);
     else if (phase === 1) t = setTimeout(() => setPhase(2), 500);
     else
       t = setTimeout(() => {
@@ -254,10 +251,10 @@ function SpeakVisual() {
         setPhase(0);
       }, 2600);
     return () => clearTimeout(t);
-  }, [inView, reduce, phase, chars]);
+  }, [inView, reduce, phase, chars, phrase]);
 
   const shownPhase = reduce ? 2 : phase;
-  const text = reduce ? PHRASE : PHRASE.slice(0, chars);
+  const text = reduce ? phrase : phrase.slice(0, chars);
 
   return (
     <div ref={ref} className="w-full max-w-[360px]">
@@ -293,7 +290,7 @@ function SpeakVisual() {
               className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-3 py-1 text-[0.75rem] font-medium text-emerald-300"
             >
               <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />
-              Confirmed · added to your calendar
+              {t.features.confirmed}
             </motion.span>
           )}
         </AnimatePresence>
@@ -303,12 +300,13 @@ function SpeakVisual() {
 }
 
 function JoinVisual() {
+  const t = useT();
   return (
     <div className="flex flex-col items-center gap-4">
       <span className="rounded-[16px] bg-[linear-gradient(90deg,#3ee8ff,#7a7bff_55%,#e15bff)] p-[1.5px] transition-shadow duration-500 group-hover:shadow-[0_0_28px_rgba(110,140,255,0.45)]">
         <span className="flex h-11 items-center gap-2 rounded-[14.5px] bg-[#0c0c12] px-6 text-[0.9rem] font-semibold">
           <Video className="h-4 w-4" aria-hidden />
-          Join now
+          {t.alarm.joinNow}
         </span>
       </span>
       <span className="flex items-center gap-2">
@@ -337,6 +335,7 @@ const PEOPLE: { name: string; photo?: StaticImageData; initials?: string; color?
 ];
 
 function ShareVisual() {
+  const t = useT();
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex items-center">
@@ -355,7 +354,7 @@ function ShareVisual() {
           </span>
         ))}
         <span className="ml-3 inline-flex items-center gap-1 rounded-full border border-white/10 px-3 py-1.5 text-[0.75rem] text-white/75">
-          <Plus className="h-3.5 w-3.5" aria-hidden /> Invite
+          <Plus className="h-3.5 w-3.5" aria-hidden /> {t.features.invite}
         </span>
       </div>
       <span className="flex items-center gap-1.5 text-[0.72rem] text-white/55 transition-colors duration-500 group-hover:text-white/75">
@@ -371,7 +370,10 @@ const TAGLINES = ["Never miss what matters.", "Nunca te pierdas lo importante."]
 function PlatformsVisual() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const lang = useCycle(TAGLINES.length, 3200, inView);
+  const t = useT();
+  // English visitors see the tagline alternate between both languages; Spanish visitors see it in Spanish
+  const cycled = useCycle(TAGLINES.length, 3200, inView && t.lang === "en");
+  const lang = t.lang === "es" ? 1 : cycled;
 
   return (
     <div ref={ref} className="flex flex-col items-center gap-3">
@@ -423,18 +425,20 @@ function PlatformsVisual() {
 /* ---------- section ---------- */
 
 export function Features() {
+  const t = useT();
+  const f = t.features;
   return (
     <section id="features" aria-labelledby="features-title" className="relative py-14 sm:py-[4.5rem]">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">Features</p>
+          <p className="eyebrow">{f.eyebrow}</p>
           <h2
             id="features-title"
             className="mt-3 text-[1.9rem] leading-[1.2] font-semibold text-balance tracking-[-0.02em] sm:text-[2.4rem]"
           >
-            Everything it takes
+            {f.line1}
             <br />
-            <span className="text-white/50">to show up on time.</span>
+            <span className="text-white/50">{f.line2}</span>
           </h2>
         </Reveal>
 
@@ -442,45 +446,39 @@ export function Features() {
           <Tile
             accent="#ff4d5e"
             className="md:col-span-2 lg:row-span-2"
-            title="Alarms you can't miss"
-            body="Full-screen alarms with sound and voice readout, gentle reminders, snooze and follow-ups — even when the app is closed. You choose the intensity for every meeting."
+            {...f.tiles.alarm}
             visual={<AlarmVisual />}
           />
           <Tile
             accent="#4f8cff"
             className="md:col-span-2"
-            title="Two-way calendar sync"
-            body="Works with Google Calendar and Outlook. Meetings you create appear in both, with invitations and video-call links."
+            {...f.tiles.sync}
             visual={<SyncVisual />}
             delay={0.05}
           />
           <Tile
             accent="#22c55e"
-            title="Instant join"
-            body="One tap into the Zoom, Google Meet or Teams call — the link is generated for you."
+            {...f.tiles.join}
             visual={<JoinVisual />}
             delay={0.1}
           />
           <Tile
             accent="#f59e0b"
-            title="Share and invite"
-            body="Invitations and the call link go to everyone in a tap."
+            {...f.tiles.share}
             visual={<ShareVisual />}
             delay={0.15}
           />
           <Tile
             accent="#a78bfa"
             className="md:col-span-2"
-            title="Speak or type"
-            body="Tell the assistant what you need, in the app or by WhatsApp. It shows what it understood and only saves after you confirm."
+            {...f.tiles.speak}
             visual={<SpeakVisual />}
             delay={0.05}
           />
           <Tile
             accent="#2dd4bf"
             className="md:col-span-2"
-            title="iPhone & Android · English & Español"
-            body="The same assistant and alarms on every phone, in English and Spanish."
+            {...f.tiles.platforms}
             visual={<PlatformsVisual />}
             delay={0.1}
           />

@@ -7,30 +7,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-// Placeholder copy — replace with the reviewed legal text before launch.
+// Placeholder copy (English and Spanish in src/lib/i18n.ts) — replace with the reviewed legal text before launch.
 export default function PrivacyPage() {
-  return (
-    <LegalPage
-      title="Privacy Policy"
-      updated="October 24, 2026"
-      sections={[
-        {
-          heading: "What we collect",
-          body: "Meeting titles, times, attendees and join links from the calendars you choose to connect, plus basic app diagnostics.",
-        },
-        {
-          heading: "How we use it",
-          body: "Only to schedule meetings, deliver reminders and alerts, and let you join with one tap. We never sell your data.",
-        },
-        {
-          heading: "Your controls",
-          body: "You can disconnect any calendar at any time and request deletion of your data from within the app.",
-        },
-        {
-          heading: "Security",
-          body: "Data is encrypted in transit and at rest, and calendar access uses the providers' official, revocable permissions.",
-        },
-      ]}
-    />
-  );
+  return <LegalPage doc="privacy" />;
 }

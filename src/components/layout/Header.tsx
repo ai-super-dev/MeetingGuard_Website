@@ -5,11 +5,13 @@ import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { useT } from "@/lib/language";
 import { navLinks } from "@/lib/site";
 import { LanguageSwitch } from "./LanguageSwitch";
 
 /** Floating, rounded navigation bar that firms up once the page scrolls. */
 export function Header() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
@@ -25,16 +27,16 @@ export function Header() {
         }`}
       >
         <div className="flex h-16 items-center px-4 sm:px-6">
-          <Link href="/" aria-label="MeetingGuard home" className="shrink-0">
+          <Link href="/" aria-label={t.header.home} className="shrink-0">
             <Logo />
           </Link>
 
-          <nav aria-label="Primary" className="ml-auto hidden md:block">
+          <nav aria-label={t.header.primary} className="ml-auto hidden md:block">
             <ul className="flex items-center gap-8">
               {navLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-[0.88rem] text-white/65 transition-colors hover:text-white">
-                    {l.label}
+                    {t.links[l.key]}
                   </Link>
                 </li>
               ))}
@@ -46,7 +48,7 @@ export function Header() {
             <button
               type="button"
               className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-white md:hidden"
-              aria-label={open ? "Close menu" : "Open menu"}
+              aria-label={open ? t.header.closeMenu : t.header.openMenu}
               aria-expanded={open}
               aria-controls="mobile-nav"
               onClick={() => setOpen((v) => !v)}
@@ -74,7 +76,7 @@ export function Header() {
                       onClick={() => setOpen(false)}
                       className="block rounded-lg px-3 py-3 text-white/75 hover:bg-white/5 hover:text-white"
                     >
-                      {l.label}
+                      {t.links[l.key]}
                     </Link>
                   </li>
                 ))}

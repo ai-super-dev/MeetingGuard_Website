@@ -1,4 +1,7 @@
+"use client";
+
 import { AlarmClock, CircleCheck, Clock, MapPin, Video } from "lucide-react";
+import { useT } from "@/lib/language";
 import { StatusBar } from "./Device";
 import { SCREEN_H, SCREEN_W } from "./geometry";
 
@@ -43,12 +46,15 @@ type MeetingAlarmScreenProps = {
  */
 export function MeetingAlarmScreen({
   time = "9:45",
-  title = "Investor call",
-  when = "10:00 AM - 10:45 AM",
+  title: titleProp,
+  when: whenProp,
   where = "Zoom",
   height = SCREEN_H,
   theme = "wine",
 }: MeetingAlarmScreenProps) {
+  const t = useT();
+  const title = titleProp ?? t.alarm.title;
+  const when = whenProp ?? t.alarm.when;
   const C = theme === "dark" ? DARK : WINE;
   return (
     <div
@@ -67,11 +73,13 @@ export function MeetingAlarmScreen({
         </span>
 
         <p className="mt-[24px] text-[14px]" style={{ color: C.soft }}>
-          Your meeting is about to start
+          {t.alarm.aboutToStart}
         </p>
-        <p className="mt-[8px] text-[32px] leading-tight font-bold">{title}</p>
+        <p className="mt-[8px] leading-tight font-bold" style={{ fontSize: title.length > 16 ? 27 : 32 }}>
+          {title}
+        </p>
         <p className="mt-[10px] text-[16px] font-semibold" style={{ color: C.amber }}>
-          Starts in 15 minutes
+          {t.alarm.startsIn}
         </p>
         <p className="mt-[18px] flex items-center gap-[8px] text-[15px]" style={{ color: C.meta }}>
           <Clock className="h-[16px] w-[16px]" aria-hidden />
@@ -88,17 +96,17 @@ export function MeetingAlarmScreen({
             style={{ background: C.light, color: C.wine }}
           >
             <CircleCheck className="h-[18px] w-[18px] fill-current text-[#841b29] [&>path]:stroke-[#ececec]" aria-hidden />
-            I&apos;m on it
+            {t.alarm.onIt}
           </div>
           <div
             className="flex h-[46px] items-center justify-center gap-[8px] rounded-[12px] text-white"
             style={{ background: C.green }}
           >
             <Video className="h-[18px] w-[18px] fill-current" aria-hidden />
-            Join now
+            {t.alarm.joinNow}
           </div>
           <div className="grid grid-cols-2 gap-[12px]">
-            {["Snooze 5 min", "Snooze 10 min"].map((s) => (
+            {[t.alarm.snooze5, t.alarm.snooze10].map((s) => (
               <div
                 key={s}
                 className="flex h-[46px] items-center justify-center gap-[6px] rounded-[12px] border"
@@ -112,7 +120,7 @@ export function MeetingAlarmScreen({
         </div>
 
         <p className="mt-[20px] text-[14px] underline underline-offset-[3px]" style={{ color: C.soft }}>
-          Meeting details
+          {t.alarm.details}
         </p>
       </div>
 
@@ -122,7 +130,7 @@ export function MeetingAlarmScreen({
           <div className="h-full w-[90%] rounded-full" style={{ background: C.amber }} />
         </div>
         <p className="mt-[8px] text-[12px]" style={{ color: C.soft }}>
-          Auto-snooze in 54 seconds
+          {t.alarm.autoSnooze}
         </p>
       </div>
     </div>

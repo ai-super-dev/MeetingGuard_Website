@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { ZoomIcon } from "@/components/icons/brand";
 import { icons } from "@/lib/assets";
+import { useT } from "@/lib/language";
 import { StatusBar } from "./Device";
 import { SCREEN_H, SCREEN_W } from "./geometry";
 
@@ -21,6 +24,7 @@ type AlertScreenProps = {
  * it is projected into the tilted phone, so the ringing bell shares its tilt.
  */
 export function AlertScreen({ time, ringing = true, height = SCREEN_H }: AlertScreenProps) {
+  const t = useT();
   return (
     <div
       className="relative overflow-hidden rounded-[48px] bg-[#0a0a0d] text-center text-white"
@@ -49,10 +53,14 @@ export function AlertScreen({ time, ringing = true, height = SCREEN_H }: AlertSc
         />
       </div>
 
-      <p className="absolute inset-x-0 top-[438px] text-[36px] leading-tight font-semibold tracking-[-0.01em]">
-        Investor call
+      {/* longer (Spanish) titles step down a size so they stay on one line */}
+      <p
+        className="absolute inset-x-0 top-[438px] leading-tight font-semibold tracking-[-0.01em]"
+        style={{ fontSize: t.alarm.title.length > 16 ? 30 : 36 }}
+      >
+        {t.alarm.title}
       </p>
-      <p className="absolute inset-x-0 top-[488px] text-[22px] text-white/55">Starts in 15 minutes</p>
+      <p className="absolute inset-x-0 top-[488px] text-[22px] text-white/55">{t.alarm.startsIn}</p>
 
       {/* meeting platform */}
       <div className="absolute inset-x-0 top-[552px] flex items-center justify-center gap-[10px]">
@@ -63,7 +71,7 @@ export function AlertScreen({ time, ringing = true, height = SCREEN_H }: AlertSc
       {/* Join now: neon gradient outline */}
       <div className="absolute inset-x-[34px] top-[640px] rounded-[20px] bg-[linear-gradient(90deg,#3ee8ff,#7a7bff_55%,#e15bff)] p-[2.5px] shadow-[0_0_24px_rgba(90,160,255,0.45),0_0_40px_rgba(200,90,255,0.25)]">
         <div className="flex h-[66px] items-center justify-center rounded-[18px] bg-[#0c0c12] text-[23px] font-semibold">
-          Join now
+          {t.alarm.joinNow}
         </div>
       </div>
 

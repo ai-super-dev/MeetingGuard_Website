@@ -1,9 +1,11 @@
+"use client";
+
 import type { CSSProperties } from "react";
 import { ScrollDrift, TiltPhone } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
 import { PhoneMockup } from "@/components/phone/PhoneMockup";
 import { StoreButtons } from "@/components/ui/StoreButtons";
-import { siteConfig } from "@/lib/site";
+import { useT } from "@/lib/language";
 
 const rise = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
 
@@ -45,6 +47,7 @@ function TiltedRings() {
 }
 
 export function Hero() {
+  const t = useT();
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-[4.5rem] lg:pt-28">
       {/* crimson glow behind the phone */}
@@ -78,12 +81,12 @@ export function Hero() {
           className="rise relative mt-2 text-[2.75rem] leading-[1.06] font-semibold tracking-[-0.03em] sm:text-[3.6rem] lg:text-[4rem]"
           style={rise(250)}
         >
-          Never miss
+          {t.hero.line1}
           <br />
-          <span className="text-white/50">what matters.</span>
+          <span className="text-white/50">{t.hero.line2}</span>
         </h1>
         <p className="rise mt-4 text-[1.02rem] font-medium text-white/60 sm:text-[1.1rem]" style={rise(380)}>
-          {siteConfig.tagline}
+          {t.tagline}
         </p>
         <div className="rise mt-7" style={rise(500)}>
           <StoreButtons className="justify-center" />

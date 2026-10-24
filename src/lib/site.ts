@@ -18,16 +18,16 @@ export const siteConfig = {
   newsletterEndpoint: "",
 } as const;
 
-export type NavLink = { label: string; href: string };
+export type NavLink = { key: "privacy" | "terms"; href: string };
 
 export const navLinks: NavLink[] = [
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms of Service", href: "/terms" },
+  { key: "privacy", href: "/privacy" },
+  { key: "terms", href: "/terms" },
 ];
 
 export const footerLinks: NavLink[] = [
-  { label: "Terms of Service", href: "/terms" },
-  { label: "Privacy Policy", href: "/privacy" },
+  { key: "terms", href: "/terms" },
+  { key: "privacy", href: "/privacy" },
 ];
 
 export const socialLinks = [

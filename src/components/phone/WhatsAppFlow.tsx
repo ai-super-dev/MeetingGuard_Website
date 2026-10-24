@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
 import { ArrowLeft, CheckCheck, Menu, Mic, EllipsisVertical, Plus, Reply, Sun } from "lucide-react";
 import { AppMark } from "@/components/ui/Logo";
+import { useT } from "@/lib/language";
 import { siteConfig } from "@/lib/site";
 import { Screen } from "./Device";
 import { FramedPhone } from "./FramedPhone";
@@ -38,6 +39,8 @@ const pop = {
 /* ---------- phone 1: MeetingGuard app ---------- */
 
 function AppLinkScreen({ step }: { step: number }) {
+  const t = useT();
+  const l = t.whatsapp.link;
   const pressed = step === 0;
   const ready = step >= 1;
   return (
@@ -46,7 +49,7 @@ function AppLinkScreen({ step }: { step: number }) {
         <ArrowLeft className="h-[22px] w-[22px] text-white/85" aria-hidden />
         <span className="flex-1 text-[20px] font-medium">WhatsApp</span>
         <span className="grid h-[34px] w-[34px] place-items-center rounded-full text-[11px] font-semibold" style={{ background: APP.line }}>
-          EN
+          {t.lang.toUpperCase()}
         </span>
         <span className="grid h-[34px] w-[34px] place-items-center rounded-full" style={{ background: APP.line }}>
           <Sun className="h-[17px] w-[17px]" aria-hidden />
@@ -55,8 +58,7 @@ function AppLinkScreen({ step }: { step: number }) {
       </div>
 
       <p className="px-[16px] pt-[14px] text-[13px] leading-[1.45]" style={{ color: APP.muted }}>
-        Link your WhatsApp number to create meetings by message. Generate a code here, then send it to the bot from
-        WhatsApp. The code works once and expires after a few minutes.
+        {l.intro}
       </p>
 
       <div className="relative mx-[14px] mt-[14px]">
@@ -80,7 +82,7 @@ function AppLinkScreen({ step }: { step: number }) {
                   transition={{ duration: 0.45, ease: "easeOut" }}
                 />
               )}
-              <span className="relative">Generate code</span>
+              <span className="relative">{l.generate}</span>
             </motion.div>
           ) : (
             <motion.div
@@ -91,22 +93,22 @@ function AppLinkScreen({ step }: { step: number }) {
             >
               <p className="font-mono text-[36px] font-semibold tracking-[0.18em]">{LINK_CODE}</p>
               <p className="mt-[6px] text-[13px]" style={{ color: APP.muted }}>
-                Send this code by WhatsApp to {siteConfig.whatsappNumberRaw}
+                {l.sendTo} {siteConfig.whatsappNumberRaw}
               </p>
               <p className="mt-[12px] text-[13px]" style={{ color: APP.muted }}>
-                Expires in 9:58
+                {l.expires}
               </p>
               <div
                 className="mt-[14px] flex h-[42px] items-center justify-center rounded-full text-[14px] font-semibold"
                 style={{ background: "#2e3a52" }}
               >
-                Copy code
+                {l.copy}
               </div>
               <div
                 className="mt-[10px] flex h-[42px] items-center justify-center rounded-full text-[14px] font-semibold"
                 style={{ background: APP.accent, color: APP.ink }}
               >
-                Open WhatsApp
+                {l.open}
               </div>
             </motion.div>
           )}
@@ -145,6 +147,7 @@ function Bubble({ from, time, children, className = "" }: { from: "me" | "bot"; 
 }
 
 function WhatsAppChrome({ children }: { children: ReactNode }) {
+  const t = useT();
   return (
     <Screen className="bg-[#0b141a]" time="11:44" height={STRAIGHT_FRAME.screenH}>
       <div className="relative mt-[14px] flex items-center gap-[10px] px-[12px] pb-[12px]" style={{ background: WA.bar }}>
@@ -164,7 +167,7 @@ function WhatsAppChrome({ children }: { children: ReactNode }) {
       <div className="absolute inset-x-[8px] bottom-[34px] flex items-center gap-[8px]">
         <span className="flex h-[46px] flex-1 items-center gap-[10px] rounded-full px-[14px] text-[15px] text-white/40" style={{ background: WA.in }}>
           <Plus className="h-[20px] w-[20px]" aria-hidden />
-          Message
+          {t.whatsapp.chat.message}
         </span>
         <span className="grid h-[46px] w-[46px] place-items-center rounded-full" style={{ background: WA.green }}>
           <Mic className="h-[20px] w-[20px] text-[#0b141a]" aria-hidden />
@@ -175,13 +178,14 @@ function WhatsAppChrome({ children }: { children: ReactNode }) {
 }
 
 function ChatScreen({ step }: { step: number }) {
+  const c = useT().whatsapp.chat;
   return (
     <WhatsAppChrome>
       <span className="mx-auto shrink-0 rounded-[8px] px-[10px] py-[3px] text-[12px] text-white/55" style={{ background: WA.in }}>
-        Today
+        {c.today}
       </span>
       <p className="mx-[6px] shrink-0 rounded-[8px] bg-[#182229] px-[10px] py-[6px] text-center text-[12px] leading-snug text-[#e9c46a]/80">
-        This business uses a secure service from Meta to manage this chat.
+        {c.meta}
       </p>
       {step >= 2 && (
         <Bubble from="me" time="11:41">
@@ -199,29 +203,29 @@ function ChatScreen({ step }: { step: number }) {
       )}
       {step >= 4 && (
         <Bubble from="me" time="11:43">
-          investor call with Ana tomorrow at 10, add a zoom link
+          {c.request}
         </Bubble>
       )}
       {step >= 5 && (
         <>
           <Bubble from="bot" time="11:43">
-            I prepared the following for you. Please review and confirm.
+            {c.prepared}
           </Bubble>
           <motion.div {...pop} className="w-[86%] shrink-0 overflow-hidden rounded-[12px] rounded-tl-[4px]" style={{ background: WA.in }}>
             <div className="px-[11px] pt-[8px] pb-[5px] text-[15px] leading-snug">
               <p className="flex gap-[6px]">
                 <span>•</span>
-                <span>Propose an investor call with Ana tomorrow at 10:00 with a Zoom link.</span>
+                <span>{c.proposal}</span>
               </p>
-              <p className="mt-[8px]">Should I apply this? Reply 1 to confirm or 2 to cancel.</p>
+              <p className="mt-[8px]">{c.apply}</p>
               <span className="mt-[2px] block text-right text-[11px] text-white/50">11:43</span>
             </div>
             {/* WhatsApp quick-reply buttons */}
-            {["Confirm", "Cancel"].map((b) => (
+            {[c.confirm, c.cancel].map((b, bi) => (
               <div
-                key={b}
+                key={bi}
                 className="flex items-center justify-center gap-[6px] border-t border-white/[0.08] py-[8px] text-[15px] font-medium"
-                style={{ color: step >= 6 && b === "Confirm" ? "rgba(255,255,255,0.35)" : WA.green }}
+                style={{ color: step >= 6 && bi === 0 ? "rgba(255,255,255,0.35)" : WA.green }}
               >
                 <Reply className="h-[16px] w-[16px]" aria-hidden />
                 {b}
@@ -235,14 +239,14 @@ function ChatScreen({ step }: { step: number }) {
           {/* quoted reply */}
           <span className="mb-[6px] block rounded-[8px] border-l-[4px] border-[#a78bfa] bg-black/20 px-[8px] py-[5px] text-[13px] leading-snug">
             <span className="block font-semibold text-[#c4b5fd]">Meeting Guard AI</span>
-            <span className="text-white/65">• Propose an investor call with Ana tomorrow at 10:00…</span>
+            <span className="text-white/65">{c.quoted}</span>
           </span>
-          Confirm
+          {c.confirm}
         </Bubble>
       )}
       {step >= 7 && (
         <Bubble from="bot" time="11:44">
-          Done. I applied the changes.
+          {c.done}
         </Bubble>
       )}
     </WhatsAppChrome>
@@ -250,19 +254,6 @@ function ChatScreen({ step }: { step: number }) {
 }
 
 /* ---------- the row ---------- */
-
-const PHONES: { where: string; title: string; body: string }[] = [
-  {
-    where: "In MeetingGuard",
-    title: "Generate a code",
-    body: "Tap Generate code, then copy it or open WhatsApp. One-time use, expires in minutes.",
-  },
-  {
-    where: "In WhatsApp",
-    title: "Send it, then book in plain words",
-    body: "Send the code to link your number, then just ask for a meeting. Confirm, and it's done.",
-  },
-];
 
 function FlowPhone({
   index,
@@ -301,6 +292,7 @@ function FlowPhone({
 }
 
 export function WhatsAppFlow() {
+  const t = useT();
   const [done, setDone] = useState(0); // phones that have finished playing
   const screens = [
     (step: number) => <AppLinkScreen step={step} />,
@@ -309,8 +301,8 @@ export function WhatsAppFlow() {
 
   return (
     <ol className="mx-auto grid max-w-[880px] gap-14 md:grid-cols-2 md:gap-8">
-      {PHONES.map((p, i) => (
-        <li key={p.title} className="flex flex-col items-center text-center">
+      {t.whatsapp.phones.map((p, i) => (
+        <li key={i} className="flex flex-col items-center text-center">
           <p className="flex items-center gap-2 font-mono text-[0.72rem] tracking-[0.06em] uppercase">
             <span className="text-[#25D366]">0{i + 1}</span>
             <span className="text-white/55">{p.where}</span>

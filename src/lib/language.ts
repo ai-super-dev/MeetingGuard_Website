@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
+import { dictionaries, type Dict } from "./i18n";
 
 export type Lang = "en" | "es";
 
@@ -34,4 +35,10 @@ export function useLanguage() {
     window.dispatchEvent(new Event(EVENT));
   }, []);
   return [lang, setLang] as const;
+}
+
+/** The site's strings in the visitor's chosen language. */
+export function useT(): Dict {
+  const [lang] = useLanguage();
+  return dictionaries[lang];
 }

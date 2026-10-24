@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import {
@@ -9,6 +11,7 @@ import {
   YouTubeIcon,
 } from "@/components/icons/brand";
 import { Logo } from "@/components/ui/Logo";
+import { useT } from "@/lib/language";
 import { footerLinks, siteConfig, socialLinks } from "@/lib/site";
 import { NewsletterForm } from "./NewsletterForm";
 
@@ -22,17 +25,18 @@ const socialIcons = {
 };
 
 export function Footer() {
+  const t = useT();
   return (
     <footer className="border-t border-white/[0.07] bg-ink-950">
       <div className="container-page">
         <div className="grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1.4fr] lg:gap-16">
           {/* connect */}
           <div>
-            <Link href="/" aria-label="MeetingGuard home">
+            <Link href="/" aria-label={t.header.home}>
               <Logo />
             </Link>
             <p className="mt-4 max-w-[260px] text-[0.9rem] leading-relaxed text-white/60">
-              Stay organized and never miss a meeting again.
+              {t.footer.blurb}
             </p>
             <ul className="mt-6 flex items-center gap-4">
               {socialLinks.map((s) => {
@@ -54,7 +58,7 @@ export function Footer() {
 
           {/* contact */}
           <div>
-            <p className="eyebrow">Contact</p>
+            <p className="eyebrow">{t.footer.contact}</p>
             <ul className="mt-4 space-y-3 text-[0.9rem]">
               <li>
                 <a
@@ -79,7 +83,7 @@ export function Footer() {
 
           {/* updates */}
           <div className="md:col-span-2 lg:col-span-1">
-            <p className="eyebrow">Stay updated</p>
+            <p className="eyebrow">{t.footer.updates}</p>
             <div className="mt-4">
               <NewsletterForm />
             </div>
@@ -87,13 +91,13 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col items-center gap-4 border-t border-white/[0.07] py-6 sm:flex-row sm:justify-between">
-          <p className="text-xs text-white/50">© 2026 MeetingGuard. All rights reserved.</p>
-          <nav aria-label="Footer">
+          <p className="text-xs text-white/50">{t.footer.rights}</p>
+          <nav aria-label={t.footer.nav}>
             <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
               {footerLinks.map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-xs text-white/65 transition-colors hover:text-white">
-                    {l.label}
+                    {t.links[l.key]}
                   </Link>
                 </li>
               ))}

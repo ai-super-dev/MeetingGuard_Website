@@ -7,30 +7,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/terms" },
 };
 
-// Placeholder copy — replace with the reviewed legal text before launch.
+// Placeholder copy (English and Spanish in src/lib/i18n.ts) — replace with the reviewed legal text before launch.
 export default function TermsPage() {
-  return (
-    <LegalPage
-      title="Terms of Service"
-      updated="October 24, 2026"
-      sections={[
-        {
-          heading: "1. Acceptance of terms",
-          body: "By downloading or using MeetingGuard you agree to these terms. If you do not agree, please do not use the app.",
-        },
-        {
-          heading: "2. Your account",
-          body: "You are responsible for the calendars and accounts you connect, and for keeping your sign-in credentials secure.",
-        },
-        {
-          heading: "3. Acceptable use",
-          body: "Do not misuse the service, interfere with its operation, or use it to send unsolicited invitations.",
-        },
-        {
-          heading: "4. Changes",
-          body: "We may update these terms from time to time. Continued use after changes take effect means you accept the revised terms.",
-        },
-      ]}
-    />
-  );
+  return <LegalPage doc="terms" />;
 }
