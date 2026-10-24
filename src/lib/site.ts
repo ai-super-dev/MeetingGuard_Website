@@ -15,9 +15,8 @@ export const siteConfig = {
 export type NavLink = { label: string; href: string };
 
 export const navLinks: NavLink[] = [
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "WhatsApp", href: "/#whatsapp" },
-  { label: "Features", href: "/#features" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
 ];
 
 export const footerLinks: NavLink[] = [
