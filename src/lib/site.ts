@@ -8,6 +8,10 @@ export const siteConfig = {
   // TODO: replace with the real store listings.
   appStoreUrl: "#",
   playStoreUrl: "#",
+  // TODO: replace with the agent's real WhatsApp number and its wa.me link
+  // (e.g. "https://wa.me/15550100199").
+  whatsappNumber: "+1 (555) 010-0199",
+  whatsappUrl: "#",
 } as const;
 
 export type NavLink = { label: string; href: string };

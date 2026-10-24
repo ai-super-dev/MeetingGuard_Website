@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { BellRing, Check, CheckCheck, ChevronLeft, Copy, Mic, Plus, Users, Video } from "lucide-react";
-import { GoogleCalendarIcon, GoogleMeetIcon, OutlookIcon, WhatsAppIcon, ZoomIcon } from "@/components/icons/brand";
+import { BellRing, Check, ChevronLeft, Copy, Mic, Users, Video } from "lucide-react";
+import { GoogleCalendarIcon, GoogleMeetIcon, OutlookIcon, ZoomIcon } from "@/components/icons/brand";
 import { AppMark } from "@/components/ui/Logo";
 import { Screen } from "./Device";
 
@@ -140,63 +140,6 @@ export function JoinScreen({ height }: ScreenProps) {
         <div className="flex h-[58px] items-center justify-center gap-[8px] rounded-[18px] bg-[#0c0c12] text-[19px] font-semibold">
           <Video className="h-[20px] w-[20px]" aria-hidden /> Join now
         </div>
-      </div>
-    </Screen>
-  );
-}
-
-/** WhatsApp chat with the MeetingGuard assistant. */
-export function WhatsAppScreen() {
-  return (
-    <Screen className="bg-[#0b0f0d]">
-      <TopBar
-        title="MeetingGuard"
-        leading={
-          <span className="relative">
-            <AppMark className="h-[28px] w-[28px]" sizes="56px" />
-            <WhatsAppIcon className="absolute -right-[4px] -bottom-[4px] h-[14px] w-[14px]" />
-          </span>
-        }
-      />
-      <div className="flex flex-col gap-[12px] px-[16px] pt-[16px]">
-        <p className="mx-auto rounded-[8px] bg-white/[0.06] px-[10px] py-[3px] text-[12px] text-white/45">Today</p>
-        {/* voice note */}
-        <div className="ml-auto flex w-[78%] items-center gap-[10px] rounded-[18px] rounded-br-[6px] bg-[#1f6e4c]/70 px-[12px] py-[10px]">
-          <span className="grid h-[30px] w-[30px] place-items-center rounded-full bg-white/15">
-            <Mic className="h-[15px] w-[15px]" aria-hidden />
-          </span>
-          <span className="flex h-[20px] flex-1 items-center gap-[2px]" aria-hidden>
-            {[8, 14, 6, 18, 10, 16, 7, 12, 18, 9, 14, 6, 11, 16, 8, 12].map((h, i) => (
-              <span key={i} className="w-[3px] rounded-full bg-white/70" style={{ height: h }} />
-            ))}
-          </span>
-          <span className="text-[12px] text-white/60">0:06</span>
-        </div>
-        <div className="ml-auto max-w-[80%] rounded-[18px] rounded-br-[6px] bg-[#1f6e4c]/70 px-[14px] py-[10px] text-[15px] leading-snug">
-          Meeting with Ana and the design team this Friday at 10, Zoom link please
-          <span className="mt-[2px] flex items-center justify-end gap-[4px] text-[11px] text-white/50">
-            9:41 <CheckCheck className="h-[13px] w-[13px] text-[#53bdeb]" aria-hidden />
-          </span>
-        </div>
-        <div className="max-w-[88%] rounded-[18px] rounded-bl-[6px] border border-white/[0.06] bg-white/[0.05] p-[14px] text-[14px] text-white/80">
-          <p className="text-[16px] font-semibold text-white">Design review · Fri 10:00</p>
-          <p className="mt-[6px] flex items-center gap-[6px]">
-            <ZoomIcon className="h-[16px] w-[16px]" /> zoom.us/j/57204816390
-          </p>
-          <p className="mt-[4px] flex items-center gap-[6px]">
-            <GoogleCalendarIcon className="h-[16px] w-[16px]" /> Added to Google Calendar
-          </p>
-          <p className="mt-[4px] flex items-center gap-[6px]">
-            <Users className="h-[16px] w-[16px]" aria-hidden /> Invitations sent to 4 people
-          </p>
-        </div>
-      </div>
-      <div className="absolute inset-x-[12px] bottom-[34px] flex h-[48px] items-center gap-[10px] rounded-full bg-white/[0.06] px-[14px] text-[14px] text-white/35">
-        <Plus className="h-[20px] w-[20px]" aria-hidden />
-        <span className="flex-1">Message</span>
-        <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-[#25D366]">
-          <Mic className="h-[16px] w-[16px] text-[#0b0f0d]" aria-hidden />
-        </span>
       </div>
     </Screen>
   );
