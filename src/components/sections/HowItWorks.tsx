@@ -45,13 +45,13 @@ const STEPS: Step[] = [
 /** Plan, Alert and Join each get their own phone colour. */
 const PHONE_BODY_H = 500;
 const SCREENS = [
-  <FramedPhone key="plan" frame={PURPLE_FRAME} bodyHeight={PHONE_BODY_H}>
+  <FramedPhone key="plan" frame={PURPLE_FRAME} bodyHeight={PHONE_BODY_H} mirror>
     <PlanScreen height={PURPLE_FRAME.screenH} />
   </FramedPhone>,
-  <FramedPhone key="alert" frame={RED_FRAME} bodyHeight={PHONE_BODY_H}>
+  <FramedPhone key="alert" frame={RED_FRAME} bodyHeight={PHONE_BODY_H} mirror>
     <AlertScreen time="9:45" height={RED_FRAME.screenH} />
   </FramedPhone>,
-  <FramedPhone key="join" frame={TEAL_FRAME} bodyHeight={PHONE_BODY_H}>
+  <FramedPhone key="join" frame={TEAL_FRAME} bodyHeight={PHONE_BODY_H} mirror>
     <JoinScreen height={TEAL_FRAME.screenH} />
   </FramedPhone>,
 ];

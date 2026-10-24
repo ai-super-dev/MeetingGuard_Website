@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -175,16 +175,6 @@ function CalendarWeek() {
 
 /* ---------- the phone stepping in ---------- */
 
-/**
- * Glossy-floor reflection under the phone (the calendar gets the same one on
- * desktop via a Tailwind class). The mask is laid over
- * the reflection before it's flipped, so its bottom (opaque) end sits right
- * at the object's edge and the reflection fades out as it goes down.
- */
-const MIRROR: CSSProperties = {
-  WebkitBoxReflect: "below 6px linear-gradient(transparent 76%, rgba(255,255,255,0.24))",
-};
-
 function GuardPhone() {
   return (
     <div className="relative lg:-translate-x-9">
@@ -192,11 +182,9 @@ function GuardPhone() {
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
-      <div className="relative" style={MIRROR}>
-        <FramedPhone frame={BLUE_FRAME} bodyHeight={476}>
+      <FramedPhone frame={BLUE_FRAME} bodyHeight={476} mirror>
         <AlertScreen time="9:45" ringing={false} height={BLUE_FRAME.screenH} />
-        </FramedPhone>
-      </div>
+      </FramedPhone>
     </div>
   );
 }

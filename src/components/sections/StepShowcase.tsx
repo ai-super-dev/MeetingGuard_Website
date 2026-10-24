@@ -165,7 +165,7 @@ export function StepShowcase({
         onPointerLeave={() => setHovered(false)}
       >
         {/* phone */}
-        <div className="flex flex-col items-center">
+        <div className="mb-16 flex flex-col items-center md:mb-0">
           <div className="relative">
             {glows.map((g, i) => (
               <motion.div
