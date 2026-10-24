@@ -1,7 +1,16 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+  type MotionValue,
+} from "motion/react";
 
 export type Step = {
   day: string;
@@ -11,14 +20,54 @@ export type Step = {
   points: string[];
 };
 
-/** How long each step stays on screen before advancing (s). */
+/** Seconds the timeline takes to flow from one step to the next. */
 const DWELL = 6;
 const ease = [0.22, 1, 0.36, 1] as const;
+
+function TrackNode({
+  step,
+  index,
+  progress,
+  onSelect,
+}: {
+  step: Step;
+  index: number;
+  progress: MotionValue<number>;
+  onSelect: () => void;
+}) {
+  const lit = useTransform(progress, [index - 0.04, index], [0, 1]);
+  const label = useTransform(lit, [0, 1], [0.45, 1]);
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="group flex flex-col items-center focus-visible:outline-none"
+      aria-label={`Show step ${index + 1}: ${step.title}`}
+    >
+      <span className="relative grid h-4 w-4 place-items-center">
+        <span className="absolute inset-0 rounded-full border border-white/15 bg-ink-950 group-focus-visible:ring-2 group-focus-visible:ring-accent" />
+        <motion.span
+          className="absolute inset-0 rounded-full bg-accent shadow-[0_0_0_4px_rgba(255,77,94,0.18),0_0_18px_rgba(255,77,94,0.8)]"
+          style={{ opacity: lit, scale: lit }}
+        />
+      </span>
+      <motion.span
+        style={{ opacity: label }}
+        className="mt-3 flex items-baseline gap-1.5 font-mono text-[0.66rem] tracking-[0.06em] whitespace-nowrap group-hover:!opacity-100 sm:gap-2 sm:text-[0.72rem]"
+      >
+        <span className="text-white/45 uppercase">{step.day}</span>
+        <span className="text-[0.85rem] text-white tabular-nums sm:text-[0.95rem]">{step.time}</span>
+      </motion.span>
+    </button>
+  );
+}
 
 /**
  * Plan → Alert → Join as one interactive story: the phone on the left and the
  * explanation on the right change together. It advances on its own while in
- * view; the dots under the phone and the timeline above jump to any step.
+ * view: the timeline line flows from one time to the next and the step changes
+ * when it arrives. Pausing (hover, off-screen) freezes the line mid-flow;
+ * clicking a time glides the line there.
  */
 export function StepShowcase({ steps, screens }: { steps: Step[]; screens: ReactNode[] }) {
   const [active, setActive] = useState(0);
@@ -28,50 +77,71 @@ export function StepShowcase({ steps, screens }: { steps: Step[]; screens: React
   const reduce = useReducedMotion();
   const playing = inView && !hovered && !reduce;
   const last = steps.length - 1;
-  const next = () => setActive((a) => (a + 1) % steps.length);
   const step = steps[active];
+
+  /** Position on the timeline in step units: 0 = first step, `last` = final step. */
+  const progress = useMotionValue(0);
+  const fill = useTransform(progress, (v) => (last ? v / last : 0));
+  const head = useTransform(fill, (v) => `${v * 100}%`);
+  const snap = useRef(false);
+
+  const select = (i: number) => {
+    snap.current = true;
+    setActive(i);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    let controls: ReturnType<typeof animate> | undefined;
+    const run = async () => {
+      // after a click (or the loop restarting) glide the line to the chosen step
+      if (snap.current) {
+        snap.current = false;
+        controls = animate(progress, active, { duration: 0.8, ease });
+        await controls;
+      }
+      if (cancelled || !playing) return;
+      if (active < last) {
+        // time flows toward the next step, continuing from wherever it paused
+        const target = active + 1;
+        controls = animate(progress, target, { duration: (target - progress.get()) * DWELL, ease: "linear" });
+        await controls;
+        if (!cancelled) setActive(target);
+      } else {
+        await new Promise((r) => setTimeout(r, DWELL * 1000));
+        if (!cancelled) select(0);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+      controls?.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, playing]);
 
   return (
     <div ref={ref}>
-      {/* timeline: fills up to the active step */}
-      <div className="relative mx-auto hidden max-w-[760px] md:block">
-        <span aria-hidden className="absolute top-[7px] right-[16.66%] left-[16.66%] h-px bg-white/10" />
-        <motion.span
-          aria-hidden
-          className="absolute top-[6.5px] right-[16.66%] left-[16.66%] h-[2px] origin-left bg-[linear-gradient(90deg,#ff4d5e,#ff8a95)] shadow-[0_0_12px_rgba(255,77,94,0.7)]"
-          animate={{ scaleX: last ? active / last : 0 }}
-          transition={{ duration: 0.8, ease }}
-        />
+      {/* timeline: the line itself is the timer, flowing from one time to the next */}
+      <div className="relative mx-auto max-w-[760px]" role="group" aria-label="How it works steps">
+        <div className="absolute top-[7px] right-[16.66%] left-[16.66%]">
+          <span aria-hidden className="absolute inset-x-0 h-px bg-white/10" />
+          <motion.span
+            aria-hidden
+            className="absolute inset-x-0 -top-px h-[2px] origin-left bg-[linear-gradient(90deg,#ff4d5e,#ff8a95)] shadow-[0_0_12px_rgba(255,77,94,0.7)]"
+            style={{ scaleX: fill }}
+          />
+          {/* glowing "now" head riding the end of the line */}
+          <motion.span
+            aria-hidden
+            className="absolute top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_10px_3px_rgba(255,120,135,0.9)]"
+            style={{ left: head }}
+          />
+        </div>
         <div className="grid grid-cols-3">
-          {steps.map((s, i) => {
-            const lit = i <= active;
-            return (
-              <button
-                key={s.title}
-                type="button"
-                onClick={() => setActive(i)}
-                className="group flex flex-col items-center focus-visible:outline-none"
-                aria-label={`Show step ${i + 1}: ${s.title}`}
-              >
-                <span className="relative grid h-4 w-4 place-items-center">
-                  <span className="absolute inset-0 rounded-full border border-white/15 bg-ink-950 group-focus-visible:ring-2 group-focus-visible:ring-accent" />
-                  <motion.span
-                    className="absolute inset-0 rounded-full bg-accent shadow-[0_0_0_4px_rgba(255,77,94,0.18),0_0_18px_rgba(255,77,94,0.8)]"
-                    animate={{ opacity: lit ? 1 : 0, scale: lit ? 1 : 0.3 }}
-                    transition={{ duration: 0.4, delay: lit ? 0.35 : 0 }}
-                  />
-                </span>
-                <span
-                  className={`mt-3 flex items-baseline gap-2 font-mono text-[0.72rem] tracking-[0.06em] whitespace-nowrap transition-opacity duration-500 ${
-                    lit ? "opacity-100" : "opacity-45 group-hover:opacity-75"
-                  }`}
-                >
-                  <span className="text-white/45 uppercase">{s.day}</span>
-                  <span className="text-[0.95rem] text-white tabular-nums">{s.time}</span>
-                </span>
-              </button>
-            );
-          })}
+          {steps.map((s, i) => (
+            <TrackNode key={s.title} step={s} index={i} progress={progress} onSelect={() => select(i)} />
+          ))}
         </div>
       </div>
 
@@ -80,7 +150,7 @@ export function StepShowcase({ steps, screens }: { steps: Step[]; screens: React
         onPointerEnter={() => setHovered(true)}
         onPointerLeave={() => setHovered(false)}
       >
-        {/* phone + step dots */}
+        {/* phone */}
         <div className="flex flex-col items-center">
           <div className="relative">
             <motion.div
@@ -111,39 +181,6 @@ export function StepShowcase({ steps, screens }: { steps: Step[]; screens: React
             </div>
           </div>
 
-          <div className="mt-2 flex items-center gap-2" role="tablist" aria-label="How it works steps">
-            {steps.map((s, i) => (
-              <button
-                key={s.title}
-                type="button"
-                role="tab"
-                aria-selected={i === active}
-                aria-label={`Step ${i + 1}: ${s.title}`}
-                onClick={() => setActive(i)}
-                className="group grid h-6 place-items-center px-0.5 focus-visible:outline-none"
-              >
-                <span
-                  className={`relative block h-[6px] overflow-hidden rounded-full transition-all duration-500 group-focus-visible:ring-2 group-focus-visible:ring-accent ${
-                    i === active ? "w-9 bg-white/15" : "w-[6px] bg-white/25 group-hover:bg-white/50"
-                  }`}
-                >
-                  {i === active &&
-                    (playing ? (
-                      <motion.span
-                        key={`${active}-play`}
-                        className="absolute inset-0 origin-left rounded-full bg-accent"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: DWELL, ease: "linear" }}
-                        onAnimationComplete={next}
-                      />
-                    ) : (
-                      <span className="absolute inset-0 rounded-full bg-accent" />
-                    ))}
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* explanation */}
