@@ -20,6 +20,9 @@ function StatusIcons() {
   );
 }
 
+/** One timeline for the slider knob, its trail and the label so they stay in sync. */
+const SLIDE = "3.6s cubic-bezier(0.45,0,0.2,1) 2s infinite both";
+
 /**
  * The lock screen shown inside the phone, laid out at SCREEN_W×SCREEN_H CSS
  * px and projected into the frame's opening by PhoneMockup.
@@ -80,18 +83,24 @@ export function LockScreen() {
 
       {/* slide to join */}
       <div className="absolute inset-x-[30px] top-[628px] flex h-[100px] items-center overflow-hidden rounded-full border border-[#a98bff]/40 bg-[linear-gradient(90deg,rgba(80,70,200,0.55),rgba(110,60,210,0.35))] shadow-[0_0_24px_rgba(140,90,255,0.45),inset_0_1px_0_rgba(255,255,255,0.12)]">
+        {/* knob + its light trail move as one piece */}
         <span
-          aria-hidden
-          className="absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)]"
-          style={{ animation: "hero-sweep 3.6s ease-in-out 2s infinite" }}
-        />
-        <span
-          className="relative z-10 ml-[11px] grid h-[78px] w-[78px] place-items-center rounded-full bg-white shadow-[0_0_20px_rgba(160,140,255,0.9)]"
-          style={{ animation: "lock-knob 3.6s cubic-bezier(0.45,0,0.2,1) 2s infinite" }}
+          className="relative z-10 ml-[11px] h-[78px] w-[78px] shrink-0"
+          style={{ animation: `lock-knob ${SLIDE}` }}
         >
-          <ChevronRight className="h-[38px] w-[38px] text-[#4b3bdc]" strokeWidth={3} aria-hidden />
+          <span
+            aria-hidden
+            className="absolute top-1/2 right-1/2 h-[66px] w-[170px] -translate-y-1/2 rounded-full bg-[linear-gradient(90deg,transparent,rgba(210,200,255,0.25)_45%,rgba(255,255,255,0.75))] blur-[3px]"
+            style={{ animation: `lock-trail ${SLIDE}` }}
+          />
+          <span className="absolute inset-0 grid place-items-center rounded-full bg-white shadow-[0_0_20px_rgba(160,140,255,0.9)]">
+            <ChevronRight className="h-[38px] w-[38px] text-[#4b3bdc]" strokeWidth={3} aria-hidden />
+          </span>
         </span>
-        <span className="flex-1 pr-[20px] text-center text-[26px] font-medium">
+        <span
+          className="flex-1 pr-[20px] text-center text-[26px] font-medium"
+          style={{ animation: `lock-label ${SLIDE}` }}
+        >
           slide to{" "}
           <span className="bg-[linear-gradient(90deg,#b28cff,#e48cff)] bg-clip-text text-transparent">join</span>
         </span>

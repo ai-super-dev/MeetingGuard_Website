@@ -219,16 +219,6 @@ body {
   }
 }
 
-@keyframes hero-sweep {
-  0%,
-  55% {
-    transform: translateX(-130%) skewX(-18deg);
-  }
-  100% {
-    transform: translateX(330%) skewX(-18deg);
-  }
-}
-
 @keyframes hero-drift {
   0% {
     opacity: 0;
@@ -364,6 +354,11 @@ body {
   }
 }
 
+/*
+ * Slider: knob, trail and label share the SLIDE timeline (LockScreen.tsx)
+ * and the same stops — the knob slides out over 20–45%, holds, returns by
+ * 100%; the trail glows only while it slides out; the label dims meanwhile.
+ */
 @keyframes lock-knob {
   0%,
   20%,
@@ -373,6 +368,33 @@ body {
   45%,
   60% {
     transform: translateX(58px);
+  }
+}
+
+@keyframes lock-trail {
+  0%,
+  20%,
+  100% {
+    opacity: 0;
+  }
+  32%,
+  45% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+}
+
+@keyframes lock-label {
+  0%,
+  20%,
+  100% {
+    opacity: 1;
+  }
+  45%,
+  60% {
+    opacity: 0.3;
   }
 }
 
