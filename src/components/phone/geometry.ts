@@ -68,7 +68,7 @@ export const SILVER_FRAME: FrameSpec = {
   ),
 };
 
-/** phone-purple_cal.png — the purple phone beside the calendar. */
+/** phone-alert.png — the alarm phone beside the calendar. */
 export const CAL_FRAME: FrameSpec = {
   src: images.phoneCal,
   w: 1086,

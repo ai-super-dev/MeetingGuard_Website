@@ -4,7 +4,7 @@ import appIcon from "../../public/icons/app_icon.png";
 import appStoreIcon from "../../public/icons/app_store_icon.png";
 import bellIcon from "../../public/icons/bell_icon.png";
 import playStoreIcon from "../../public/icons/play_store_icon.png";
-import phoneCal from "../../public/images/phone-purple_cal.png";
+import phoneCal from "../../public/images/phone-alert.png";
 import phoneFrame from "../../public/images/phone_frame.png";
 import phoneFrameStraight from "../../public/images/phone_frame_str.png";
 import phonePurple from "../../public/images/phone_purple.png";
