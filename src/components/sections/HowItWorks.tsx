@@ -1,5 +1,5 @@
 import { Reveal } from "@/components/motion";
-import { AlertScreen } from "@/components/phone/AlertScreen";
+import { MeetingAlarmScreen } from "@/components/phone/MeetingAlarmScreen";
 import { JoinScreen, PlanScreen } from "@/components/phone/screens";
 import { FramedPhone } from "@/components/phone/FramedPhone";
 import { PURPLE_FRAME, RED_FRAME, TEAL_FRAME } from "@/components/phone/geometry";
@@ -49,7 +49,7 @@ const SCREENS = [
     <PlanScreen height={PURPLE_FRAME.screenH} />
   </FramedPhone>,
   <FramedPhone key="alert" frame={RED_FRAME} bodyHeight={PHONE_BODY_H} mirror>
-    <AlertScreen time="9:45" ringing={false} height={RED_FRAME.screenH} />
+    <MeetingAlarmScreen height={RED_FRAME.screenH} />
   </FramedPhone>,
   <FramedPhone key="join" frame={TEAL_FRAME} bodyHeight={PHONE_BODY_H} mirror>
     <JoinScreen height={TEAL_FRAME.screenH} />
