@@ -43,10 +43,10 @@ export const PHONE_H = (PHONE.w * FRAME_H) / FRAME_W;
  * (TL, TR, BR, BL — frame px).
  */
 const SCREEN_QUAD: [number, number][] = [
-  [337.7, 83.5],
-  [904.7, 108.7],
-  [629.2, 1505.7],
-  [35.7, 1425.9],
+  [363.1, 80.6],
+  [896.5, 104.3],
+  [680.6, 1421.7],
+  [115.5, 1353.9],
 ];
 
 /** Lock-screen layout size (CSS px) before it is projected into the opening. */
