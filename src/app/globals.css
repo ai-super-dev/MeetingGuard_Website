@@ -195,6 +195,35 @@ body {
   }
 }
 
+/* a phone on vibrate: two short buzzes, then a pause */
+@keyframes phone-vibrate {
+  0%,
+  44%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  2%,
+  6%,
+  10%,
+  26%,
+  30%,
+  34% {
+    transform: translate(-2.5px, 0) rotate(-0.6deg);
+  }
+  4%,
+  8%,
+  12%,
+  28%,
+  32%,
+  36% {
+    transform: translate(2.5px, 0) rotate(0.6deg);
+  }
+  14%,
+  24% {
+    transform: translate(0, 0) rotate(0);
+  }
+}
+
 /* hero rings: spread out from the phone, fading to nothing as they go */
 @keyframes ring-out {
   0% {

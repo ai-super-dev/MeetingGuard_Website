@@ -7,28 +7,37 @@ import { SCREEN_H, SCREEN_W } from "./geometry";
 /** One ring of the alarm: the bell shakes, then rests. */
 const RING = "2.4s";
 
+type AlertScreenProps = {
+  /** Clock shown in the status bar. */
+  time?: string;
+  /** Animate the bell; off when the whole phone vibrates instead. */
+  ringing?: boolean;
+  /** Screen height in CSS px (frames differ slightly in aspect). */
+  height?: number;
+};
+
 /**
- * The 15-minute meeting alarm, laid out at SCREEN_W×SCREEN_H CSS px and
- * projected into the hero phone, so the ringing bell shares the phone's tilt.
+ * The 15-minute meeting alarm, laid out at SCREEN_W CSS px wide. In the hero
+ * it is projected into the tilted phone, so the ringing bell shares its tilt.
  */
-export function AlertScreen() {
+export function AlertScreen({ time, ringing = true, height = SCREEN_H }: AlertScreenProps) {
   return (
     <div
       className="relative overflow-hidden rounded-[48px] bg-[#0a0a0d] text-center text-white"
-      style={{ width: SCREEN_W, height: SCREEN_H }}
+      style={{ width: SCREEN_W, height }}
     >
       <div
         aria-hidden
         className="absolute inset-0 bg-[radial-gradient(70%_42%_at_50%_34%,rgba(255,40,70,0.22),transparent_70%),linear-gradient(180deg,#101016_0%,#0a0a0d_60%)]"
       />
-      <StatusBar className="relative px-[34px] pt-[20px]" />
+      <StatusBar time={time} className="relative px-[34px] pt-[20px]" />
 
       {/* ringing bell */}
       <div className="absolute top-[150px] left-1/2 h-[250px] w-[250px] -translate-x-1/2">
         <span
           aria-hidden
           className="absolute inset-[6%] rounded-full bg-[radial-gradient(closest-side,rgba(255,40,70,0.55),rgba(255,40,70,0.12)_60%,transparent)]"
-          style={{ animation: `bell-glow ${RING} ease-in-out infinite` }}
+          style={ringing ? { animation: `bell-glow ${RING} ease-in-out infinite` } : undefined}
         />
         <Image
           src={icons.bell}
@@ -36,7 +45,7 @@ export function AlertScreen() {
           sizes="260px"
           preload
           className="relative h-full w-full origin-[50%_14%] object-contain"
-          style={{ animation: `bell-vibrate ${RING} linear infinite` }}
+          style={ringing ? { animation: `bell-vibrate ${RING} linear infinite` } : undefined}
         />
       </div>
 

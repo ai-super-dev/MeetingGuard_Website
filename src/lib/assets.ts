@@ -5,8 +5,9 @@ import appStoreIcon from "../../public/icons/app_store_icon.png";
 import bellIcon from "../../public/icons/bell_icon.png";
 import playStoreIcon from "../../public/icons/play_store_icon.png";
 import phoneFrame from "../../public/images/phone_frame.png";
+import phoneFrameStraight from "../../public/images/phone_frame_str.png";
 
-export const images = { phoneFrame };
+export const images = { phoneFrame, phoneFrameStraight };
 
 export const icons = {
   app: appIcon,

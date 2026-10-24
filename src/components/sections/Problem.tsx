@@ -1,8 +1,19 @@
-import { BellRing, ChevronDown, ChevronLeft, ChevronRight, Menu, Search, Video, X } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  BellRing,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  CircleX,
+  Menu,
+  Search,
+  Vibrate,
+} from "lucide-react";
 import { GoogleCalendarIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
-import { FlatPhone } from "@/components/phone/Device";
+import { STRAIGHT_SCREEN_H, StraightPhone } from "@/components/phone/StraightPhone";
 import { AppMark } from "@/components/ui/Logo";
 
 /* ---------- calendar week mock ---------- */
@@ -87,7 +98,10 @@ function EventBlock({ e }: { e: CalEvent }) {
 
 function CalendarWeek() {
   return (
-    <div className="surface overflow-hidden rounded-2xl">
+    <div
+      className="overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#0f0f13,#0a0a0d)] shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
+      style={{ border: "2px solid rgba(255,255,255,0.13)" }}
+    >
       {/* app bar */}
       <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3 text-white/70 sm:gap-3 lg:pr-9">
         <Menu className="hidden h-4 w-4 sm:block" aria-hidden />
@@ -167,68 +181,143 @@ function CalendarWeek() {
   );
 }
 
-/* ---------- minute-by-minute comparison ---------- */
+/* ---------- the phone stepping in ---------- */
 
-const MOMENTS = ["9:45", "9:50", "10:00"];
+/** Floating glass card: the moment MeetingGuard acts. */
+function MomentBadge() {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#121216]/80 py-2.5 pr-4 pl-2.5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md">
+      <span className="relative grid h-10 w-10 place-items-center rounded-xl bg-accent/15">
+        <span className="absolute inset-0 rounded-xl bg-accent/25 [animation:glow-pulse_2s_ease-in-out_infinite]" />
+        <Vibrate className="relative h-5 w-5 text-[#ff8a95]" aria-hidden />
+      </span>
+      <span className="leading-tight">
+        <span className="flex items-baseline gap-2">
+          <span className="text-[1.35rem] font-semibold tabular-nums">9:45</span>
+          <span className="flex items-center gap-1 text-[0.68rem] font-medium tracking-wide text-[#ff8a95] uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent [animation:glow-pulse_1s_ease-in-out_infinite]" />
+            Now
+          </span>
+        </span>
+        <span className="block text-[0.72rem] whitespace-nowrap text-white/50">15 min before · Investor call</span>
+      </span>
+    </div>
+  );
+}
 
-const ROWS = [
+function GuardPhone() {
+  return (
+    <div className="relative">
+      <div
+        aria-hidden
+        className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
+      />
+      {/* the phone itself vibrates instead of the bell ringing */}
+      <div className="relative [animation:phone-vibrate_2.2s_linear_infinite]">
+        <StraightPhone width={360}>
+          <AlertScreen time="9:45" ringing={false} height={STRAIGHT_SCREEN_H} />
+        </StraightPhone>
+      </div>
+      {/* centred above the screen on phones; out over the calendar's empty afternoon on desktop */}
+      <div className="absolute top-[3%] left-1/2 -translate-x-1/2 lg:top-auto lg:bottom-[5%] lg:-left-28 lg:translate-x-0">
+        <div className="[animation:float_6s_ease-in-out_infinite]">
+          <MomentBadge />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- with vs. without ---------- */
+
+type Lane = {
+  title: string;
+  icon: ReactNode;
+  outcome: string;
+  good: boolean;
+  steps: [string, string][];
+};
+
+const LANES: Lane[] = [
   {
-    who: "Your calendar",
+    title: "Calendar alone",
     icon: <GoogleCalendarIcon className="h-5 w-5" />,
-    steps: ["Nothing happens", "One small banner, swiped away", "The call started without you"],
-    tone: "muted" as const,
+    outcome: "Late for the call",
+    good: false,
+    steps: [
+      ["9:45", "Nothing happens."],
+      ["9:50", "One small banner — swiped away with everything else."],
+      ["10:00", "The call starts without you."],
+    ],
   },
   {
-    who: "MeetingGuard",
+    title: "With MeetingGuard",
     icon: <AppMark className="h-5 w-5" sizes="40px" />,
-    steps: ["Alarm rings — even with the app closed", "Follow-up until you respond", "One tap: you're in the Zoom call"],
-    tone: "accent" as const,
+    outcome: "On time",
+    good: true,
+    steps: [
+      ["9:45", "Your phone vibrates and a full-screen alarm takes over — even with the app closed."],
+      ["9:50", "Follow-ups keep going until you respond."],
+      ["10:00", "One tap on Join now — you’re in the Zoom call."],
+    ],
   },
 ];
 
-function Comparison() {
+function LaneCard({ lane }: { lane: Lane }) {
   return (
-    <div className="surface mt-5 overflow-hidden rounded-2xl">
-      <div className="hidden grid-cols-[180px_repeat(3,minmax(0,1fr))] border-b border-white/[0.06] md:grid">
-        <span />
-        {MOMENTS.map((m) => (
-          <span key={m} className="px-5 py-3 font-mono text-[0.72rem] text-white/40">
-            {m}
-          </span>
-        ))}
-      </div>
-      {ROWS.map((r) => (
-        <div
-          key={r.who}
-          className="grid grid-cols-1 border-b border-white/[0.06] last:border-b-0 md:grid-cols-[180px_repeat(3,minmax(0,1fr))]"
+    <div
+      className={`relative h-full overflow-hidden rounded-2xl p-6 sm:p-7 ${
+        lane.good
+          ? "border border-accent/30 bg-[radial-gradient(90%_70%_at_100%_0%,rgba(255,60,80,0.16),transparent_70%),linear-gradient(180deg,#121014,#0b0a0d)]"
+          : "surface"
+      }`}
+    >
+      <div className="flex items-center gap-2.5">
+        {lane.icon}
+        <span className={`text-[0.95rem] font-semibold ${lane.good ? "text-white" : "text-white/60"}`}>
+          {lane.title}
+        </span>
+        <span
+          className={`ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.72rem] font-medium ${
+            lane.good ? "bg-emerald-400/12 text-emerald-300" : "bg-white/[0.06] text-white/45"
+          }`}
         >
-          <p className="flex items-center gap-2.5 px-5 pt-4 pb-2 text-[0.9rem] font-semibold md:py-4">
-            {r.icon}
-            <span className={r.tone === "accent" ? "text-white" : "text-white/55"}>{r.who}</span>
-          </p>
-          {r.steps.map((s, i) => (
-            <p
-              key={s}
-              className={`flex items-start gap-2 px-5 py-1.5 text-[0.85rem] leading-snug md:py-4 ${
-                r.tone === "accent" ? "text-white/85" : "text-white/35"
+          {lane.good ? (
+            <CircleCheck className="h-3.5 w-3.5" aria-hidden />
+          ) : (
+            <CircleX className="h-3.5 w-3.5" aria-hidden />
+          )}
+          {lane.outcome}
+        </span>
+      </div>
+
+      <ol className="relative mt-7 space-y-5">
+        <span
+          aria-hidden
+          className={`absolute top-2 bottom-2 left-[61px] w-px ${
+            lane.good ? "bg-[linear-gradient(180deg,#ff4d5e,rgba(255,77,94,0.15))]" : "bg-white/10"
+          }`}
+        />
+        {lane.steps.map(([time, text], i) => (
+          <li key={time} className="relative grid grid-cols-[44px_12px_minmax(0,1fr)] items-start gap-x-3">
+            <span className={`pt-px font-mono text-[0.74rem] ${lane.good ? "text-[#ff8a95]" : "text-white/35"}`}>
+              {time}
+            </span>
+            <span
+              className={`mt-1 h-3 w-3 rounded-full border-2 ${
+                lane.good
+                  ? "border-accent bg-[#1a0b0e] shadow-[0_0_10px_rgba(255,77,94,0.7)]"
+                  : i === lane.steps.length - 1
+                    ? "border-white/30 bg-white/30"
+                    : "border-white/20 bg-ink-950"
               }`}
-            >
-              <span className="w-11 shrink-0 font-mono text-[0.7rem] text-white/30 md:hidden">{MOMENTS[i]}</span>
-              {r.tone === "accent" ? (
-                i === 2 ? (
-                  <Video className="mt-0.5 h-4 w-4 shrink-0 text-[#ff8a95]" aria-hidden />
-                ) : (
-                  <BellRing className="mt-0.5 h-4 w-4 shrink-0 text-[#ff8a95]" aria-hidden />
-                )
-              ) : (
-                <X className="mt-0.5 h-4 w-4 shrink-0 text-white/25" aria-hidden />
-              )}
-              {s}
-            </p>
-          ))}
-          <span className="pb-3 md:hidden" />
-        </div>
-      ))}
+            />
+            <span className={`text-[0.9rem] leading-snug ${lane.good ? "text-white/85" : "text-white/40"}`}>
+              {text}
+            </span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -249,34 +338,29 @@ export function Problem() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[0.98rem] leading-relaxed text-white/50">
             Calendars only store dates. When your day gets busy, passive notifications get ignored. MeetingGuard reads
-            the same calendar — and makes sure you&apos;re in the right meeting, right on time.
+            the same calendar — and makes sure you’re in the right meeting, right on time.
           </p>
         </Reveal>
 
         <div className="mx-auto mt-14 max-w-[1040px]">
-          <div className="relative grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
+          <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
               <CalendarWeek />
             </Reveal>
 
-            {/* MeetingGuard steps in front of the calendar */}
-            <Reveal delay={1.1} from="right" className="relative flex flex-col items-center lg:-ml-6">
-              <div
-                aria-hidden
-                className="absolute top-1/2 left-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.35),transparent)] blur-2xl"
-              />
-              <p className="eyebrow relative mb-4 text-[#ff8a95]">9:45 · 15 min before</p>
-              <div className="relative">
-                <FlatPhone width={210}>
-                  <AlertScreen />
-                </FlatPhone>
-              </div>
+            {/* MeetingGuard steps in front of the calendar (the PNG has ~62px of glow each side) */}
+            <Reveal delay={1.1} from="right" className="relative flex justify-center lg:-ml-[84px]">
+              <GuardPhone />
             </Reveal>
           </div>
 
-          <Reveal delay={0.1}>
-            <Comparison />
-          </Reveal>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {LANES.map((lane, i) => (
+              <Reveal key={lane.title} delay={i * 0.12} className="h-full">
+                <LaneCard lane={lane} />
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

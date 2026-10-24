@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { SCREEN_H, SCREEN_W } from "./geometry";
 
-export function StatusBar({ className = "" }: { className?: string }) {
+export function StatusBar({ className = "", time = "9:41" }: { className?: string; time?: string }) {
   return (
     <div className={`flex items-center justify-between text-[15px] font-semibold text-white ${className}`}>
-      <span>9:41</span>
+      <span>{time}</span>
       <svg viewBox="0 0 54 12" className="h-[11px] w-auto" aria-hidden>
         <g fill="#fff">
           <rect x="0" y="8" width="2.6" height="4" rx="0.6" />
