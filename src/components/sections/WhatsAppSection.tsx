@@ -2,39 +2,12 @@ import { Check } from "lucide-react";
 import { WhatsAppIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { WhatsAppFlow } from "@/components/phone/WhatsAppFlow";
-import { AppMark } from "@/components/ui/Logo";
-import { siteConfig } from "@/lib/site";
 
 const POINTS = [
   "Instant scheduling for individuals or groups.",
   "Plain language processing for complex bookings.",
   "Seamless multi-calendar sync (Google, Microsoft).",
 ];
-
-/** The agent's WhatsApp contact, with a direct "chat" link. */
-function ContactCard() {
-  return (
-    <div className="surface mt-8 flex flex-wrap items-center gap-4 rounded-2xl p-4">
-      <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white/[0.05]">
-        <AppMark className="h-9 w-9" sizes="72px" />
-        <WhatsAppIcon className="absolute -right-0.5 -bottom-0.5 h-5 w-5" />
-      </span>
-      <span className="min-w-[10rem] flex-1 leading-tight">
-        <span className="block font-semibold">Meeting Guard AI</span>
-        <span className="block font-mono text-[0.85rem] whitespace-nowrap text-white/55">{siteConfig.whatsappNumber}</span>
-      </span>
-      <a
-        href={siteConfig.whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 text-[0.88rem] font-semibold text-[#0b141a] transition hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#25D366] max-sm:w-full"
-      >
-        <WhatsAppIcon className="h-4 w-4 [&_path]:fill-[#25D366] [&_rect]:fill-[#0b141a]" />
-        Chat on WhatsApp
-      </a>
-    </div>
-  );
-}
 
 export function WhatsAppSection() {
   return (
@@ -68,7 +41,6 @@ export function WhatsAppSection() {
                 </li>
               ))}
             </ul>
-            <ContactCard />
           </Reveal>
         </div>
 

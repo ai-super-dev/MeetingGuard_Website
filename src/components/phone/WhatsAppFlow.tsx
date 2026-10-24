@@ -10,16 +10,17 @@ import { FramedPhone } from "./FramedPhone";
 import { STRAIGHT_FRAME } from "./geometry";
 
 /*
- * The real WhatsApp-linking flow across three phones. Beats:
- *   0 code generated in the app · 1 code sent in WhatsApp · 2 "linked" reply
- *   3 booking request · 4 proposal with Confirm/Cancel · 5 Confirm · 6 Done
+ * The real WhatsApp-linking flow on two phones. Beats:
+ *   0 "Generate code" tapped · 1 code card shown (MeetingGuard app)
+ *   2 code sent · 3 "linked" reply · 4 booking request
+ *   5 proposal with Confirm/Cancel · 6 Confirm · 7 Done (WhatsApp)
  * Each phone plays its beats once it is in view and the previous phone has
  * finished, so it reads left-to-right on desktop and phone-by-phone on mobile.
  */
-const LAST = 6;
+const LAST = 7;
 /** Beats owned by each phone, and the pause before each of them (ms). */
-const PHONE_BEATS = [[0], [1, 2], [3, 4, 5, 6]];
-const BEAT_MS = [900, 900, 1100, 800, 1300, 1400, 1100];
+const PHONE_BEATS = [[0, 1], [2, 3, 4, 5, 6, 7]];
+const BEAT_MS = [2000, 450, 800, 1100, 1300, 1300, 1400, 1100];
 
 export const LINK_CODE = "891675";
 
@@ -37,7 +38,8 @@ const pop = {
 /* ---------- phone 1: MeetingGuard app ---------- */
 
 function AppLinkScreen({ step }: { step: number }) {
-  const ready = step >= 0;
+  const pressed = step === 0;
+  const ready = step >= 1;
   return (
     <Screen className="bg-[#0e1524]" time="11:40" height={STRAIGHT_FRAME.screenH}>
       <div className="mt-[16px] flex items-center gap-[12px] border-b px-[16px] pb-[14px]" style={{ borderColor: APP.line }}>
@@ -62,12 +64,23 @@ function AppLinkScreen({ step }: { step: number }) {
           {!ready ? (
             <motion.div
               key="generate"
+              animate={{ scale: pressed ? 0.95 : 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.25 }}
-              className="flex h-[46px] items-center justify-center rounded-full text-[15px] font-semibold"
+              transition={{ duration: 0.2 }}
+              className="relative flex h-[46px] items-center justify-center overflow-hidden rounded-full text-[15px] font-semibold"
               style={{ background: APP.accent, color: APP.ink }}
             >
-              Generate code
+              {/* tap ripple */}
+              {pressed && (
+                <motion.span
+                  aria-hidden
+                  className="absolute h-[40px] w-[40px] rounded-full bg-white/60"
+                  initial={{ scale: 0, opacity: 0.8 }}
+                  animate={{ scale: 9, opacity: 0 }}
+                  transition={{ duration: 0.45, ease: "easeOut" }}
+                />
+              )}
+              <span className="relative">Generate code</span>
             </motion.div>
           ) : (
             <motion.div
@@ -161,7 +174,7 @@ function WhatsAppChrome({ children }: { children: ReactNode }) {
   );
 }
 
-function LinkChatScreen({ step }: { step: number }) {
+function ChatScreen({ step }: { step: number }) {
   return (
     <WhatsAppChrome>
       <span className="mx-auto shrink-0 rounded-[8px] px-[10px] py-[3px] text-[12px] text-white/55" style={{ background: WA.in }}>
@@ -170,12 +183,12 @@ function LinkChatScreen({ step }: { step: number }) {
       <p className="mx-[6px] shrink-0 rounded-[8px] bg-[#182229] px-[10px] py-[6px] text-center text-[12px] leading-snug text-[#e9c46a]/80">
         This business uses a secure service from Meta to manage this chat.
       </p>
-      {step >= 1 && (
+      {step >= 2 && (
         <Bubble from="me" time="11:41">
           <span className="font-semibold text-[#53bdeb] underline underline-offset-2">{LINK_CODE}</span>
         </Bubble>
       )}
-      {step >= 2 && (
+      {step >= 3 && (
         <Bubble from="bot" time="11:42">
           Your WhatsApp is now linked to MeetingGuard. Ask me about your meetings, for example &ldquo;What do I have
           tomorrow?&rdquo;
@@ -184,19 +197,12 @@ function LinkChatScreen({ step }: { step: number }) {
           </span>
         </Bubble>
       )}
-    </WhatsAppChrome>
-  );
-}
-
-function BookingChatScreen({ step }: { step: number }) {
-  return (
-    <WhatsAppChrome>
-      {step >= 3 && (
+      {step >= 4 && (
         <Bubble from="me" time="11:43">
           investor call with Ana tomorrow at 10, add a zoom link
         </Bubble>
       )}
-      {step >= 4 && (
+      {step >= 5 && (
         <>
           <Bubble from="bot" time="11:43">
             I prepared the following for you. Please review and confirm.
@@ -215,7 +221,7 @@ function BookingChatScreen({ step }: { step: number }) {
               <div
                 key={b}
                 className="flex items-center justify-center gap-[6px] border-t border-white/[0.08] py-[8px] text-[15px] font-medium"
-                style={{ color: step >= 5 && b === "Confirm" ? "rgba(255,255,255,0.35)" : WA.green }}
+                style={{ color: step >= 6 && b === "Confirm" ? "rgba(255,255,255,0.35)" : WA.green }}
               >
                 <Reply className="h-[16px] w-[16px]" aria-hidden />
                 {b}
@@ -224,7 +230,7 @@ function BookingChatScreen({ step }: { step: number }) {
           </motion.div>
         </>
       )}
-      {step >= 5 && (
+      {step >= 6 && (
         <Bubble from="me" time="11:43">
           {/* quoted reply */}
           <span className="mb-[6px] block rounded-[8px] border-l-[4px] border-[#a78bfa] bg-black/20 px-[8px] py-[5px] text-[13px] leading-snug">
@@ -234,7 +240,7 @@ function BookingChatScreen({ step }: { step: number }) {
           Confirm
         </Bubble>
       )}
-      {step >= 6 && (
+      {step >= 7 && (
         <Bubble from="bot" time="11:44">
           Done. I applied the changes.
         </Bubble>
@@ -249,17 +255,12 @@ const PHONES: { where: string; title: string; body: string }[] = [
   {
     where: "In MeetingGuard",
     title: "Generate a code",
-    body: "Tap Generate code. It works once and expires after a few minutes.",
+    body: "Tap Generate code, then copy it or open WhatsApp. It works once and expires after a few minutes.",
   },
   {
     where: "In WhatsApp",
-    title: "Send it to the bot",
-    body: "Send the code to MeetingGuard on WhatsApp — your number is linked.",
-  },
-  {
-    where: "In WhatsApp",
-    title: "Book in plain words",
-    body: "Ask for a meeting, confirm, and it's done — link and alarm included.",
+    title: "Send it, then book in plain words",
+    body: "Send the code to link your number, then just ask for a meeting. Confirm, and it's done.",
   },
 ];
 
@@ -303,12 +304,11 @@ export function WhatsAppFlow() {
   const [done, setDone] = useState(0); // phones that have finished playing
   const screens = [
     (step: number) => <AppLinkScreen step={step} />,
-    (step: number) => <LinkChatScreen step={step} />,
-    (step: number) => <BookingChatScreen step={step} />,
+    (step: number) => <ChatScreen step={step} />,
   ];
 
   return (
-    <ol className="grid gap-14 lg:grid-cols-3 lg:gap-6">
+    <ol className="mx-auto grid max-w-[880px] gap-14 md:grid-cols-2 md:gap-8">
       {PHONES.map((p, i) => (
         <li key={p.title} className="flex flex-col items-center text-center">
           <p className="flex items-center gap-2 font-mono text-[0.72rem] tracking-[0.06em] uppercase">
@@ -316,7 +316,7 @@ export function WhatsAppFlow() {
             <span className="text-white/40">{p.where}</span>
           </p>
           <h3 className="mt-2 text-[1.1rem] font-semibold">{p.title}</h3>
-          <p className="mt-1.5 max-w-[290px] text-[0.86rem] leading-relaxed text-white/50">{p.body}</p>
+          <p className="mt-1.5 max-w-[320px] text-[0.86rem] leading-relaxed text-white/50">{p.body}</p>
           <div className="relative mt-8 mb-24">
             <div
               aria-hidden

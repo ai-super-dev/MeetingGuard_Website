@@ -9,9 +9,7 @@ export const siteConfig = {
   appStoreUrl: "#",
   playStoreUrl: "#",
   // The MeetingGuard WhatsApp bot (number shown in the app's WhatsApp linking screen).
-  whatsappNumber: "+44 7403 693109",
   whatsappNumberRaw: "+447403693109",
-  whatsappUrl: "https://wa.me/447403693109",
 } as const;
 
 export type NavLink = { label: string; href: string };
