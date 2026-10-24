@@ -21,9 +21,11 @@ export type Step = {
 };
 
 /** Seconds the timeline takes to flow from one step to the next. */
-const DWELL = 5;
+const DWELL = 4;
 const ease = [0.22, 1, 0.36, 1] as const;
-/** Slow in, slow out — for the crossfades between steps. */
+/** Seconds for one phone to turn away and the next to turn in. */
+const TURN = 1.3;
+/** Slow in, slow out — for the glow and text crossfades between steps. */
 const SOFT = [0.45, 0, 0.25, 1] as const;
 
 function TrackNode({
@@ -175,25 +177,45 @@ export function StepShowcase({
                 transition={{ duration: 1.4, ease: SOFT }}
               />
             ))}
-            {/* all three screens stay mounted; only the active one is shown */}
-            <div className="relative -my-8 grid scale-[0.86] place-items-center sm:my-0 sm:scale-100">
-              {screens.map((screen, i) => (
-                <motion.div
-                  key={i}
-                  className="col-start-1 row-start-1"
-                  initial={false}
-                  animate={
-                    i === active
-                      ? { opacity: 1, scale: 1, x: 0, filter: "blur(0px)" }
-                      : { opacity: 0, scale: 0.98, x: i < active ? -10 : 10, filter: "blur(4px)" }
-                  }
-                  transition={{ duration: 1.4, ease: SOFT }}
-                  style={{ pointerEvents: i === active ? "auto" : "none" }}
-                  aria-hidden={i !== active}
-                >
-                  {screen}
-                </motion.div>
-              ))}
+            {/*
+              All three phones stay mounted. Changing step turns the current
+              phone away until it's edge-on, then the next one turns in from
+              the other side — like a phone spinning on a turntable.
+            */}
+            <div
+              className="relative -my-8 grid scale-[0.86] place-items-center sm:my-0 sm:scale-100"
+              style={{ perspective: 1400 }}
+            >
+              {screens.map((screen, i) => {
+                const isActive = i === active;
+                return (
+                  <motion.div
+                    key={i}
+                    className="col-start-1 row-start-1"
+                    initial={false}
+                    animate={
+                      isActive
+                        ? {
+                            rotateY: 0,
+                            opacity: 1,
+                            transition: { delay: TURN * 0.5, duration: TURN * 0.5, ease: "easeOut" },
+                          }
+                        : {
+                            rotateY: i < active ? 90 : -90,
+                            opacity: 0,
+                            transition: {
+                              rotateY: { duration: TURN * 0.5, ease: "easeIn" },
+                              opacity: { delay: TURN * 0.4, duration: TURN * 0.1 },
+                            },
+                          }
+                    }
+                    style={{ pointerEvents: isActive ? "auto" : "none" }}
+                    aria-hidden={!isActive}
+                  >
+                    {screen}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
