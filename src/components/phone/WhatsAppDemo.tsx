@@ -7,7 +7,7 @@ import { GoogleCalendarIcon, ZoomIcon } from "@/components/icons/brand";
 import { AppMark } from "@/components/ui/Logo";
 import { Screen } from "./Device";
 import { FramedPhone } from "./FramedPhone";
-import { TEAL_FRAME } from "./geometry";
+import { STRAIGHT_FRAME } from "./geometry";
 
 /*
  * A WhatsApp conversation with the MeetingGuard agent, played beat by beat
@@ -33,7 +33,8 @@ function Bubble({ from, time, children }: { from: "me" | "bot"; time?: string; c
   return (
     <motion.div
       {...pop}
-      className={`max-w-[82%] rounded-[14px] px-[12px] pt-[8px] pb-[6px] text-[16px] leading-snug ${
+     
+      className={`max-w-[82%] shrink-0 rounded-[14px] px-[12px] pt-[8px] pb-[6px] text-[16px] leading-snug ${
         me ? "ml-auto rounded-tr-[4px]" : "rounded-tl-[4px]"
       }`}
       style={{ background: me ? WA.out : WA.in, transformOrigin: me ? "100% 0" : "0 0" }}
@@ -51,7 +52,7 @@ function Bubble({ from, time, children }: { from: "me" | "bot"; time?: string; c
 
 function ChatScreen({ step }: { step: number }) {
   return (
-    <Screen className="bg-[#0b141a]" time="16:12" height={TEAL_FRAME.screenH}>
+    <Screen className="bg-[#0b141a]" time="16:12" height={STRAIGHT_FRAME.screenH}>
       {/* contact header */}
       <div className="relative mt-[14px] flex items-center gap-[10px] px-[14px] pb-[12px]" style={{ background: WA.bar }}>
         <ChevronLeft className="h-[24px] w-[24px] text-white/70" aria-hidden />
@@ -68,8 +69,9 @@ function ChatScreen({ step }: { step: number }) {
         <Phone className="ml-[14px] h-[20px] w-[20px] text-white/70" aria-hidden />
       </div>
 
-      <div className="flex flex-col gap-[8px] px-[12px] pt-[14px]">
-        <span className="mx-auto rounded-[8px] px-[10px] py-[3px] text-[12px] text-white/55" style={{ background: WA.in }}>
+      {/* anchored to the input bar: new messages push older ones up, like a real chat */}
+      <div className="absolute inset-x-0 top-[110px] bottom-[92px] flex flex-col justify-end gap-[8px] overflow-hidden px-[12px]">
+        <span className="mx-auto shrink-0 rounded-[8px] px-[10px] py-[3px] text-[12px] text-white/55" style={{ background: WA.in }}>
           Today
         </span>
 
@@ -121,7 +123,7 @@ function ChatScreen({ step }: { step: number }) {
         </AnimatePresence>
 
         {step >= 3 && (
-          <motion.div {...pop} className="w-[86%] overflow-hidden rounded-[14px] rounded-tl-[4px]" style={{ background: WA.in }}>
+          <motion.div {...pop} className="w-[86%] shrink-0 overflow-hidden rounded-[14px] rounded-tl-[4px]" style={{ background: WA.in }}>
             <div className="px-[12px] pt-[8px] pb-[6px] text-[15px] leading-snug">
               <p className="text-white/70">Here&apos;s what I understood:</p>
               <p className="mt-[4px] text-[17px] font-semibold">Investor call with Ana</p>
@@ -219,17 +221,18 @@ export function WhatsAppDemo() {
   }, [inView, reduce, played]);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative max-sm:mb-28">
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[440px] w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(37,211,102,0.18),transparent)] blur-2xl"
       />
       <div className="relative">
-        <FramedPhone frame={TEAL_FRAME} bodyHeight={600} mirror>
+        <FramedPhone frame={STRAIGHT_FRAME} bodyHeight={600} mirror>
           <ChatScreen step={step} />
         </FramedPhone>
       </div>
-      <div className="absolute bottom-[14%] left-1/2 -translate-x-1/2 sm:bottom-[20%] sm:-left-40 sm:translate-x-0">
+      {/* never over the chat: below the phone on small screens, to its right on wider ones */}
+      <div className="absolute top-[calc(100%+18px)] left-1/2 -translate-x-1/2 sm:top-[16%] sm:left-[calc(100%-28px)] sm:translate-x-0">
         <AnimatePresence>{step >= LAST && <AlarmNotification />}</AnimatePresence>
       </div>
     </div>

@@ -139,3 +139,21 @@ export const TEAL_FRAME: FrameSpec = {
     930,
   ),
 };
+
+/** phone_frame_str.png — front-facing silver phone (WhatsApp demo). */
+export const STRAIGHT_FRAME: FrameSpec = {
+  src: images.phoneFrameStraight,
+  w: 1024,
+  h: 1536,
+  screenH: 847,
+  body: { x: 176, y: 81, w: 674, h: 1357 },
+  matrix: quadMatrix(
+    [
+      [216, 111],
+      [808, 111],
+      [808, 1397],
+      [216, 1397],
+    ],
+    847,
+  ),
+};
