@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { GoogleCalendarIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
-import { AlertScreen } from "@/components/phone/AlertScreen";
+import { MeetingAlarmScreen } from "@/components/phone/MeetingAlarmScreen";
 import { BLUE_FRAME } from "@/components/phone/geometry";
 import { FramedPhone } from "@/components/phone/FramedPhone";
 import { AppMark } from "@/components/ui/Logo";
@@ -183,7 +183,7 @@ function GuardPhone() {
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
       <FramedPhone frame={BLUE_FRAME} bodyHeight={476} mirror>
-        <AlertScreen time="9:45" ringing={false} height={BLUE_FRAME.screenH} />
+        <MeetingAlarmScreen height={BLUE_FRAME.screenH} />
       </FramedPhone>
     </div>
   );
