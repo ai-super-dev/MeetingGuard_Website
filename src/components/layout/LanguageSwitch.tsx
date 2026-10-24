@@ -19,7 +19,7 @@ export function LanguageSwitch() {
   }, [lang]);
 
   return (
-    <div role="group" aria-label="Language" className="flex rounded-lg border border-white/10 bg-white/[0.04] p-0.5">
+    <div role="group" aria-label="Language" className="flex gap-0.5">
       {LANGS.map(({ code, label, name, Flag }) => {
         const active = code === lang;
         return (

@@ -29,7 +29,7 @@ export function Header() {
             <Logo />
           </Link>
 
-          <nav aria-label="Primary" className="mx-auto hidden md:block">
+          <nav aria-label="Primary" className="ml-auto hidden md:block">
             <ul className="flex items-center gap-8">
               {navLinks.map((l) => (
                 <li key={l.href}>
@@ -41,7 +41,7 @@ export function Header() {
             </ul>
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 md:ml-0">
+          <div className="ml-auto flex items-center gap-2 md:ml-12">
             <LanguageSwitch />
             <button
               type="button"
