@@ -217,18 +217,6 @@ body {
   }
 }
 
-@keyframes buzz-marks {
-  0%,
-  42%,
-  100% {
-    opacity: 0;
-  }
-  4%,
-  36% {
-    opacity: 1;
-  }
-}
-
 @keyframes listen-bar {
   0%,
   100% {

@@ -35,34 +35,6 @@ function TiltedRings() {
   );
 }
 
-/** Short haptic marks at the phone's sides that flicker while it buzzes. */
-function BuzzMarks() {
-  const marks = (
-    <svg viewBox="0 0 20 60" className="h-full w-full" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <path d="M6 16q-5 14 0 28" />
-      <path d="M14 8q-9 22 0 44" />
-    </svg>
-  );
-  return (
-    <>
-      <span
-        aria-hidden
-        className="absolute top-[40%] left-[4%] h-[9%] w-[4%] rotate-[12deg] text-white/45"
-        style={{ animation: `buzz-marks ${RING} linear infinite` }}
-      >
-        {marks}
-      </span>
-      <span
-        aria-hidden
-        className="absolute top-[36%] left-[90%] h-[9%] w-[4%] rotate-[192deg] text-white/45"
-        style={{ animation: `buzz-marks ${RING} linear infinite` }}
-      >
-        {marks}
-      </span>
-    </>
-  );
-}
-
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden pt-28 pb-24 sm:pt-32">
@@ -84,11 +56,10 @@ export function Hero() {
               {/* the whole phone buzzes on each ring of the alarm */}
               <div className="relative" style={{ animation: `phone-buzz ${RING} linear infinite` }}>
                 <div className="[mask-image:linear-gradient(180deg,#000_78%,transparent_100%)] [-webkit-mask-image:linear-gradient(180deg,#000_78%,transparent_100%)]">
-                  <PhoneMockup className="w-full drop-shadow-[0_30px_60px_rgba(0,0,0,0.7)]">
+                  <PhoneMockup className="w-full">
                     <AlertScreen />
                   </PhoneMockup>
                 </div>
-                <BuzzMarks />
               </div>
             </TiltPhone>
           </div>
