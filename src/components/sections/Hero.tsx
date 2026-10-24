@@ -2,8 +2,8 @@ import Image, { type StaticImageData } from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import { CountUp } from "@/components/motion";
 import { StoreButtons } from "@/components/ui/StoreButtons";
-import { icons } from "@/lib/assets";
-import { HeroArt } from "./hero/HeroArt";
+import { icons, images } from "@/lib/assets";
+import { HeroScene } from "./hero/HeroScene";
 import { HeroStage } from "./hero/HeroStage";
 
 /*
@@ -103,10 +103,31 @@ const stats: { icon: ReactNode; value: ReactNode; label: string; iconBox: string
 
 const rise = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
 
+/** Edge-to-edge night sky; anchored to the bottom so the rocks stay under the phone. */
+function HeroBackground() {
+  return (
+    <div className="absolute inset-0 [animation:hero-bg-in_1.6s_ease-out_both]">
+      <Image
+        src={images.heroBackground}
+        alt=""
+        fill
+        preload
+        quality={90}
+        sizes="100vw"
+        className="object-cover object-[72%_100%] lg:object-bottom"
+      />
+      {/* the design keeps the copy side dark */}
+      <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,rgba(0,8,26,0.78)_0%,rgba(0,8,26,0.55)_30%,rgba(0,8,26,0.15)_50%,transparent_62%)] lg:block" />
+      {/* keeps the stacked copy readable on small screens */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,8,26,0.82)_0%,rgba(0,8,26,0.55)_45%,rgba(0,8,26,0.1)_75%)] lg:hidden" />
+    </div>
+  );
+}
+
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-[#00081a]">
-      <HeroStage art={<HeroArt />}>
+      <HeroStage background={<HeroBackground />} scene={<HeroScene />}>
         <div className="px-5 pt-28 sm:px-8 lg:absolute lg:top-[calc(var(--u)*9.7)] lg:left-[calc(var(--u)*7.3)] lg:w-[calc(var(--u)*42)] lg:p-0">
           {/* badge */}
           <p
