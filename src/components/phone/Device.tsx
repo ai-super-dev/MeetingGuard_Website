@@ -21,14 +21,26 @@ export function StatusBar({ className = "", time = "9:41" }: { className?: strin
   );
 }
 
-/** A SCREEN_W×SCREEN_H screen surface with the status bar and home indicator. */
-export function Screen({ children, className = "bg-[#0a0a0d]" }: { children: ReactNode; className?: string }) {
+/** A SCREEN_W-wide screen surface with the status bar and home indicator. */
+export function Screen({
+  children,
+  className = "bg-[#0a0a0d]",
+  time,
+  height = SCREEN_H,
+}: {
+  children: ReactNode;
+  className?: string;
+  /** Clock shown in the status bar. */
+  time?: string;
+  /** Screen height in CSS px (frames differ slightly in aspect). */
+  height?: number;
+}) {
   return (
     <div
       className={`relative overflow-hidden rounded-[48px] text-left text-white ${className}`}
-      style={{ width: SCREEN_W, height: SCREEN_H }}
+      style={{ width: SCREEN_W, height }}
     >
-      <StatusBar className="relative z-10 px-[34px] pt-[20px]" />
+      <StatusBar time={time} className="relative z-10 px-[34px] pt-[20px]" />
       {children}
       <span className="absolute bottom-[12px] left-1/2 h-[5px] w-[134px] -translate-x-1/2 rounded-full bg-white/85" />
     </div>
