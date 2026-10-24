@@ -1,6 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
-import type { CSSProperties, ReactNode } from "react";
-import { CountUp } from "@/components/motion";
+import type { CSSProperties } from "react";
 import { StoreButtons } from "@/components/ui/StoreButtons";
 import { icons, images } from "@/lib/assets";
 import { HeroScene } from "./hero/HeroScene";
@@ -17,88 +16,6 @@ const features: { label: [string, string]; icon: StaticImageData; glow: string }
   { label: ["AI", "Scheduling"], icon: icons.aiScheduling, glow: "rgba(50,120,255,0.55)" },
   { label: ["Calendar", "Sync"], icon: icons.calendarSync, glow: "rgba(40,220,120,0.5)" },
   { label: ["AI", "Assistant"], icon: icons.aiAssistant, glow: "rgba(160,80,255,0.55)" },
-];
-
-function UsersIcon() {
-  return (
-    <svg viewBox="0 0 44 32" className="h-full w-full" aria-hidden>
-      <defs>
-        <linearGradient id="stat-users" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#4f8dff" />
-          <stop offset="1" stopColor="#8a6cff" />
-        </linearGradient>
-      </defs>
-      <g fill="url(#stat-users)">
-        <circle cx="22" cy="8" r="6.5" />
-        <path d="M10 30c0-7 5.4-12 12-12s12 5 12 12z" />
-        <circle cx="8.5" cy="11" r="4.6" />
-        <path d="M0 29c0-5 3.6-8.6 8.5-8.6 2 0 3.7.6 5 1.6A14.6 14.6 0 0 0 9.4 30H0z" />
-        <circle cx="35.5" cy="11" r="4.6" />
-        <path d="M44 29c0-5-3.6-8.6-8.5-8.6-2 0-3.7.6-5 1.6a14.6 14.6 0 0 1 4.1 8H44z" />
-      </g>
-    </svg>
-  );
-}
-
-function ShieldCheckIcon() {
-  return (
-    <svg viewBox="0 0 32 36" className="h-full w-full" aria-hidden>
-      <defs>
-        <linearGradient id="stat-shield" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#4f8dff" />
-          <stop offset="1" stopColor="#7d6cff" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M16 2 29 6.5v9.3c0 8.4-5.6 14.4-13 17.7C8.6 30.2 3 24.2 3 15.8V6.5Z"
-        fill="none"
-        stroke="url(#stat-shield)"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
-      <path d="m10.5 17.5 4 4 7.5-8" fill="none" stroke="url(#stat-shield)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function StarIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden>
-      <defs>
-        <linearGradient id="stat-star" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#4f8dff" />
-          <stop offset="1" stopColor="#6f6cff" />
-        </linearGradient>
-      </defs>
-      <path fill="url(#stat-star)" d="m12 1.8 3.1 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.6l-6.4 3.6 1.5-7.1-5.4-4.9 7.2-.8z" />
-    </svg>
-  );
-}
-
-const stats: { icon: ReactNode; value: ReactNode; label: string; iconBox: string }[] = [
-  {
-    icon: <UsersIcon />,
-    value: <CountUp value={10} suffix="K+" />,
-    label: "Active Users",
-    iconBox: "w-7 sm:w-10 lg:w-[calc(var(--u)*2.65)]",
-  },
-  {
-    icon: <ShieldCheckIcon />,
-    value: <CountUp value={99.9} decimals={1} suffix="%" />,
-    label: "Meeting Protection",
-    iconBox: "w-6 sm:w-8 lg:w-[calc(var(--u)*2.05)]",
-  },
-  {
-    icon: <StarIcon />,
-    value: (
-      <>
-        <CountUp value={4.8} decimals={1} />
-        /5
-      </>
-    ),
-    label: "App Store Rating",
-    iconBox: "w-6 sm:w-9 lg:w-[calc(var(--u)*2.4)]",
-  },
 ];
 
 const rise = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
@@ -128,7 +45,7 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden bg-[#00081a]">
       <HeroStage background={<HeroBackground />} scene={<HeroScene />}>
-        <div className="px-5 pt-28 sm:px-8 lg:absolute lg:top-[calc(var(--u)*9.7)] lg:left-[calc(var(--u)*7.3)] lg:w-[calc(var(--u)*42)] lg:p-0">
+        <div className="px-5 pt-28 sm:px-8 lg:absolute lg:top-[calc(var(--u)*12)] lg:left-[calc(var(--u)*7.3)] lg:w-[calc(var(--u)*42)] lg:p-0">
           {/* badge */}
           <p
             className="hero-rise inline-flex h-9 items-center gap-2 rounded-full border border-[#3a5fc4]/45 bg-[#0a1634]/70 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-sm lg:h-[calc(var(--u)*2.4)] lg:gap-[calc(var(--u)*0.85)] lg:pr-[calc(var(--u)*1.2)] lg:pl-[calc(var(--u)*1.05)]"
@@ -160,11 +77,10 @@ export function Hero() {
 
           {/* intro */}
           <p
-            className="hero-rise mt-5 max-w-[34rem] text-[1.12rem] leading-[1.3] text-[#c3c9d6] lg:mt-[calc(var(--u)*0.85)] lg:max-w-[calc(var(--u)*37.5)] lg:text-[calc(var(--u)*1.5)] lg:leading-[1.24]"
+            className="hero-rise mt-5 max-w-[34rem] text-[1.12rem] leading-[1.3] text-[#c3c9d6] lg:mt-[calc(var(--u)*1.1)] lg:max-w-[calc(var(--u)*37.5)] lg:text-[calc(var(--u)*1.7)] lg:leading-[1.24]"
             style={rise(520)}
           >
-            AI-powered meeting scheduling, critical alerts, and automatic calendar sync — so you&apos;re always in the
-            right meeting, right on time.
+            Plan, Alert, Join. Your AI meeting companion.
           </p>
 
           {/* feature icons */}
@@ -201,36 +117,9 @@ export function Hero() {
           </ul>
 
           {/* store buttons */}
-          <div className="hero-rise mt-8 lg:mt-[calc(var(--u)*2.2)]" style={rise(1000)}>
+          <div className="hero-rise mt-8 lg:mt-[calc(var(--u)*2.6)]" style={rise(1000)}>
             <StoreButtons />
           </div>
-
-          {/* stats */}
-          <ul
-            className="hero-rise mt-8 flex items-center lg:mt-[calc(var(--u)*2.25)]"
-            style={rise(1120)}
-          >
-            {stats.map((s, i) => (
-              <li
-                key={s.label}
-                className={`flex items-center gap-2 sm:gap-3 lg:gap-[calc(var(--u)*0.75)] ${
-                  i > 0
-                    ? "ml-3 border-l border-white/15 pl-3 sm:ml-5 sm:pl-5 lg:ml-[calc(var(--u)*1.75)] lg:pl-[calc(var(--u)*1.75)]"
-                    : ""
-                }`}
-              >
-                <span className={`shrink-0 drop-shadow-[0_0_8px_rgba(80,130,255,0.55)] ${s.iconBox}`}>{s.icon}</span>
-                <span className="leading-none">
-                  <span className="block text-[1.05rem] font-semibold sm:text-[1.3rem] tracking-[-0.01em] text-[#f7f8fa] lg:text-[calc(var(--u)*1.55)]">
-                    {s.value}
-                  </span>
-                  <span className="mt-1 block text-[0.66rem] text-[#9aa3b6] sm:text-[0.8rem] lg:mt-[calc(var(--u)*0.4)] lg:text-[max(11px,calc(var(--u)*1.0))]">
-                    {s.label}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
       </HeroStage>
     </section>

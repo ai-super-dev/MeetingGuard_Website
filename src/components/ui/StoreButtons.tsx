@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { ChevronRight } from "lucide-react";
 import { icons } from "@/lib/assets";
 import { siteConfig } from "@/lib/site";
 
@@ -10,9 +9,6 @@ const stores = [
     icon: icons.appStore,
     small: "Download on the",
     big: "App Store",
-    width: "lg:w-[calc(var(--u)*17.5)]",
-    edge: "linear-gradient(90deg, #a24dff 0%, #6a6dff 50%, #3a8dff 100%)",
-    halo: "rgb(140 80 255 / 0.6)",
   },
   {
     href: siteConfig.playStoreUrl,
@@ -20,15 +16,12 @@ const stores = [
     icon: icons.googlePlay,
     small: "GET IT ON",
     big: "Google Play",
-    width: "lg:w-[calc(var(--u)*18.4)]",
-    edge: "linear-gradient(90deg, #3a8dff 0%, #38c6ff 100%)",
-    halo: "rgb(56 150 255 / 0.6)",
   },
 ];
 
 /**
- * Black store badges with a neon gradient edge and chevron — sized in hero
- * units (`--u`) on desktop so they scale with the "First page" composition.
+ * Classic store badges: black fill, thin light border, white lettering —
+ * sized in hero units (`--u`) on desktop so they scale with the hero.
  */
 export function StoreButtons({ className = "" }: { className?: string }) {
   return (
@@ -38,28 +31,23 @@ export function StoreButtons({ className = "" }: { className?: string }) {
           key={s.big}
           href={s.href}
           aria-label={s.label}
-          className={`hero-store-btn group flex h-16 w-[15.5rem] items-center gap-3 rounded-xl px-5 text-white transition duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-azure lg:h-[calc(var(--u)*5.2)] lg:rounded-[calc(var(--u)*0.9)] lg:gap-[calc(var(--u)*0.7)] lg:pr-[calc(var(--u)*1.6)] lg:pl-[calc(var(--u)*1.75)] ${s.width}`}
-          style={{ ["--edge" as string]: s.edge, ["--halo" as string]: s.halo }}
+          className="flex h-[3.75rem] items-center gap-2.5 rounded-xl border-2 border-[#a6a6a6] bg-black pr-5 pl-3.5 text-white transition duration-300 hover:-translate-y-0.5 hover:border-white hover:shadow-[0_6px_24px_rgba(0,0,0,0.5)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-azure lg:h-[calc(var(--u)*4.7)] lg:gap-[calc(var(--u)*0.75)] lg:rounded-[calc(var(--u)*0.85)] lg:pr-[calc(var(--u)*1.7)] lg:pl-[calc(var(--u)*1.05)]"
         >
+          {/* the icon PNGs carry transparent padding, so draw them a bit larger */}
           <Image
             src={s.icon}
             alt=""
             sizes="96px"
-            className="h-11 w-11 flex-none object-contain lg:-ml-[calc(var(--u)*0.35)] lg:h-[calc(var(--u)*3.6)] lg:w-[calc(var(--u)*3.6)]"
+            className="h-10 w-10 flex-none object-contain lg:h-[calc(var(--u)*3.3)] lg:w-[calc(var(--u)*3.3)]"
           />
-          <span className="flex flex-1 flex-col leading-none whitespace-nowrap">
-            <span className="text-[0.8rem] font-medium tracking-wide text-slate-100 lg:text-[max(11px,calc(var(--u)*1.02))]">
+          <span className="flex flex-col leading-none whitespace-nowrap">
+            <span className="text-[0.78rem] font-medium tracking-wide lg:text-[max(11px,calc(var(--u)*1.0))]">
               {s.small}
             </span>
-            <span className="mt-1 text-[1.45rem] font-semibold tracking-[-0.02em] lg:mt-[calc(var(--u)*0.25)] lg:text-[max(18px,calc(var(--u)*1.75))]">
+            <span className="mt-1 text-[1.6rem] font-semibold tracking-[-0.02em] lg:mt-[calc(var(--u)*0.2)] lg:text-[max(19px,calc(var(--u)*2.05))]">
               {s.big}
             </span>
           </span>
-          <ChevronRight
-            aria-hidden
-            className="h-5 w-5 flex-none text-slate-300 transition-transform duration-300 group-hover:translate-x-1 lg:h-[calc(var(--u)*1.5)] lg:w-[calc(var(--u)*1.5)]"
-            strokeWidth={2}
-          />
         </a>
       ))}
     </div>
