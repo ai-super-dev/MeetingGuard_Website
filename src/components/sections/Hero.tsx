@@ -18,19 +18,27 @@ const PHONE_CENTER = { left: "49.3%", top: "47.5%" };
  */
 const PHONE_PLANE = "matrix(0.995, -0.094, -0.209, 0.978, 0, 0)";
 
-/** Faint concentric rings around the phone, tilted to the phone's plane. */
+/**
+ * Faint rings broadcasting outward from the phone in its own tilted plane,
+ * like a radio signal: each ring grows from the centre and fades until it
+ * is gone. Negative delays start the loop already spread across the field.
+ */
+const RING_COUNT = 8;
+const RING_CYCLE = 9.6; // s — two rings per bell ring (2.4 s)
+
 function TiltedRings() {
   return (
     <div aria-hidden className="pointer-events-none absolute" style={PHONE_CENTER}>
       <div className="absolute top-0 left-0 h-0 w-0" style={{ transform: PHONE_PLANE }}>
-        <span
-          className="absolute top-0 left-0 aspect-square w-[min(1100px,200vw)] -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{
-            background: "repeating-radial-gradient(circle, transparent 0 63px, rgba(255,255,255,0.045) 64px 65px)",
-            maskImage: "radial-gradient(circle, #000 22%, transparent 68%)",
-            WebkitMaskImage: "radial-gradient(circle, #000 22%, transparent 68%)",
-          }}
-        />
+        {Array.from({ length: RING_COUNT }, (_, i) => (
+          <span
+            key={i}
+            className="absolute top-0 left-0 aspect-square w-[min(1100px,200vw)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/[0.11]"
+            style={{
+              animation: `ring-out ${RING_CYCLE}s linear ${(-i * RING_CYCLE) / RING_COUNT}s infinite`,
+            }}
+          />
+        ))}
       </div>
     </div>
   );

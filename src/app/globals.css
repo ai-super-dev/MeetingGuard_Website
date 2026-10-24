@@ -195,6 +195,24 @@ body {
   }
 }
 
+/* hero rings: spread out from the phone, fading to nothing as they go */
+@keyframes ring-out {
+  0% {
+    opacity: 0;
+    transform: scale(0.12);
+  }
+  8% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
 @keyframes listen-bar {
   0%,
   100% {
