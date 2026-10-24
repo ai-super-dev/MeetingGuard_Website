@@ -181,8 +181,7 @@ function GuardPhone() {
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[380px] w-[380px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,20,40,0.32),transparent)] blur-2xl"
       />
-      {/* the phone itself vibrates instead of the bell ringing */}
-      <div className="relative [animation:phone-vibrate_1.8s_linear_infinite]">
+      <div className="relative">
         <StraightPhone width={360}>
           <AlertScreen time="9:45" ringing={false} height={STRAIGHT_SCREEN_H} />
         </StraightPhone>
@@ -306,7 +305,8 @@ export function Problem() {
         </Reveal>
 
         <div className="mx-auto mt-14 max-w-[1040px]">
-          <div className="relative grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
+          {/* the 3D tilt pushes the calendar's near edge out to the left; shift the pair back to centre */}
+          <div className="relative grid items-center gap-4 lg:translate-x-[4.2%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
               <div className="lg:[transform:perspective(800px)_rotateY(18deg)]">
                 <CalendarWeek />
