@@ -49,7 +49,7 @@ const SCREENS = [
     <PlanScreen height={PURPLE_FRAME.screenH} />
   </FramedPhone>,
   <FramedPhone key="alert" frame={RED_FRAME} bodyHeight={PHONE_BODY_H} mirror>
-    <AlertScreen time="9:45" height={RED_FRAME.screenH} />
+    <AlertScreen time="9:45" ringing={false} height={RED_FRAME.screenH} />
   </FramedPhone>,
   <FramedPhone key="join" frame={TEAL_FRAME} bodyHeight={PHONE_BODY_H} mirror>
     <JoinScreen height={TEAL_FRAME.screenH} />

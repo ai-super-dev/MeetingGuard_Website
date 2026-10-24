@@ -178,14 +178,14 @@ export function StepShowcase({
                 transition={{ duration: FADE, ease: SOFT }}
               />
             ))}
-            {/* all three phones stay mounted; the active one fades in as the last fades out */}
+            {/* all three phones stay mounted; the active one fades in as the last fades out (opacity only, so the phone never shifts) */}
             <div className="relative -my-8 grid scale-[0.86] place-items-center sm:my-0 sm:scale-100">
               {screens.map((screen, i) => (
                 <motion.div
                   key={i}
                   className="col-start-1 row-start-1"
                   initial={false}
-                  animate={i === active ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: i === active ? 1 : 0 }}
                   transition={{ duration: FADE, ease: SOFT }}
                   style={{ filter: "none", pointerEvents: i === active ? "auto" : "none" }}
                   aria-hidden={i !== active}
