@@ -280,7 +280,10 @@ export function Problem() {
     <section aria-labelledby="problem-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">{p.eyebrow}</p>
+          {/* HeroSnap lands the page with this line just under the header */}
+          <p data-snap-anchor className="eyebrow">
+            {p.eyebrow}
+          </p>
           <h2
             id="problem-title"
             className="mt-3 text-[1.9rem] leading-[1.2] font-semibold text-balance tracking-[-0.02em] sm:text-[2.4rem]"

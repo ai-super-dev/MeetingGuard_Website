@@ -1,5 +1,6 @@
 import { Features } from "@/components/sections/Features";
 import { FinalCta } from "@/components/sections/FinalCta";
+import { HeroSnap } from "@/components/layout/HeroSnap";
 import { Hero } from "@/components/sections/Hero";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { Problem } from "@/components/sections/Problem";
@@ -26,6 +27,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <Hero />
+      <HeroSnap />
       <Problem />
       <HowItWorks />
       <WhatsAppSection />
