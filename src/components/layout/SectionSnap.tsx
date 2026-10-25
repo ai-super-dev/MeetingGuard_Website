@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import { animate, useReducedMotion } from "motion/react";
 
 const GLIDE = { duration: 0.9, ease: [0.65, 0, 0.35, 1] as const };
-/** Space between the floating header's bottom edge and the calendar section's eyebrow. */
+/** Space between the floating header's bottom edge and a section's eyebrow when a glide lands. */
 const GAP = 44;
+/** Space kept under the "Why MeetingGuard" cards when gliding back up to them. */
+const END_GAP = 40;
 /** Wheel silence (ms) that marks the end of trackpad inertia after a glide. */
 const QUIET_MS = 180;
 
@@ -16,13 +18,44 @@ function pageTop(el: HTMLElement) {
   return top;
 }
 
+/** Scroll position that puts `[data-snap=name]` just under the header. */
+function landing(name: string) {
+  const el = document.querySelector<HTMLElement>(`[data-snap="${name}"]`);
+  if (!el) return null;
+  const bar = document.querySelector("header > div");
+  const headerBottom = bar ? bar.getBoundingClientRect().bottom : 0;
+  return Math.max(0, Math.round(pageTop(el) - headerBottom - GAP));
+}
+
 /**
- * Hero ↔ calendar section glide. One scroll down from the hero lands with the
- * calendar section fully in view; one scroll up from there returns to the hero,
- * so the half-hero / half-calendar view is never left on screen. Below the
- * calendar section the page scrolls normally, and scrollbar drags are untouched.
+ * Glide zones, each a [top, bottom] scroll range the page never rests inside:
+ *   hero → "Why MeetingGuard" (its eyebrow under the header), and
+ *   the end of the "Why" cards → "How it works".
+ * The calendar section is taller than the screen, so between its top and the
+ * bottom of its cards the page scrolls normally.
  */
-export function HeroSnap() {
+function zones(): [number, number][] {
+  const why = landing("why");
+  const how = landing("how");
+  const end = document.querySelector<HTMLElement>('[data-snap="why-end"]');
+  const out: [number, number][] = [];
+  if (why === null) return out;
+  out.push([0, why]);
+  if (how !== null && end) {
+    const cardsInView = Math.round(pageTop(end) + end.offsetHeight + END_GAP - window.innerHeight);
+    const top = Math.max(why, cardsInView);
+    if (how > top) out.push([top, how]);
+  }
+  return out;
+}
+
+/**
+ * Section glides: a scroll that would leave two sections half on screen glides
+ * to the next section instead (and back up), so the half-and-half view never
+ * stays on screen. Elsewhere the page scrolls normally, and scrollbar drags are
+ * untouched.
+ */
+export function SectionSnap() {
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -34,14 +67,6 @@ export function HeroSnap() {
     let swipeUsed = false; // the current touch gesture already triggered a glide
     let touchY: number | null = null;
     let lastTouch = 0;
-
-    const target = () => {
-      const anchor = document.querySelector<HTMLElement>("[data-snap-anchor]");
-      if (!anchor) return 0;
-      const bar = document.querySelector("header > div");
-      const headerBottom = bar ? bar.getBoundingClientRect().bottom : 0;
-      return Math.max(0, Math.round(pageTop(anchor) - headerBottom - GAP));
-    };
 
     const waitForQuiet = () => {
       clearTimeout(quietTimer);
@@ -64,11 +89,16 @@ export function HeroSnap() {
 
     /** Where a scroll of `dy` px from here should glide to instead, or null to scroll normally. */
     const redirect = (dy: number): number | null => {
-      const t = target();
       const y = window.scrollY;
-      if (dy > 0 && y < t - 1) return t; // down from the hero → calendar section
-      if (dy < 0 && y > 0 && y <= t + 1) return 0; // up from the calendar section → hero
-      if (dy < 0 && y > t + 1 && y + dy < t) return t; // coming back up: stop with the section in full first
+      for (const [top, bottom] of zones()) {
+        if (dy > 0) {
+          if (y >= top - 1 && y < bottom - 1) return bottom; // down from the upper section → the next one
+          if (y < top - 1 && y + dy > top) return bottom; // scrolling down into the zone
+        } else {
+          if (y > top + 1 && y <= bottom + 1) return top; // up from the lower section → back
+          if (y > bottom + 1 && y + dy < bottom) return bottom; // coming back up: stop with the section in full first
+        }
+      }
       return null;
     };
 
@@ -106,12 +136,12 @@ export function HeroSnap() {
       swipeUsed = true;
       glide(to);
     };
-    // a touch fling can coast into the in-between view; finish it to the nearer end
+    // a touch fling can coast into a zone; finish it to the nearer end
     const onScrollEnd = () => {
       if (gliding || Date.now() - lastTouch > 1500) return;
-      const t = target();
       const y = window.scrollY;
-      if (y > 1 && y < t - 1) glide(y > t / 2 ? t : 0);
+      const zone = zones().find(([top, bottom]) => y > top + 1 && y < bottom - 1);
+      if (zone) glide(y > (zone[0] + zone[1]) / 2 ? zone[1] : zone[0]);
     };
 
     const onKey = (e: KeyboardEvent) => {

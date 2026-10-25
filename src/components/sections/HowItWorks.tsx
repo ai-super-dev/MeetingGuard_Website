@@ -32,7 +32,9 @@ export function HowItWorks() {
     <section id="how-it-works" aria-labelledby="how-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-xl text-center">
-          <p className="eyebrow">{t.how.eyebrow}</p>
+          <p data-snap="how" className="eyebrow">
+            {t.how.eyebrow}
+          </p>
           <h2 id="how-title" className="mt-3 text-[1.9rem] text-balance font-semibold tracking-[-0.02em] sm:text-[2.4rem]">
             {t.how.title}
           </h2>

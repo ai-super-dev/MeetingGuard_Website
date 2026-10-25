@@ -280,8 +280,8 @@ export function Problem() {
     <section aria-labelledby="problem-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
-          {/* HeroSnap lands the page with this line just under the header */}
-          <p data-snap-anchor className="eyebrow">
+          {/* SectionSnap lands the page with this line just under the header */}
+          <p data-snap="why" className="eyebrow">
             {p.eyebrow}
           </p>
           <h2
@@ -315,7 +315,8 @@ export function Problem() {
             </Reveal>
           </div>
 
-          <div className="mt-16 grid gap-5 md:grid-cols-2 lg:mt-20">
+          {/* SectionSnap: scrolling past the bottom of these cards glides on to How it works */}
+          <div data-snap="why-end" className="mt-16 grid gap-5 md:grid-cols-2 lg:mt-20">
             {p.lanes.map((lane, i) => (
               <Reveal key={i} delay={i * 0.12} className="h-full">
                 <LaneCard lane={{ ...lane, ...LANE_LOOK[i] }} />
