@@ -3,7 +3,7 @@
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
 import Image, { type StaticImageData } from "next/image";
 import { FramedPhone } from "./FramedPhone";
-import { ANDROID_FRAME, SCREEN_W, STRAIGHT_FRAME } from "./geometry";
+import { ANDROID_FRAME, ANDROID_FRAME_RIGHT, SCREEN_W, STRAIGHT_FRAME } from "./geometry";
 
 /** Screen height (CSS px) used by every PhoneShot, so iPhone and Android shots line up. */
 export const SHOT_H = STRAIGHT_FRAME.screenH;
@@ -30,16 +30,19 @@ export function PhoneShot({
   image,
   alt = "",
   mirror = false,
+  facing = "left",
   children,
 }: {
   kind?: "iphone" | "android";
+  /** Android only: which way the tilted phone's screen faces. */
+  facing?: "left" | "right";
   bodyHeight?: number;
   image?: StaticImageData | string;
   alt?: string;
   mirror?: boolean;
   children?: ReactNode;
 }) {
-  const frame = kind === "android" ? ANDROID_FRAME : STRAIGHT_FRAME;
+  const frame = kind === "android" ? (facing === "right" ? ANDROID_FRAME_RIGHT : ANDROID_FRAME) : STRAIGHT_FRAME;
   // the Android frame's opening is the inside of its metal rim, so the screen
   // sits inside a thin black bezel drawn here
   const bezel = kind === "android" ? ANDROID_BEZEL : 0;

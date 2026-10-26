@@ -129,8 +129,8 @@ const en: Record<UseCaseSlug, UseCase> = {
       title: ["From the standup", "to the investor call."],
       steps: [
         { screen: "summary", kind: "android", caption: "The morning summary" },
-        { screen: "confirm", kind: "iphone", caption: "A moved call, confirmed" },
-        { screen: "alarm", kind: "iphone", caption: "The alarm before it starts" },
+        { screen: "confirm", kind: "android", caption: "A moved call, confirmed" },
+        { screen: "alarm", kind: "android", caption: "The alarm before it starts" },
       ],
     },
     cta: ["Keep every", "commitment."],
@@ -243,8 +243,8 @@ const es: Record<UseCaseSlug, UseCase> = {
       title: ["De la reunión diaria", "a la llamada con inversores."],
       steps: [
         { screen: "summary", kind: "android", caption: "El resumen matinal" },
-        { screen: "confirm", kind: "iphone", caption: "Una llamada movida, confirmada" },
-        { screen: "alarm", kind: "iphone", caption: "La alarma antes de empezar" },
+        { screen: "confirm", kind: "android", caption: "Una llamada movida, confirmada" },
+        { screen: "alarm", kind: "android", caption: "La alarma antes de empezar" },
       ],
     },
     cta: ["Cumple cada", "compromiso."],

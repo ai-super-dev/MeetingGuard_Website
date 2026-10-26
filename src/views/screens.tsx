@@ -44,15 +44,17 @@ export function Shot({
   lang,
   bodyHeight = 420,
   mirror = false,
+  facing,
 }: {
   screen: ScreenKey;
   kind: "iphone" | "android";
   lang: Lang;
   bodyHeight?: number;
   mirror?: boolean;
+  facing?: "left" | "right";
 }) {
   return (
-    <PhoneShot kind={kind} bodyHeight={bodyHeight} mirror={mirror}>
+    <PhoneShot kind={kind} bodyHeight={bodyHeight} mirror={mirror} facing={facing}>
       {screenFor(screen, lang)}
     </PhoneShot>
   );

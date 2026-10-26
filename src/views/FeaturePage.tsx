@@ -193,10 +193,11 @@ export function FeaturePage({ lang, slug }: { lang: Lang; slug: FeatureSlug }) {
               </Reveal>
             </div>
             {c.extra.screens && (
-              <Reveal delay={0.15} className="flex justify-center gap-5">
-                {c.extra.screens.map((s) => (
+              <Reveal delay={0.15} className="flex justify-center gap-6 max-sm:[zoom:0.84] sm:gap-12">
+                {c.extra.screens.map((s, i, all) => (
                   <figure key={s.caption} className="flex flex-col items-center">
-                    <Shot screen={s.screen} kind={s.kind} lang={lang} bodyHeight={360} />
+                    {/* a pair of phones turn to face each other */}
+                    <Shot screen={s.screen} kind={s.kind} lang={lang} bodyHeight={360} facing={all.length === 2 && i === 0 ? "right" : "left"} />
                     <figcaption className="mt-4 max-w-[170px] text-center text-[0.78rem] text-white/55">{s.caption}</figcaption>
                   </figure>
                 ))}

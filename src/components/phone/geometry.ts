@@ -152,3 +152,25 @@ export const ANDROID_FRAME: FrameSpec = {
     916,
   ),
 };
+
+/**
+ * android_phone_tilt_left.png: the same phone turned the other way (screen
+ * facing right), made from android_phone_tilt.png by mirroring it with the
+ * side buttons painted out, since they are now on the far side.
+ */
+export const ANDROID_FRAME_RIGHT: FrameSpec = {
+  src: images.androidPhoneLeft,
+  w: 1024,
+  h: 1536,
+  screenH: 916,
+  body: { x: 143, y: 36, w: 758, h: 1454 },
+  matrix: quadMatrix(
+    [
+      [193.5, 62],
+      [743.8, 101.7],
+      [882.1, 1393.9],
+      [295.9, 1437.1],
+    ],
+    916,
+  ),
+};
