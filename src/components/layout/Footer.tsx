@@ -9,7 +9,6 @@ import { StoreBadges } from "@/components/ui/StoreBadges";
 import { useHref, useT } from "@/lib/language";
 import { FEATURE_SLUGS } from "@/lib/routes";
 import { siteConfig, socialLinks } from "@/lib/site";
-import { LanguageSwitch } from "./LanguageSwitch";
 
 const socialIcons = {
   facebook: FacebookIcon,
@@ -24,10 +23,10 @@ function Column({ title, links }: { title: string; links: { label: string; href:
   return (
     <div>
       <p className="eyebrow">{title}</p>
-      <ul className="mt-4 space-y-2.5">
+      <ul className="mt-4 space-y-2">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="text-[0.86rem] text-white/65 transition-colors hover:text-white">
+            <Link href={l.href} className="text-[0.84rem] text-white/60 transition-colors hover:text-white">
               {l.label}
             </Link>
           </li>
@@ -37,6 +36,10 @@ function Column({ title, links }: { title: string; links: { label: string; href:
   );
 }
 
+/**
+ * Two layers: brand, update sign-up and badges beside the four link columns;
+ * then one thin bar with the copyright, company line and contact.
+ */
 export function Footer() {
   const t = useT();
   const href = useHref();
@@ -46,16 +49,18 @@ export function Footer() {
   return (
     <footer className="border-t border-white/[0.07] bg-ink-950">
       <div className="container-page">
-        <div className="grid gap-12 py-14 lg:grid-cols-12 lg:gap-8">
+        <div className="grid gap-12 pt-14 pb-12 lg:grid-cols-12 lg:gap-10">
           {/* brand */}
           <div className="lg:col-span-4">
             <Link href={href("/")} aria-label={t.header.home}>
               <Logo />
             </Link>
-            <p className="mt-4 max-w-[280px] text-[0.9rem] leading-relaxed text-white/60">{t.footer.blurb}</p>
-            <StoreBadges className="mt-6" height={40} />
-            <div className="mt-6 flex flex-wrap items-center gap-4">
-              <LanguageSwitch layoutId="lang-pill-footer" />
+            <p className="mt-3 max-w-[300px] text-[0.86rem] leading-relaxed text-white/55">{t.footer.blurb}</p>
+            <div className="mt-6">
+              <NewsletterForm />
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-4">
+              <StoreBadges height={36} />
               {socials.length > 0 && (
                 <ul className="flex items-center gap-2">
                   {socials.map((s) => {
@@ -77,7 +82,7 @@ export function Footer() {
             </div>
           </div>
 
-          <nav aria-label={t.footer.nav} className="grid grid-cols-2 gap-10 sm:grid-cols-4 lg:col-span-8 lg:gap-8">
+          <nav aria-label={t.footer.nav} className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:col-span-8 lg:pl-10">
             <Column
               title={t.footer.product}
               links={[
@@ -111,43 +116,24 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="grid gap-10 border-t border-white/[0.07] py-10 md:grid-cols-2">
-          <div>
-            <p className="eyebrow">{t.footer.contact}</p>
-            <ul className="mt-4 space-y-3 text-[0.9rem]">
-              <li>
-                <a
-                  href={`mailto:${siteConfig.supportEmail}`}
-                  className="inline-flex items-center gap-2.5 text-white/75 transition-colors hover:text-white"
-                >
-                  <Mail className="h-4 w-4 text-white/45" aria-hidden />
-                  {siteConfig.supportEmail}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`tel:${siteConfig.contactPhone}`}
-                  className="inline-flex items-center gap-2.5 text-white/75 transition-colors hover:text-white"
-                >
-                  <Phone className="h-4 w-4 text-white/45" aria-hidden />
-                  {siteConfig.contactPhoneLabel}
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="md:justify-self-end">
-            <p className="eyebrow">{t.footer.updates}</p>
-            <div className="mt-4">
-              <NewsletterForm />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 border-t border-white/[0.07] py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
-          <p>
+        <div className="flex flex-col gap-4 border-t border-white/[0.07] py-6 text-[0.75rem] text-white/45 md:flex-row md:items-center md:justify-between">
+          <p className="text-white/60">
             © 2026 {siteConfig.company}. {t.footer.rights}
           </p>
-          <p className="sm:text-right">{t.footer.companyLine(siteConfig.company, siteConfig.companyNumber)}</p>
+          <ul aria-label={t.footer.contact} className="flex shrink-0 flex-wrap items-center gap-x-5 gap-y-2">
+            <li>
+              <a href={`mailto:${siteConfig.supportEmail}`} className="inline-flex items-center gap-1.5 text-white/65 transition-colors hover:text-white">
+                <Mail className="h-3.5 w-3.5" aria-hidden />
+                {siteConfig.supportEmail}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${siteConfig.contactPhone}`} className="inline-flex items-center gap-1.5 text-white/65 transition-colors hover:text-white">
+                <Phone className="h-3.5 w-3.5" aria-hidden />
+                {siteConfig.contactPhoneLabel}
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

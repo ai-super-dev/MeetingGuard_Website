@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { HONEYPOT, submitForm, type FormKind, type SubmitResult } from "@/lib/forms";
 import { useHref, useLang, useT } from "@/lib/language";
@@ -183,17 +183,17 @@ export function SendLinkForm({ done }: { done: string }) {
   );
 }
 
-/** Footer: "Subscribe for updates". */
+/** Footer: "Subscribe for updates", as one pill (email field with the button inside). */
 export function NewsletterForm() {
   const t = useT();
   const { status, onSubmit } = useSubmit("updates", false);
   return (
-    <form onSubmit={onSubmit} className="relative w-full max-w-[380px]">
+    <form onSubmit={onSubmit} className="relative w-full max-w-[400px]">
       <Honeypot />
-      <label htmlFor="newsletter-email" className="text-[0.88rem] text-white/75">
+      <label htmlFor="newsletter-email" className="sr-only">
         {t.footer.emailLabel}
       </label>
-      <div className="mt-3 flex flex-col items-start gap-3">
+      <div className="relative">
         <input
           id="newsletter-email"
           name="email"
@@ -201,10 +201,16 @@ export function NewsletterForm() {
           required
           autoComplete="email"
           placeholder={t.footer.emailPlaceholder}
-          className={inputClass}
+          className="h-11 w-full rounded-full border border-white/10 bg-white/[0.04] pr-[8.5rem] pl-4 text-[0.86rem] text-white transition-colors placeholder:text-white/35 focus:border-white/30 focus:outline-none"
         />
-        <button type="submit" disabled={status === "sending"} className={buttonClass}>
-          {t.footer.subscribe}
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          aria-label={t.footer.subscribe}
+          className="group absolute top-1 right-1 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#f4f4f5] pr-3 pl-4 text-[0.8rem] font-medium whitespace-nowrap text-[#0b0b0e] transition hover:bg-white disabled:opacity-60"
+        >
+          {t.footer.subscribeShort}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden />
         </button>
       </div>
       <Status status={status} done={t.footer.done} />

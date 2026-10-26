@@ -130,3 +130,25 @@ export const STRAIGHT_FRAME: FrameSpec = {
     847,
   ),
 };
+
+/**
+ * android_phone_tilt.png: Android phone turned slightly (right edge nearer),
+ * used for Android-only screens. Only the metal rim and camera are opaque;
+ * the quad is the rim's inner edge.
+ */
+export const ANDROID_FRAME: FrameSpec = {
+  src: images.androidPhone,
+  w: 1024,
+  h: 1536,
+  screenH: 916,
+  body: { x: 122, y: 36, w: 758, h: 1454 },
+  matrix: quadMatrix(
+    [
+      [280.2, 101.7],
+      [830.5, 62],
+      [728.1, 1437.1],
+      [141.9, 1393.9],
+    ],
+    916,
+  ),
+};

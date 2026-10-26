@@ -463,6 +463,7 @@ export const en = {
     emailLabel: "Enter your email address here",
     emailPlaceholder: "Your email for notifications",
     subscribe: "Subscribe for updates",
+    subscribeShort: "Subscribe",
     done: "Thanks, you're on the list.",
   },
 
@@ -907,6 +908,7 @@ export const es: Dict = {
     emailLabel: "Introduce tu correo electrónico",
     emailPlaceholder: "Tu correo para notificaciones",
     subscribe: "Suscribirme a novedades",
+    subscribeShort: "Suscribirme",
     done: "Gracias, ya estás en la lista.",
   },
 
