@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ZoomIcon } from "@/components/icons/brand";
+import { Video } from "lucide-react";
 import { icons } from "@/lib/assets";
 import { useT } from "@/lib/language";
 import { StatusBar } from "./Device";
@@ -64,8 +64,10 @@ export function AlertScreen({ time, ringing = true, height = SCREEN_H }: AlertSc
 
       {/* meeting platform */}
       <div className="absolute inset-x-0 top-[552px] flex items-center justify-center gap-[10px]">
-        <ZoomIcon className="h-[40px] w-[40px]" />
-        <span className="text-[34px] leading-none font-bold tracking-[-0.02em] text-[#2D8CFF]">zoom</span>
+        <span className="grid h-[44px] w-[44px] place-items-center rounded-[12px] bg-white/[0.08]">
+          <Video className="h-[24px] w-[24px] text-white/85" aria-hidden />
+        </span>
+        <span className="text-[26px] leading-none font-semibold text-white/85">Zoom</span>
       </div>
 
       {/* Join now: neon gradient outline */}

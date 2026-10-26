@@ -1,9 +1,10 @@
 import QRCode from "qrcode";
+import { localize, type Lang } from "@/lib/routes";
 import { siteConfig } from "@/lib/site";
 import { FooterAwareDock } from "./FooterAwareDock";
 
 /** QR code as a single SVG path, generated synchronously at render/build time. */
-function QrSvg({ value, className }: { value: string; className?: string }) {
+export function QrSvg({ value, className }: { value: string; className?: string }) {
   const { modules } = QRCode.create(value, { errorCorrectionLevel: "M" });
   const n = modules.size;
   let d = "";
@@ -20,12 +21,11 @@ function QrSvg({ value, className }: { value: string; className?: string }) {
   );
 }
 
-/** Desktop-only corner card so visitors can grab the app on their phone. */
-export function QrDownload() {
+/** Desktop-only corner card: scanning it opens the download page, which picks the right store. */
+export function QrDownload({ lang }: { lang: Lang }) {
   return (
     <FooterAwareDock className="fixed right-5 bottom-5 z-40 hidden flex-col items-center gap-2 rounded-2xl border border-white/10 bg-[#0d0d10]/90 p-3 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-md lg:flex">
-      {/* TODO: point this at the store / download link once the apps are live */}
-      <QrSvg value={siteConfig.url} className="h-[104px] w-[104px] rounded-md" />
+      <QrSvg value={`${siteConfig.url}${localize("/download", lang)}`} className="h-[104px] w-[104px] rounded-md" />
     </FooterAwareDock>
   );
 }

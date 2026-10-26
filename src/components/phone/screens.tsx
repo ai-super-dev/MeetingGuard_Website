@@ -1,9 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Image from "next/image";
 import { useT } from "@/lib/language";
-import { people } from "@/lib/people";
 import {
   ArrowLeft,
   Bot,
@@ -27,7 +25,7 @@ import { Screen } from "./Device";
  */
 
 /** The app's dark theme (as on its WhatsApp-linking screen). */
-const APP = {
+export const APP = {
   bg: "#0e1524",
   card: "#131b2c",
   line: "#263048",
@@ -254,7 +252,9 @@ export function JoinScreen({ height }: ScreenProps) {
 
         <Label>{a.participants}</Label>
         <Card className="flex items-center gap-[12px] px-[14px] py-[10px]">
-          <Image src={people.woman} alt="" width={36} height={36} className="h-[36px] w-[36px] rounded-full object-cover" />
+          <span className="grid h-[36px] w-[36px] shrink-0 place-items-center rounded-full text-[13px] font-semibold" style={{ background: APP.chip, color: APP.accent }}>
+            AG
+          </span>
           <span className="leading-tight">
             <span className="block text-[15px]">Ana García</span>
             <span className="block text-[13px]" style={{ color: APP.muted }}>

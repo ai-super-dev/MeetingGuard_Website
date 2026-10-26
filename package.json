@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "postbuild": "node scripts/optimize-images.mjs",
+    "preview": "node scripts/serve-out.mjs 3000",
     "lint": "eslint"
   },
   "dependencies": {

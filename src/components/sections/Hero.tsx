@@ -4,7 +4,9 @@ import type { CSSProperties } from "react";
 import { ScrollDrift, TiltPhone } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
 import { PhoneMockup } from "@/components/phone/PhoneMockup";
-import { StoreButtons } from "@/components/ui/StoreButtons";
+import { Check, Star } from "lucide-react";
+import { StoreBadges } from "@/components/ui/StoreBadges";
+import { siteConfig } from "@/lib/site";
 import { useT } from "@/lib/language";
 
 const rise = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
@@ -64,7 +66,7 @@ export function Hero() {
         <ScrollDrift y={-90} scale={0.94} className="relative">
           <TiltedRings />
           <div className="rise relative" style={rise(100)}>
-            <TiltPhone className="w-[260px] sm:w-[330px] lg:w-[clamp(290px,36vh,350px)]">
+            <TiltPhone className="w-[240px] sm:w-[300px] lg:w-[clamp(250px,30vh,320px)]">
               <div className="relative">
                 <div className="[mask-image:linear-gradient(180deg,#000_78%,transparent_100%)] [-webkit-mask-image:linear-gradient(180deg,#000_78%,transparent_100%)]">
                   <PhoneMockup className="w-full">
@@ -78,19 +80,44 @@ export function Hero() {
 
         <h1
           id="hero-title"
-          className="rise relative mt-2 text-[2.75rem] leading-[1.06] font-semibold tracking-[-0.03em] sm:text-[3.6rem] lg:text-[4rem]"
+          className="rise relative mt-2 text-[2.6rem] leading-[1.06] font-semibold tracking-[-0.03em] sm:text-[3.4rem] lg:text-[3.7rem]"
           style={rise(250)}
         >
           {t.hero.line1}
           <br />
           <span className="text-white/50">{t.hero.line2}</span>
         </h1>
-        <p className="rise mt-4 text-[1.02rem] font-medium text-white/60 sm:text-[1.1rem]" style={rise(380)}>
-          {t.tagline}
+        <p className="rise mt-4 max-w-xl text-[1rem] leading-relaxed text-white/65 sm:text-[1.08rem]" style={rise(380)}>
+          {t.hero.sentence}
         </p>
-        <div className="rise mt-7" style={rise(500)}>
-          <StoreButtons className="justify-center" />
+        {/* the three promises */}
+        <ul className="rise mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[0.88rem] text-white/80" style={rise(440)}>
+          {t.hero.promises.map((p) => (
+            <li key={p} className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-[#ff8a95]" strokeWidth={2.6} aria-hidden />
+              {p}
+            </li>
+          ))}
+        </ul>
+        <div className="rise mt-6" style={rise(500)}>
+          <StoreBadges className="justify-center" />
         </div>
+        {/* social proof strip */}
+        <p className="rise mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[0.78rem] text-white/50" style={rise(580)}>
+          <span className="font-medium text-white/70">{t.hero.proof}</span>
+          <span aria-hidden className="h-3 w-px bg-white/15" />
+          <span>{t.hero.proofDetail}</span>
+          {siteConfig.ratings &&
+            (["appStore", "googlePlay"] as const).map((store) =>
+              siteConfig.ratings?.[store] ? (
+                <span key={store} className="inline-flex items-center gap-1">
+                  <span aria-hidden className="h-3 w-px bg-white/15" />
+                  <Star className="h-3.5 w-3.5 fill-[#ffd9a0] text-[#ffd9a0]" aria-hidden />
+                  {siteConfig.ratings[store]} {t.hero.ratingStore[store]}
+                </span>
+              ) : null,
+            )}
+        </p>
       </div>
     </section>
   );

@@ -1,44 +1,29 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { createContext, createElement, useContext, type ReactNode } from "react";
 import { dictionaries, type Dict } from "./i18n";
+import { localize, type Lang } from "./routes";
 
-export type Lang = "en" | "es";
+export type { Lang } from "./routes";
 
-const KEY = "mg-lang";
-const EVENT = "mg-lang-change";
+const LangContext = createContext<Lang>("en");
 
-function read(): Lang {
-  try {
-    return localStorage.getItem(KEY) === "es" ? "es" : "en";
-  } catch {
-    return "en";
-  }
+/** Set once per root layout: `/` pages are English, `/es/` pages Spanish. */
+export function LangProvider({ lang, children }: { lang: Lang; children: ReactNode }) {
+  return createElement(LangContext.Provider, { value: lang }, children);
 }
 
-function subscribe(onChange: () => void) {
-  window.addEventListener(EVENT, onChange);
-  window.addEventListener("storage", onChange);
-  return () => {
-    window.removeEventListener(EVENT, onChange);
-    window.removeEventListener("storage", onChange);
-  };
+export function useLang(): Lang {
+  return useContext(LangContext);
 }
 
-/** The visitor's chosen language, remembered in this browser (English until they pick). */
-export function useLanguage() {
-  const lang = useSyncExternalStore(subscribe, read, () => "en" as Lang);
-  const setLang = useCallback((next: Lang) => {
-    try {
-      localStorage.setItem(KEY, next);
-    } catch {}
-    window.dispatchEvent(new Event(EVENT));
-  }, []);
-  return [lang, setLang] as const;
-}
-
-/** The site's strings in the visitor's chosen language. */
+/** The site's strings in the page's language. */
 export function useT(): Dict {
-  const [lang] = useLanguage();
-  return dictionaries[lang];
+  return dictionaries[useLang()];
+}
+
+/** Builds a link in the page's language: `href("/pricing")` is `/es/pricing` on Spanish pages. */
+export function useHref() {
+  const lang = useLang();
+  return (path: string) => localize(path, lang);
 }

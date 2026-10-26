@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Firebase Cloud Function (separate Node package, deployed on its own)
+    "functions/**",
   ]),
 ]);
 

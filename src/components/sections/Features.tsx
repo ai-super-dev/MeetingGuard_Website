@@ -1,22 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import Image, { type StaticImageData } from "next/image";
-import { AlarmClock, Bell, BellRing, Check, Link2, Mic, Plus, Video } from "lucide-react";
-import {
-  AndroidIcon,
-  AppleIcon,
-  GoogleCalendarIcon,
-  GoogleMeetIcon,
-  OutlookIcon,
-  TeamsIcon,
-  ZoomIcon,
-} from "@/components/icons/brand";
+import { AlarmClock, ArrowUpRight, Bell, BellRing, CalendarDays, Check, ListChecks, Mic, Reply, Volume2 } from "lucide-react";
+import { featureAccents } from "@/components/icons/feature-icons";
 import { Reveal } from "@/components/motion";
+import { AvailableLabel } from "@/components/page/blocks";
 import { AppMark } from "@/components/ui/Logo";
-import { useT } from "@/lib/language";
-import { people } from "@/lib/people";
+import { useHref, useT } from "@/lib/language";
+import type { FeatureSlug } from "@/lib/routes";
+import { availability } from "@/lib/site";
 
 /* ---------- shared ---------- */
 
@@ -26,33 +20,37 @@ function useCycle(count: number, ms: number, active: boolean) {
   const [i, setI] = useState(0);
   useEffect(() => {
     if (!active || reduce) return;
-    const t = setInterval(() => setI((n) => (n + 1) % count), ms);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setI((n) => (n + 1) % count), ms);
+    return () => clearInterval(timer);
   }, [active, reduce, count, ms]);
   return reduce ? count - 1 : i;
 }
 
 /**
- * Bento tile: quiet dark surface with a faint accent tint, and a soft
- * spotlight (plus border highlight) that follows the cursor on hover.
+ * Bento tile linking to its feature page: quiet dark surface with a faint
+ * accent tint, and a soft spotlight (plus border highlight) that follows the
+ * cursor on hover.
  */
 function Tile({
-  accent,
+  slug,
   title,
   body,
   visual,
   className = "",
   delay = 0,
 }: {
-  accent: string;
+  slug: FeatureSlug;
   title: string;
   body: string;
   visual: ReactNode;
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const t = useT();
+  const href = useHref();
+  const accent = featureAccents[slug];
+  const ref = useRef<HTMLAnchorElement>(null);
+  const onMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -62,10 +60,11 @@ function Tile({
 
   return (
     <Reveal delay={delay} className={className}>
-      <article
+      <Link
+        href={href(`/features/${slug}`)}
         ref={ref}
         onPointerMove={onMove}
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,#101014,#0a0a0d)]"
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,#101014,#0a0a0d)] transition-colors duration-500 hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         style={{ "--accent": accent } as CSSProperties}
       >
         {/* faint resting tint in the accent colour */}
@@ -93,19 +92,23 @@ function Tile({
           }}
         />
 
-        <div className="relative flex min-h-[150px] flex-1 items-center justify-center px-6 pt-8">{visual}</div>
+        <div className="relative flex min-h-[170px] flex-1 items-center justify-center px-6 pt-8">{visual}</div>
         <div className="relative px-6 pt-5 pb-6">
           <h3 className="text-[1rem] font-semibold text-white">{title}</h3>
           <p className="mt-1.5 max-w-md text-[0.86rem] leading-relaxed text-white/60">{body}</p>
+          <span className="mt-3 inline-flex items-center gap-1 text-[0.8rem] font-medium text-white/45 transition-colors duration-300 group-hover:text-white">
+            {t.learnMore}
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+          </span>
         </div>
-      </article>
+      </Link>
     </Reveal>
   );
 }
 
-/* ---------- visuals ---------- */
+/* ---------- alarms ---------- */
 
-/** The alarm badge for each intensity: outline bell → ringing bell → shaking alarm clock. */
+/** The alarm badge for each intensity: outline bell, ringing bell, shaking alarm clock. */
 function LevelBadge({ level }: { level: number }) {
   if (level === 0) {
     return (
@@ -129,11 +132,7 @@ function LevelBadge({ level }: { level: number }) {
     <span className="relative grid h-16 w-16 place-items-center">
       <span className="absolute inset-0 rounded-full bg-[#e5484d]/40 [animation:glow-pulse_1.2s_ease-in-out_infinite]" />
       <span className="relative grid h-16 w-16 place-items-center rounded-full bg-[#e5484d] shadow-[0_0_0_3px_#ff8a8f,0_0_28px_rgba(229,72,77,0.7)]">
-        <AlarmClock
-          className="h-8 w-8 text-white [animation:bell-vibrate_1.2s_linear_infinite]"
-          strokeWidth={2.2}
-          aria-hidden
-        />
+        <AlarmClock className="h-8 w-8 text-white [animation:bell-vibrate_1.2s_linear_infinite]" strokeWidth={2.2} aria-hidden />
       </span>
     </span>
   );
@@ -191,43 +190,7 @@ function AlarmVisual() {
   );
 }
 
-function SyncVisual() {
-  // tile centres sit at y = 28 and 92 in the 120px-tall column
-  const sources = [
-    { key: "g", icon: <GoogleCalendarIcon className="h-8 w-8" />, y: 28 },
-    { key: "o", icon: <OutlookIcon className="h-8 w-8" />, y: 92 },
-  ];
-  const path = (y: number) => `M0 ${y} C 70 ${y}, 90 60, 160 60`;
-
-  return (
-    <div className="flex items-center justify-center">
-      <div className="flex h-[120px] flex-col justify-between">
-        {sources.map((s) => (
-          <span key={s.key} className="grid h-14 w-14 place-items-center rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.08]">
-            {s.icon}
-          </span>
-        ))}
-      </div>
-      <svg viewBox="0 0 160 120" className="h-[120px] w-[160px] shrink-0" aria-hidden>
-        {sources.map((s, i) => (
-          <g key={s.key}>
-            <path d={path(s.y)} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="1" />
-            {/* one dot each way: two-way sync */}
-            <circle r="2.4" fill="#6ea8ff">
-              <animateMotion path={path(s.y)} dur="2.8s" begin={`${i * 0.7}s`} repeatCount="indefinite" />
-            </circle>
-            <circle r="2.4" fill="#c7d2fe">
-              <animateMotion path={path(s.y)} dur="2.8s" begin={`${1.4 + i * 0.7}s`} repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" />
-            </circle>
-          </g>
-        ))}
-      </svg>
-      <span className="grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.1]">
-        <AppMark className="h-10 w-10" sizes="80px" />
-      </span>
-    </div>
-  );
-}
+/* ---------- voice assistant ---------- */
 
 function SpeakVisual() {
   const t = useT();
@@ -241,23 +204,23 @@ function SpeakVisual() {
 
   useEffect(() => {
     if (!inView || reduce) return;
-    let t: ReturnType<typeof setTimeout>;
-    if (phase === 0) t = setTimeout(() => setPhase(1), 1800);
-    else if (phase === 1 && chars < phrase.length) t = setTimeout(() => setChars((c) => c + 1), 45);
-    else if (phase === 1) t = setTimeout(() => setPhase(2), 500);
+    let timer: ReturnType<typeof setTimeout>;
+    if (phase === 0) timer = setTimeout(() => setPhase(1), 1800);
+    else if (phase === 1 && chars < phrase.length) timer = setTimeout(() => setChars((c) => c + 1), 45);
+    else if (phase === 1) timer = setTimeout(() => setPhase(2), 500);
     else
-      t = setTimeout(() => {
+      timer = setTimeout(() => {
         setChars(0);
         setPhase(0);
       }, 2600);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [inView, reduce, phase, chars, phrase]);
 
   const shownPhase = reduce ? 2 : phase;
   const text = reduce ? phrase : phrase.slice(0, chars);
 
   return (
-    <div ref={ref} className="w-full max-w-[360px]">
+    <div ref={ref} className="w-full max-w-[380px]">
       <div className="flex h-12 items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4">
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/[0.08]">
           <Mic className="h-3.5 w-3.5 text-white/80" aria-hidden />
@@ -299,125 +262,213 @@ function SpeakVisual() {
   );
 }
 
-function JoinVisual() {
+/* ---------- tasks ---------- */
+
+/** A new task arrives (linked to its meeting), then the first one is ticked off. */
+function TasksVisual() {
   const t = useT();
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <span className="rounded-[16px] bg-[linear-gradient(90deg,#3ee8ff,#7a7bff_55%,#e15bff)] p-[1.5px] transition-shadow duration-500 group-hover:shadow-[0_0_28px_rgba(110,140,255,0.45)]">
-        <span className="flex h-11 items-center gap-2 rounded-[14.5px] bg-[#0c0c12] px-6 text-[0.9rem] font-semibold">
-          <Video className="h-4 w-4" aria-hidden />
-          {t.alarm.joinNow}
-        </span>
-      </span>
-      <span className="flex items-center gap-2">
-        {[
-          { name: "Zoom", icon: <ZoomIcon className="h-6 w-6" /> },
-          { name: "Google Meet", icon: <GoogleMeetIcon className="h-6 w-6" /> },
-          { name: "Microsoft Teams", icon: <TeamsIcon className="h-6 w-6" /> },
-        ].map((a) => (
-          <span
-            key={a.name}
-            title={a.name}
-            className="grid h-10 w-10 place-items-center rounded-xl bg-white/[0.06] ring-1 ring-white/[0.08]"
-          >
-            {a.icon}
-          </span>
-        ))}
-      </span>
-    </div>
-  );
-}
-
-const PEOPLE: { name: string; photo?: StaticImageData; initials?: string; color?: string }[] = [
-  { name: "Ana", photo: people.woman },
-  { name: "David", photo: people.man },
-  { name: "Mia", initials: "MS", color: "#f59e0b" },
-];
-
-function ShareVisual() {
-  const t = useT();
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex items-center">
-        {PEOPLE.map((p, i) => (
-          <span
-            key={p.name}
-            className={`relative grid h-11 w-11 place-items-center overflow-hidden rounded-full text-[0.72rem] font-semibold ring-2 ring-[#0d0d11] transition-transform duration-500 ease-out ${
-              i === 0 ? "group-hover:-translate-x-1.5" : i === 2 ? "group-hover:translate-x-1.5" : ""
-            }`}
-            style={{
-              marginLeft: i ? -12 : 0,
-              ...(p.color ? { background: `color-mix(in srgb, ${p.color} 22%, #0d0d11)`, color: p.color } : null),
-            }}
-          >
-            {p.photo ? <Image src={p.photo} alt="" fill sizes="44px" className="object-cover" /> : p.initials}
-          </span>
-        ))}
-        <span className="ml-3 inline-flex items-center gap-1 rounded-full border border-white/10 px-3 py-1.5 text-[0.75rem] text-white/75">
-          <Plus className="h-3.5 w-3.5" aria-hidden /> {t.features.invite}
-        </span>
-      </div>
-      <span className="flex items-center gap-1.5 text-[0.72rem] text-white/55 transition-colors duration-500 group-hover:text-white/75">
-        <Link2 className="h-3.5 w-3.5" aria-hidden />
-        zoom.us/j/84629371054
-      </span>
-    </div>
-  );
-}
-
-const TAGLINES = ["Never miss what matters.", "Nunca te pierdas lo importante."];
-
-function PlatformsVisual() {
+  const v = t.features.visuals;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const t = useT();
-  // English visitors see the tagline alternate between both languages; Spanish visitors see it in Spanish
-  const cycled = useCycle(TAGLINES.length, 3200, inView && t.lang === "en");
-  const lang = t.lang === "es" ? 1 : cycled;
-
+  const phase = useCycle(3, 1700, inView); // 0 two tasks · 1 new task in · 2 new task ticked
+  const rows = [
+    ...(phase >= 1 ? [{ title: v.newTaskShort, due: v.dueToday, fresh: true }] : []),
+    ...v.tasks.map((x) => ({ ...x, fresh: false })),
+  ];
   return (
-    <div ref={ref} className="flex flex-col items-center gap-3">
-      <div className="flex items-end gap-6">
-      {["iPhone", "Android"].map((os, i) => (
-        <div key={os} className="flex flex-col items-center gap-2">
-          <div className={`relative h-[132px] w-[78px] border border-white/15 bg-white/[0.03] ${i ? "rounded-[14px]" : "rounded-[20px]"}`}>
-            <span
-              className={`absolute top-2 left-1/2 -translate-x-1/2 bg-white/15 ${i ? "h-1.5 w-1.5 rounded-full" : "h-1.5 w-6 rounded-full"}`}
-            />
-            <span className="absolute top-7 left-1/2 -translate-x-1/2">
-              {i ? <AndroidIcon className="h-6 w-6" /> : <AppleIcon className="h-6 w-6 text-white" />}
-            </span>
-            <div className="absolute inset-x-2 top-[58%] -translate-y-1/2 text-center">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={lang}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="text-[0.62rem] leading-snug font-medium text-white/80"
+    <div ref={ref} className="w-full max-w-[300px]">
+      <div className="flex h-[116px] flex-col justify-end gap-2">
+        <AnimatePresence initial={false}>
+          {rows.map((r, i) => {
+            const done = phase === 2 && i === 0;
+            return (
+              <motion.div
+                key={r.title}
+                layout
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 ${r.fresh ? "border-[#f59e0b]/40 bg-[#f59e0b]/[0.06]" : "border-white/[0.07] bg-white/[0.03]"}`}
+              >
+                <span
+                  className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-500 ${done ? "border-emerald-400 bg-emerald-400" : "border-white/30"}`}
                 >
-                  {TAGLINES[lang]}
-                </motion.p>
-              </AnimatePresence>
-            </div>
-          </div>
-          <span className="text-[0.72rem] font-medium text-white/55">{os}</span>
-        </div>
-      ))}
+                  {done && <Check className="h-2.5 w-2.5 text-[#0b0b0e]" strokeWidth={4} aria-hidden />}
+                </span>
+                <span className={`min-w-0 flex-1 truncate text-[0.78rem] ${done ? "text-white/40 line-through" : "text-white/85"}`}>{r.title}</span>
+                <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[0.65rem] text-white/55">{r.due}</span>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
-      <div className="flex gap-1.5">
-        {["EN", "ES"].map((l, i) => (
-          <span
-            key={l}
-            className={`rounded-md px-2 py-0.5 font-mono text-[0.65rem] transition-colors duration-500 ${
-              i === lang ? "bg-white/[0.1] text-white" : "text-white/50"
+      <AvailableLabel className="mt-3 whitespace-normal!">
+        {v.debrief} · {t.available(availability.debrief)}
+      </AvailableLabel>
+    </div>
+  );
+}
+
+/* ---------- agenda aloud ---------- */
+
+/** Each part of the agenda lights up as it is read. */
+function AgendaVisual() {
+  const t = useT();
+  const s = t.screens;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  const line = useCycle(3, 1500, inView);
+  const rows = [
+    { label: s.agendaToday, n: s.agendaItems.today.length },
+    { label: s.agendaOverdue, n: s.agendaItems.overdue.length },
+    { label: s.agendaTomorrow, n: s.agendaItems.tomorrow.length },
+  ];
+  return (
+    <div ref={ref} className="flex w-full max-w-[280px] flex-col items-center gap-4">
+      <span className="relative grid h-14 w-14 place-items-center">
+        <span className="absolute inset-0 rounded-full bg-[#2dd4bf]/20 [animation:glow-pulse_1.8s_ease-in-out_infinite]" />
+        <span className="relative grid h-11 w-11 place-items-center rounded-full bg-[#2dd4bf]/90 text-[#062a26]">
+          <Volume2 className="h-5 w-5" aria-hidden />
+        </span>
+      </span>
+      <div className="w-full space-y-1.5">
+        {rows.map((r, i) => (
+          <div
+            key={r.label}
+            className={`flex items-center justify-between rounded-lg px-3 py-1.5 text-[0.78rem] transition-colors duration-500 ${
+              i === line ? "bg-[#2dd4bf]/12 text-white" : "text-white/45"
             }`}
           >
-            {l}
-          </span>
+            <span>{r.label}</span>
+            <span className="flex items-center gap-2">
+              {i === line && (
+                <span className="flex h-3 items-center gap-[2px]" aria-hidden>
+                  {Array.from({ length: 5 }, (_, k) => (
+                    <span
+                      key={k}
+                      className="w-[2px] rounded-full bg-[#2dd4bf]"
+                      style={{ height: "100%", animation: `listen-bar 0.9s ease-in-out ${k * 0.12}s infinite` }}
+                    />
+                  ))}
+                </span>
+              )}
+              <span className="tabular-nums">{r.n}</span>
+            </span>
+          </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* ---------- WhatsApp ---------- */
+
+/** A message, the confirm card, the tap, the reply. */
+function WhatsAppVisual() {
+  const t = useT();
+  const v = t.features.visuals;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  const phase = useCycle(4, 1500, inView); // 0 ask · 1 card · 2 confirmed · 3 done
+  const pop = { initial: { opacity: 0, y: 6, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { duration: 0.35 } };
+  return (
+    <div ref={ref} className="flex h-[150px] w-full max-w-[340px] flex-col justify-end gap-2 text-[0.78rem]">
+      <motion.p {...pop} className="ml-auto max-w-[78%] rounded-xl rounded-tr-sm bg-[#005c4b] px-3 py-1.5 text-white/90">
+        {v.chatAsk}
+      </motion.p>
+      <AnimatePresence>
+        {phase >= 1 && (
+          <motion.div key="card" {...pop} className="max-w-[82%] overflow-hidden rounded-xl rounded-tl-sm bg-[#1f2c34]">
+            <p className="px-3 pt-2 pb-1.5 text-white/85">{v.chatCard}</p>
+            <div className="grid grid-cols-2 border-t border-white/[0.08] text-[0.72rem] font-medium">
+              <span
+                className={`flex items-center justify-center gap-1 py-1.5 transition-colors duration-300 ${phase >= 2 ? "bg-[#00a884]/20 text-white" : "text-[#00a884]"}`}
+              >
+                <Reply className="h-3 w-3" aria-hidden />
+                {t.whatsapp.chat.confirm}
+              </span>
+              <span className="flex items-center justify-center gap-1 border-l border-white/[0.08] py-1.5 text-[#00a884]">
+                <Reply className="h-3 w-3" aria-hidden />
+                {t.whatsapp.chat.cancel}
+              </span>
+            </div>
+          </motion.div>
+        )}
+        {phase >= 3 && (
+          <motion.p key="done" {...pop} className="max-w-[78%] rounded-xl rounded-tl-sm bg-[#1f2c34] px-3 py-1.5 text-white/85">
+            {v.chatDone}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- calendars and tasks ---------- */
+
+/** What syncs today and what is on the way (names only, no third-party logos). */
+function IntegrationsVisual() {
+  const t = useT();
+  const sources = [
+    { name: "Google Calendar", icon: CalendarDays, month: null },
+    { name: "Outlook", icon: CalendarDays, month: availability.outlook },
+    { name: "Microsoft To Do", icon: ListChecks, month: availability.microsoftToDo },
+    { name: "Google Tasks", icon: ListChecks, month: availability.googleTasks },
+  ] as const;
+  // row centres in the 176px-tall column (four 36px rows)
+  const ys = [18, 64.7, 111.3, 158];
+  const path = (y: number) => `M0 ${y} C 50 ${y}, 60 88, 110 88`;
+  return (
+    <div className="flex items-center justify-center">
+      <div className="flex h-[176px] flex-col justify-between">
+        {sources.map((s) => {
+          const Icon = s.icon;
+          return (
+            <span
+              key={s.name}
+              className={`flex h-9 items-center gap-2 rounded-xl px-3 ring-1 ${s.month ? "bg-white/[0.02] ring-white/[0.06]" : "bg-white/[0.06] ring-white/[0.1]"}`}
+            >
+              <Icon className={`h-4 w-4 ${s.month ? "text-white/35" : "text-[#8ab4ff]"}`} aria-hidden />
+              <span className={`text-[0.78rem] whitespace-nowrap ${s.month ? "text-white/45" : "text-white"}`}>{s.name}</span>
+              {s.month ? (
+                <span className="ml-1 rounded-full bg-[#ffd9a0]/10 px-1.5 py-0.5 text-[0.6rem] whitespace-nowrap text-[#ffd9a0]">{t.available(s.month)}</span>
+              ) : (
+                <span className="ml-1 flex items-center gap-1 text-[0.6rem] text-emerald-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  {t.features.visuals.live}
+                </span>
+              )}
+            </span>
+          );
+        })}
+      </div>
+      <svg viewBox="0 0 110 176" className="hidden h-[176px] w-[110px] shrink-0 sm:block" aria-hidden>
+        {sources.map((s, i) => (
+          <g key={s.name}>
+            <path
+              d={path(ys[i])}
+              fill="none"
+              stroke={s.month ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.2)"}
+              strokeWidth="1"
+              strokeDasharray={s.month ? "3 4" : undefined}
+            />
+            {!s.month && (
+              <>
+                <circle r="2.4" fill="#6ea8ff">
+                  <animateMotion path={path(ys[i])} dur="2.6s" repeatCount="indefinite" />
+                </circle>
+                <circle r="2.4" fill="#c7d2fe">
+                  <animateMotion path={path(ys[i])} dur="2.6s" begin="1.3s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" />
+                </circle>
+              </>
+            )}
+          </g>
+        ))}
+      </svg>
+      <span className="hidden h-16 w-16 shrink-0 place-items-center rounded-2xl bg-white/[0.06] ring-1 ring-white/[0.1] sm:grid">
+        <AppMark className="h-10 w-10" sizes="80px" />
+      </span>
     </div>
   );
 }
@@ -432,10 +483,7 @@ export function Features() {
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="eyebrow">{f.eyebrow}</p>
-          <h2
-            id="features-title"
-            className="mt-3 text-[1.9rem] leading-[1.2] font-semibold text-balance tracking-[-0.02em] sm:text-[2.4rem]"
-          >
+          <h2 id="features-title" className="mt-3 text-[1.9rem] leading-[1.2] font-semibold tracking-[-0.02em] text-balance sm:text-[2.4rem]">
             {f.line1}
             <br />
             <span className="text-white/50">{f.line2}</span>
@@ -443,47 +491,17 @@ export function Features() {
         </Reveal>
 
         <div className="mx-auto mt-14 grid max-w-[1080px] gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Tile
-            accent="#ff4d5e"
-            className="md:col-span-2 lg:row-span-2"
-            {...f.tiles.alarm}
-            visual={<AlarmVisual />}
-          />
-          <Tile
-            accent="#4f8cff"
-            className="md:col-span-2"
-            {...f.tiles.sync}
-            visual={<SyncVisual />}
-            delay={0.05}
-          />
-          <Tile
-            accent="#22c55e"
-            {...f.tiles.join}
-            visual={<JoinVisual />}
-            delay={0.1}
-          />
-          <Tile
-            accent="#f59e0b"
-            {...f.tiles.share}
-            visual={<ShareVisual />}
-            delay={0.15}
-          />
-          <Tile
-            accent="#a78bfa"
-            className="md:col-span-2"
-            {...f.tiles.speak}
-            visual={<SpeakVisual />}
-            delay={0.05}
-          />
-          <Tile
-            accent="#2dd4bf"
-            className="md:col-span-2"
-            {...f.tiles.platforms}
-            visual={<PlatformsVisual />}
-            delay={0.1}
-          />
+          <Tile slug="alarms" className="md:col-span-2 lg:row-span-2" {...f.tiles.alarms} visual={<AlarmVisual />} />
+          <Tile slug="voice-assistant" className="md:col-span-2" {...f.tiles["voice-assistant"]} visual={<SpeakVisual />} delay={0.05} />
+          <Tile slug="tasks" {...f.tiles.tasks} visual={<TasksVisual />} delay={0.1} />
+          <Tile slug="agenda" {...f.tiles.agenda} visual={<AgendaVisual />} delay={0.15} />
+          <Tile slug="whatsapp" className="md:col-span-2" {...f.tiles.whatsapp} visual={<WhatsAppVisual />} delay={0.05} />
+          <Tile slug="integrations" className="md:col-span-2" {...f.tiles.integrations} visual={<IntegrationsVisual />} delay={0.1} />
         </div>
       </div>
     </section>
   );
 }
+
+/* the visuals double as illustrations on the feature pages */
+export { AgendaVisual, AlarmVisual, IntegrationsVisual, SpeakVisual, TasksVisual, WhatsAppVisual };

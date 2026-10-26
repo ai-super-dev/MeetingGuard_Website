@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import {
+  CalendarDays,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -10,7 +11,6 @@ import {
   Menu,
   Search,
 } from "lucide-react";
-import { GoogleCalendarIcon } from "@/components/icons/brand";
 import { Reveal } from "@/components/motion";
 import { MeetingAlarmScreen } from "@/components/phone/MeetingAlarmScreen";
 import { CAL_FRAME } from "@/components/phone/geometry";
@@ -93,7 +93,7 @@ function EventBlock({ e, title }: { e: CalEvent; title: string }) {
           <AppMark className="h-3 w-3 shrink-0" sizes="24px" />
           {title}
         </p>
-        <p className="truncate text-white/60">10:00 – 10:45 · Zoom</p>
+        <p className="truncate text-white/60">10:00 - 10:45 · Zoom</p>
       </div>
     </div>
   );
@@ -112,7 +112,9 @@ function CalendarWeek() {
       {/* app bar */}
       <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3 text-white/70 sm:gap-3 lg:pr-9">
         <Menu className="hidden h-4 w-4 sm:block" aria-hidden />
-        <GoogleCalendarIcon className="h-6 w-6" />
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-[#4f8cff]/15 text-[#8ab4ff]">
+          <CalendarDays className="h-4 w-4" aria-hidden />
+        </span>
         <span className="hidden text-[0.95rem] text-white/85 sm:inline">{p.calendar}</span>
         <span className="ml-2 hidden rounded-full border border-white/15 px-3 py-1 text-[0.72rem] sm:inline">{p.today}</span>
         <ChevronLeft className="hidden h-4 w-4 sm:block" aria-hidden />
@@ -209,7 +211,7 @@ function GuardPhone() {
 type Lane = Dict["problem"]["lanes"][number] & { icon: ReactNode; good: boolean };
 
 const LANE_LOOK = [
-  { icon: <GoogleCalendarIcon className="h-5 w-5" />, good: false },
+  { icon: <CalendarDays className="h-5 w-5 text-white/55" aria-hidden />, good: false },
   { icon: <AppMark className="h-5 w-5" sizes="40px" />, good: true },
 ];
 const LANE_TIMES = ["9:45", "9:50", "10:00"];

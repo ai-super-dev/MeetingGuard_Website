@@ -2,7 +2,7 @@
 
 import { Reveal } from "@/components/motion";
 import { AppIcon } from "@/components/ui/Logo";
-import { StoreButtons } from "@/components/ui/StoreButtons";
+import { StoreBadges } from "@/components/ui/StoreBadges";
 import { useT } from "@/lib/language";
 
 export function FinalCta() {
@@ -23,8 +23,8 @@ export function FinalCta() {
           <br />
           <span className="text-white/50">{t.cta.line2}</span>
         </h2>
-        <p className="mt-4 font-medium text-white/60">{t.tagline}</p>
-        <StoreButtons className="mt-8 justify-center" />
+        <p className="mt-4 font-medium text-white/60">{t.cta.sentence}</p>
+        <StoreBadges className="mt-8 justify-center" />
       </Reveal>
     </section>
   );

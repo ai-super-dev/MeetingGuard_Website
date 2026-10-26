@@ -1,37 +1,146 @@
 /*
- * Every visible string on the site, in English and Spanish. `es` must mirror
- * the shape of `en` (the Dict type enforces it), so a missing translation is a
- * type error rather than a blank on the page.
+ * Shared strings (header, footer, forms, home page, phone screens) in English
+ * and Spanish. `es` must mirror the shape of `en` (the Dict type enforces it),
+ * so a missing translation is a type error rather than a blank on the page.
+ * Page-specific copy lives in src/content/.
+ *
+ * Content rules from the brief: plain punctuation (no em dashes, ellipses or
+ * curly quotes), short, direct and friendly. Text inside screens rebuilt from
+ * the real app keeps the app's own wording.
  */
 
 type Widen<T> = T extends string
   ? string
-  : T extends readonly (infer U)[]
-    ? readonly Widen<U>[]
-    : { readonly [K in keyof T]: Widen<T[K]> };
+  : T extends (...args: never[]) => unknown
+    ? T
+    : T extends readonly (infer U)[]
+      ? readonly Widen<U>[]
+      : { readonly [K in keyof T]: Widen<T[K]> };
+
+const MONTHS_EN = { november: "November", december: "December", january: "January" } as const;
+const MONTHS_ES = { november: "noviembre", december: "diciembre", january: "enero" } as const;
+export type Month = keyof typeof MONTHS_EN;
+
+/** "November" / "noviembre". */
+export const monthName = (lang: "en" | "es", m: Month) => (lang === "es" ? MONTHS_ES : MONTHS_EN)[m];
 
 export const en = {
   lang: "en",
-  tagline: "Plan, Alert, Join. Your AI meeting companion.",
   skip: "Skip to content",
+  available: (m: Month) => `Available ${MONTHS_EN[m]}`,
+  comingSoon: "Coming soon",
+  learnMore: "Learn more",
+  tbc: "TBC",
+  common: {
+    androidOnly: "Android only",
+    related: "Keep exploring",
+    availableNow: "Available now",
+    getApp: "Get the app",
+    questions: "Questions",
+  },
+
+  meta: {
+    homeTitle: "MeetingGuard: never miss a meeting",
+    homeDescription:
+      "MeetingGuard is the AI meeting assistant for busy professionals. Say what you need, confirm the card, and a full-screen alarm makes sure you never miss it. English and Spanish, iPhone and Android.",
+  },
 
   header: {
     home: "MeetingGuard home",
-    primary: "Primary",
+    primary: "Main",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     language: "Language",
+    nav: { how: "How it works", features: "Features", pricing: "Pricing", assistant: "Assistant" },
+    download: "Download",
+    featuresMenu: {
+      features: "Features",
+      useCases: "Use cases",
+      all: "All features on the home page",
+    },
+    theme: { toLight: "Light theme (coming soon)", toDark: "Dark theme" },
   },
-  links: { privacy: "Privacy Policy", terms: "Terms of Service" },
-  store: {
-    appStoreAria: "Download MeetingGuard on the App Store",
-    appStoreTop: "Get it today",
-    playAria: "Get MeetingGuard on Google Play",
-    playTop: "Get it on",
-  },
-  qr: { scan: "Scan to Download", aria: "QR code to download MeetingGuard" },
 
-  hero: { line1: "Never miss", line2: "what matters." },
+  // short names for every page, used by menus and the footer
+  pages: {
+    how: "How it works",
+    pricing: "Pricing",
+    assistant: "Assistant",
+    download: "Download",
+    blog: "Blog",
+    about: "About",
+    security: "Security",
+    faq: "FAQ",
+    support: "Support",
+    press: "Press",
+    privacy: "Privacy policy",
+    terms: "Terms of service",
+    deleteAccount: "Delete account",
+    cookies: "Cookies",
+    features: {
+      "voice-assistant": "Voice assistant",
+      alarms: "Alarms",
+      tasks: "Tasks and reminders",
+      agenda: "Agenda aloud",
+      whatsapp: "WhatsApp",
+      integrations: "Calendars and tasks",
+    },
+    featureBlurbs: {
+      "voice-assistant": "Create, move and cancel by voice",
+      alarms: "Full-screen alarms you can't miss",
+      tasks: "Tasks with due dates and reminders",
+      agenda: "Today and tomorrow, read to you",
+      whatsapp: "Meetings and tasks by message",
+      integrations: "Google Calendar and more",
+    },
+    useCases: { consultants: "For consultants", sales: "For sales", founders: "For founders" },
+    useCaseBlurbs: {
+      consultants: "Back-to-back clients, no slips",
+      sales: "Every call, on time",
+      founders: "Investors, team and hiring",
+    },
+  },
+
+  badges: {
+    appStore: "Download on the App Store",
+    googlePlay: "Get it on Google Play",
+  },
+  qr: { scan: "Scan to download", aria: "QR code that opens the MeetingGuard download page" },
+
+  consent: {
+    text: "We use analytics to improve this site, only if you agree.",
+    accept: "Accept",
+    decline: "Decline",
+    more: "Cookies",
+  },
+
+  forms: {
+    email: "Email",
+    emailPlaceholder: "you@company.com",
+    name: "Name",
+    message: "Message",
+    topic: "Topic",
+    topics: { question: "A question", problem: "Something is not working", billing: "Billing", other: "Other" },
+    language: "Language",
+    languages: { en: "English", es: "Spanish" },
+    sending: "Sending",
+    error: "Something went wrong. Please try again, or email us.",
+    offline: "This form opens at launch. Until then, email us.",
+    joinList: "Join the list",
+    sendLink: "Send me the link",
+    sendMessage: "Send message",
+    honeypot: "Leave this field empty",
+  },
+
+  hero: {
+    line1: "Never miss",
+    line2: "what matters.",
+    sentence: "The AI meeting assistant that turns what you say into meetings, rings until you show up, and remembers your tasks.",
+    promises: ["Never miss a meeting", "Talk to your calendar", "Your tasks remembered"],
+    proof: "Built for busy professionals",
+    proofDetail: "iPhone and Android · English and Spanish",
+    ratingStore: { appStore: "App Store", googlePlay: "Google Play" },
+  },
 
   alarm: {
     title: "Investor call",
@@ -44,6 +153,7 @@ export const en = {
     snooze10: "Snooze 10 min",
     details: "Meeting details",
     autoSnooze: "Auto-snooze in 54 seconds",
+    platform: "Video call",
   },
 
   problem: {
@@ -51,7 +161,7 @@ export const en = {
     line1: "Your calendar stores time.",
     line2a: "MeetingGuard",
     line2b: "protects it.",
-    body: "Calendars only store dates. When your day gets busy, passive notifications get ignored. MeetingGuard reads the same calendar — and makes sure you’re in the right meeting, right on time.",
+    body: "Calendars only store dates. When your day gets busy, passive notifications get ignored. MeetingGuard reads the same calendar and makes sure you're in the right meeting, right on time.",
     calendar: "Calendar",
     today: "Today",
     month: "October 2026",
@@ -70,15 +180,15 @@ export const en = {
       {
         title: "Calendar alone",
         outcome: "Late for the call",
-        steps: ["Nothing happens.", "One small banner — swiped away with everything else.", "The call starts without you."],
+        steps: ["Nothing happens.", "One small banner, swiped away with everything else.", "The call starts without you."],
       },
       {
         title: "With MeetingGuard",
         outcome: "On time",
         steps: [
-          "Your phone vibrates and a full-screen alarm takes over — even with the app closed.",
+          "Your phone rings and a full-screen alarm takes over, even with the app closed.",
           "Follow-ups keep going until you respond.",
-          "One tap on Join now — you’re in the Zoom call.",
+          "One tap on Join now and you're in the call.",
         ],
       },
     ],
@@ -86,44 +196,46 @@ export const en = {
 
   how: {
     eyebrow: "How it works",
-    title: "Plan. Alert. Join.",
-    body: "Follow one meeting from the moment you ask for it to the moment you're in the call.",
+    title: "Say it. Confirm it. Never miss it.",
+    body: "One meeting, from the sentence you say to the moment it starts.",
     group: "How it works steps",
     show: "Show step",
+    more: "See the full walkthrough",
     steps: [
       {
         day: "Mon",
-        title: "Plan",
-        body: "Type or say it in plain words. The assistant shows what it understood, and saves only when you confirm.",
+        title: "Say it",
+        body: "Tell MeetingGuard what you need in plain words, by voice or by text, in English or Spanish.",
         points: [
-          "Plain text or voice, in English or Spanish",
-          "Zoom, Google Meet or Teams link generated for you",
-          "Saved to Google Calendar, Outlook and your phone, invitations sent",
+          "Create, move or cancel a meeting by voice",
+          "A meeting and its task from one sentence",
+          "Type to correct anything it misheard",
+        ],
+      },
+      {
+        day: "Mon",
+        title: "Confirm it",
+        body: "You see a card with exactly what it understood. Nothing is saved until you confirm.",
+        points: [
+          "Title, time, people and the call link on one card",
+          "Change anything before you confirm",
+          "Saved to your calendar and invitations sent",
         ],
       },
       {
         day: "Wed",
-        title: "Alert",
-        body: "Fifteen minutes before, an alarm takes over the screen — even with the app closed.",
+        title: "Never miss it",
+        body: "Fifteen minutes before, an alarm takes over the screen, even with the app closed.",
         points: [
           "Full-screen alarm with sound and voice readout",
-          "Snooze, or keep follow-ups going until you respond",
-          "You choose the intensity for every meeting",
-        ],
-      },
-      {
-        day: "Wed",
-        title: "Join",
-        body: "Everything you need is one tap away — no searching for links or switching apps.",
-        points: [
-          "One tap into the Zoom, Google Meet or Teams call",
-          "Meeting details and the link in one place",
-          "See who's already in the call",
+          "Snooze or dismiss in one tap",
+          "Still rings after your phone restarts",
         ],
       },
     ],
   },
 
+  // text on phone screens (the Plan and Join screens are rebuilt from the real app)
   app: {
     allMeetings: "All meetings",
     search: "Search meetings",
@@ -160,15 +272,51 @@ export const en = {
     intensity: "Intensity: Maximum (your default)",
   },
 
+  // stand-in screens for flows without exported screenshots yet
+  screens: {
+    listening: "Listening",
+    spoken: "Investor call with Ana Wednesday at 10, add a Zoom link",
+    typeInstead: "Type instead",
+    cardTitle: "New meeting",
+    cardWhen: "Wed, Oct 28 · 10:00 - 10:45",
+    cardWith: "Ana García",
+    cardLink: "Zoom link added",
+    cardTask: "Task: send the deck to Ana",
+    notSaved: "Nothing is saved until you confirm",
+    confirm: "Confirm",
+    edit: "Edit",
+    agendaTitle: "Your agenda",
+    agendaToday: "Today",
+    agendaOverdue: "Overdue",
+    agendaTomorrow: "Tomorrow",
+    agendaItems: {
+      today: ["10:00 Investor call", "12:30 Lunch with Ana", "16:00 Design review"],
+      overdue: ["Send the deck to Ana"],
+      tomorrow: ["09:00 Team standup", "11:00 Client sync"],
+    },
+    reading: "Reading aloud",
+    summaryHello: "Good morning",
+    summaryLine: "3 meetings today. 1 task overdue.",
+    summaryFirst: "First up: Investor call at 10:00",
+    summaryStart: "Start my day",
+    tasksTitle: "Tasks",
+    tasks: [
+      { title: "Send the deck to Ana", due: "Today", link: "Investor call" },
+      { title: "Book flights to Madrid", due: "Friday", link: "" },
+      { title: "Review the Q4 plan", due: "Next week", link: "Design review" },
+    ],
+    taskDone: "Done",
+  },
+
   whatsapp: {
     eyebrow: "WhatsApp",
     line1: "Schedule straight",
     line2: "from WhatsApp.",
-    body: "Link your number once with a code from the app, then chat with MeetingGuard like you would with an assistant — it books the meeting and makes sure you never miss it.",
+    body: "Link your number once with a code from the app. Then message MeetingGuard like you would an assistant: it books the meeting and makes sure you never miss it.",
     points: [
-      ["Instant scheduling for", "individuals or groups"],
-      ["Plain language processing", "for complex bookings"],
-      ["Seamless multi-calendar", "sync (Google, Microsoft)"],
+      ["Meetings and tasks", "by message"],
+      ["Confirm buttons before", "anything is saved"],
+      ["No messages you", "didn't ask for"],
     ],
     phones: [
       {
@@ -215,106 +363,134 @@ export const en = {
       { name: "Standard", note: "Sound and vibration" },
       { name: "Critical", note: "Full-screen alarm with voice readout" },
     ],
-    phrase: "Lunch with Ana tomorrow at 2 pm",
-    confirmed: "Confirmed · added to your calendar",
-    invite: "Invite",
+    phrase: "Move my 3 pm with Mia to Friday",
+    confirmed: "Moved to Friday · confirmed",
     tiles: {
-      alarm: {
+      alarms: {
         title: "Alarms you can't miss",
-        body: "Full-screen alarms with sound and voice readout, gentle reminders, snooze and follow-ups — even when the app is closed. You choose the intensity for every meeting.",
+        body: "A full-screen alarm with sound, snooze and dismiss. It works with the app closed and survives a restart. You choose the intensity for every meeting.",
       },
-      sync: {
-        title: "Two-way calendar sync",
-        body: "Works with Google Calendar and Outlook. Meetings you create appear in both, with invitations and video-call links.",
+      "voice-assistant": {
+        title: "Voice assistant",
+        body: "Create, move and cancel meetings by voice in English or Spanish. Nothing is saved until you confirm.",
       },
-      join: {
-        title: "Instant join",
-        body: "One tap into the Zoom, Google Meet or Teams call — the link is generated for you.",
+      tasks: {
+        title: "Tasks and reminders",
+        body: "Tasks by voice with due dates, reminded through the same alarms and linked to their meetings.",
       },
-      share: { title: "Share and invite", body: "Invitations and the call link go to everyone in a tap." },
-      speak: {
-        title: "Speak or type",
-        body: "Tell the assistant what you need, in the app or by WhatsApp. It shows what it understood and only saves after you confirm.",
+      agenda: {
+        title: "Agenda aloud",
+        body: "Hear today, what's overdue and tomorrow, with a daily briefing at your time.",
       },
-      platforms: {
-        title: "iPhone & Android · English & Español",
-        body: "The same assistant and alarms on every phone, in English and Spanish.",
+      whatsapp: {
+        title: "WhatsApp",
+        body: "Create meetings and tasks by message and confirm with one tap. We never send messages you didn't ask for.",
       },
+      integrations: {
+        title: "Calendars and tasks in sync",
+        body: "Google Calendar today. Outlook, Microsoft To Do and Google Tasks are on the way.",
+      },
+    },
+    visuals: {
+      dueToday: "Today",
+      linked: "Investor call",
+      newTask: "Send the deck to Ana",
+      reading: "Reading your agenda",
+      chatAsk: "Lunch with Ana Friday at 1",
+      chatCard: "Lunch with Ana · Fri 13:00",
+      chatDone: "Done. It's in your calendar.",
+      live: "Live",
+      debrief: "Debriefs",
+      tasks: [
+        { title: "Book flights", due: "Fri" },
+        { title: "Review Q4 plan", due: "Mon" },
+      ],
+      newTaskShort: "Send the deck",
     },
   },
 
-  cta: { line1: "Your next meeting", line2: "is already covered." },
+  briefing: {
+    eyebrow: "Daily briefing",
+    line1: "Your day, read to you,",
+    line2: "at the time you choose.",
+    body: "Every morning MeetingGuard reads your meetings, what's overdue and what's next. On Android, a full-screen summary is waiting when you wake up.",
+    points: ["Today, overdue and tomorrow", "At the time you set", "Full-screen summary on Android"],
+    androidOnly: "Full-screen summary: Android only",
+  },
+
+  pricingTeaser: {
+    eyebrow: "Pricing",
+    line1: "Start free.",
+    line2: "Upgrade when you're ready.",
+    points: ["Free plan, no card needed", "3-day free trial", "Pro from USD 7.99 a month"],
+    note: "Subscriptions are bought inside the app on Google Play or the App Store.",
+    cta: "See pricing",
+  },
+
+  assistantTeaser: {
+    eyebrow: "Coming soon",
+    line1: "An executive assistant",
+    line2: "that works for you.",
+    body: "Delegate by voice. It emails, follows up and books, and you approve every step. You are copied on every email.",
+    addon: "Available as an add-on subscription.",
+    more: "What it will do",
+    visual: {
+      ask: "Find 30 minutes with Carlos next week",
+      to: "To: Carlos",
+      cc: "Cc: you",
+      subject: "30 minutes next week?",
+      steps: ["Email sent", "Follow-up sent", "Carlos picked Tue 11:00", "You approved. Booked."],
+      booked: "Tue 11:00 with Carlos, in your calendar",
+    },
+  },
+
+  faqHome: { eyebrow: "FAQ", title: "Questions, answered.", all: "All questions" },
+
+  cta: { line1: "Your next meeting", line2: "is already covered.", sentence: "Free to start. Set up in a minute." },
 
   footer: {
     blurb: "Stay organized and never miss a meeting again.",
+    product: "Product",
+    featuresCol: "Features",
+    company: "Company",
+    legal: "Legal",
     contact: "Contact",
     updates: "Stay updated",
-    rights: "© 2026 MeetingGuard. All rights reserved.",
+    rights: "All rights reserved.",
+    companyLine: (company: string, number: string) =>
+      `MeetingGuard is a product of ${company}, a company registered in England and Wales${number ? `, number ${number}` : ""}.`,
     nav: "Footer",
     emailLabel: "Enter your email address here",
     emailPlaceholder: "Your email for notifications",
     subscribe: "Subscribe for updates",
-    done: "Thanks — you're on the list.",
-    error: "Something went wrong. Please try again.",
-    soon: "Update subscriptions are opening soon.",
+    done: "Thanks, you're on the list.",
   },
 
-  legal: {
-    back: "Back to home",
-    updated: "Last updated: October 24, 2026",
-    privacy: {
-      title: "Privacy Policy",
-      sections: [
-        {
-          heading: "What we collect",
-          body: "Meeting titles, times, attendees and join links from the calendars you choose to connect, plus basic app diagnostics.",
-        },
-        {
-          heading: "How we use it",
-          body: "Only to schedule meetings, deliver reminders and alerts, and let you join with one tap. We never sell your data.",
-        },
-        {
-          heading: "Your controls",
-          body: "You can disconnect any calendar at any time and request deletion of your data from within the app.",
-        },
-        {
-          heading: "Security",
-          body: "Data is encrypted in transit and at rest, and calendar access uses the providers' official, revocable permissions.",
-        },
-      ],
-    },
-    terms: {
-      title: "Terms of Service",
-      sections: [
-        {
-          heading: "1. Acceptance of terms",
-          body: "By downloading or using MeetingGuard you agree to these terms. If you do not agree, please do not use the app.",
-        },
-        {
-          heading: "2. Your account",
-          body: "You are responsible for the calendars and accounts you connect, and for keeping your sign-in credentials secure.",
-        },
-        {
-          heading: "3. Acceptable use",
-          body: "Do not misuse the service, interfere with its operation, or use it to send unsolicited invitations.",
-        },
-        {
-          heading: "4. Changes",
-          body: "We may update these terms from time to time. Continued use after changes take effect means you accept the revised terms.",
-        },
-      ],
-    },
-  },
+  notFound: { title: "This page does not exist.", body: "The link may be old or mistyped.", home: "Back to home" },
 };
 
-export type Dict = Widen<Omit<typeof en, "app">> & {
-  readonly app: Widen<Omit<typeof en.app, "meetingCount">> & { readonly meetingCount: (n: number) => string };
-};
+export type Dict = Widen<typeof en>;
 
 export const es: Dict = {
   lang: "es",
-  tagline: "Planifica, Alerta, Únete. Tu asistente de reuniones con IA.",
   skip: "Saltar al contenido",
+  available: (m: Month) => `Disponible en ${MONTHS_ES[m]}`,
+  comingSoon: "Muy pronto",
+  learnMore: "Más información",
+  tbc: "Por confirmar",
+  common: {
+    androidOnly: "Solo Android",
+    related: "Sigue explorando",
+    availableNow: "Disponible ya",
+    getApp: "Descarga la app",
+    questions: "Preguntas",
+  },
+
+  meta: {
+    homeTitle: "MeetingGuard: no te pierdas ninguna reunión",
+    homeDescription:
+      "MeetingGuard es el asistente de reuniones con IA para profesionales ocupados. Di lo que necesitas, confirma la tarjeta y una alarma a pantalla completa se asegura de que no te lo pierdas. En inglés y español, para iPhone y Android.",
+  },
 
   header: {
     home: "Inicio de MeetingGuard",
@@ -322,17 +498,95 @@ export const es: Dict = {
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
     language: "Idioma",
+    nav: { how: "Cómo funciona", features: "Funciones", pricing: "Precios", assistant: "Asistente" },
+    download: "Descargar",
+    featuresMenu: {
+      features: "Funciones",
+      useCases: "Casos de uso",
+      all: "Todas las funciones en la página de inicio",
+    },
+    theme: { toLight: "Tema claro (muy pronto)", toDark: "Tema oscuro" },
   },
-  links: { privacy: "Política de privacidad", terms: "Términos del servicio" },
-  store: {
-    appStoreAria: "Descarga MeetingGuard en el App Store",
-    appStoreTop: "Descárgalo hoy",
-    playAria: "Consigue MeetingGuard en Google Play",
-    playTop: "Disponible en",
-  },
-  qr: { scan: "Escanea para descargar", aria: "Código QR para descargar MeetingGuard" },
 
-  hero: { line1: "Nunca te pierdas", line2: "lo importante." },
+  pages: {
+    how: "Cómo funciona",
+    pricing: "Precios",
+    assistant: "Asistente",
+    download: "Descargar",
+    blog: "Blog",
+    about: "Quiénes somos",
+    security: "Seguridad",
+    faq: "Preguntas frecuentes",
+    support: "Soporte",
+    press: "Prensa",
+    privacy: "Política de privacidad",
+    terms: "Términos del servicio",
+    deleteAccount: "Eliminar la cuenta",
+    cookies: "Cookies",
+    features: {
+      "voice-assistant": "Asistente de voz",
+      alarms: "Alarmas",
+      tasks: "Tareas y recordatorios",
+      agenda: "Agenda en voz alta",
+      whatsapp: "WhatsApp",
+      integrations: "Calendarios y tareas",
+    },
+    featureBlurbs: {
+      "voice-assistant": "Crea, mueve y cancela con la voz",
+      alarms: "Alarmas a pantalla completa",
+      tasks: "Tareas con fecha y recordatorio",
+      agenda: "Hoy y mañana, leídos para ti",
+      whatsapp: "Reuniones y tareas por mensaje",
+      integrations: "Google Calendar y más",
+    },
+    useCases: { consultants: "Para consultores", sales: "Para ventas", founders: "Para fundadores" },
+    useCaseBlurbs: {
+      consultants: "Clientes seguidos, sin despistes",
+      sales: "Cada llamada, a tiempo",
+      founders: "Inversores, equipo y contratación",
+    },
+  },
+
+  badges: {
+    appStore: "Descárgalo en el App Store",
+    googlePlay: "Disponible en Google Play",
+  },
+  qr: { scan: "Escanea para descargar", aria: "Código QR que abre la página de descarga de MeetingGuard" },
+
+  consent: {
+    text: "Usamos analítica para mejorar este sitio, solo si lo aceptas.",
+    accept: "Aceptar",
+    decline: "Rechazar",
+    more: "Cookies",
+  },
+
+  forms: {
+    email: "Correo electrónico",
+    emailPlaceholder: "tu@empresa.com",
+    name: "Nombre",
+    message: "Mensaje",
+    topic: "Tema",
+    topics: { question: "Una pregunta", problem: "Algo no funciona", billing: "Facturación", other: "Otro" },
+    language: "Idioma",
+    languages: { en: "Inglés", es: "Español" },
+    sending: "Enviando",
+    error: "Algo salió mal. Inténtalo de nuevo o escríbenos.",
+    offline: "Este formulario se activa en el lanzamiento. Mientras tanto, escríbenos.",
+    joinList: "Unirme a la lista",
+    sendLink: "Envíame el enlace",
+    sendMessage: "Enviar mensaje",
+    honeypot: "Deja este campo vacío",
+  },
+
+  hero: {
+    line1: "Nunca te pierdas",
+    line2: "lo importante.",
+    sentence: "El asistente de reuniones con IA que convierte lo que dices en reuniones, suena hasta que llegas y recuerda tus tareas.",
+    promises: ["Nunca te pierdas una reunión", "Habla con tu calendario", "Tus tareas, recordadas"],
+    proof: "Creado para profesionales ocupados",
+    proofDetail: "iPhone y Android · Inglés y español",
+    ratingStore: { appStore: "App Store", googlePlay: "Google Play" },
+  },
 
   alarm: {
     title: "Llamada con inversores",
@@ -345,6 +599,7 @@ export const es: Dict = {
     snooze10: "Posponer 10 min",
     details: "Detalles de la reunión",
     autoSnooze: "Se pospondrá en 54 segundos",
+    platform: "Videollamada",
   },
 
   problem: {
@@ -377,9 +632,9 @@ export const es: Dict = {
         title: "Con MeetingGuard",
         outcome: "A tiempo",
         steps: [
-          "Tu teléfono vibra y una alarma a pantalla completa toma el control, incluso con la app cerrada.",
+          "Tu teléfono suena y una alarma a pantalla completa toma el control, incluso con la app cerrada.",
           "Los recordatorios siguen hasta que respondes.",
-          "Un toque en Unirse ahora y ya estás en la llamada de Zoom.",
+          "Un toque en Unirse ahora y ya estás en la llamada.",
         ],
       },
     ],
@@ -387,39 +642,40 @@ export const es: Dict = {
 
   how: {
     eyebrow: "Cómo funciona",
-    title: "Planifica. Alerta. Únete.",
-    body: "Sigue una reunión desde que la pides hasta que entras en la llamada.",
+    title: "Dilo. Confírmalo. No te lo pierdas.",
+    body: "Una reunión, desde la frase que dices hasta el momento en que empieza.",
     group: "Pasos de cómo funciona",
     show: "Mostrar paso",
+    more: "Ver el recorrido completo",
     steps: [
       {
         day: "Lun",
-        title: "Planifica",
-        body: "Escríbelo o dilo con tus palabras. El asistente te muestra lo que entendió y solo guarda cuando confirmas.",
+        title: "Dilo",
+        body: "Dile a MeetingGuard lo que necesitas con tus palabras, por voz o por texto, en inglés o español.",
         points: [
-          "Texto o voz, en inglés o español",
-          "Enlace de Zoom, Google Meet o Teams generado automáticamente",
-          "Guardada en Google Calendar, Outlook y tu teléfono, con invitaciones enviadas",
+          "Crea, mueve o cancela una reunión con la voz",
+          "Una reunión y su tarea con una sola frase",
+          "Escribe para corregir lo que no entendió",
+        ],
+      },
+      {
+        day: "Lun",
+        title: "Confírmalo",
+        body: "Ves una tarjeta con exactamente lo que entendió. No se guarda nada hasta que confirmas.",
+        points: [
+          "Título, hora, personas y enlace en una tarjeta",
+          "Cambia lo que quieras antes de confirmar",
+          "Guardada en tu calendario, con invitaciones enviadas",
         ],
       },
       {
         day: "Mié",
-        title: "Alerta",
+        title: "No te lo pierdas",
         body: "Quince minutos antes, una alarma ocupa la pantalla, incluso con la app cerrada.",
         points: [
           "Alarma a pantalla completa con sonido y lectura en voz",
-          "Pospón, o deja que los recordatorios sigan hasta que respondas",
-          "Tú eliges la intensidad de cada reunión",
-        ],
-      },
-      {
-        day: "Mié",
-        title: "Únete",
-        body: "Todo lo que necesitas está a un toque: sin buscar enlaces ni cambiar de app.",
-        points: [
-          "Un toque y entras en la llamada de Zoom, Google Meet o Teams",
-          "Los detalles de la reunión y el enlace en un solo lugar",
-          "Mira quién está ya en la llamada",
+          "Pospón o descarta con un toque",
+          "Sigue sonando aunque el teléfono se reinicie",
         ],
       },
     ],
@@ -461,15 +717,50 @@ export const es: Dict = {
     intensity: "Intensidad: Máxima (tu predeterminada)",
   },
 
+  screens: {
+    listening: "Escuchando",
+    spoken: "Llamada con inversores con Ana el miércoles a las 10, añade un enlace de Zoom",
+    typeInstead: "Escribir",
+    cardTitle: "Nueva reunión",
+    cardWhen: "Mié, 28 oct · 10:00 - 10:45",
+    cardWith: "Ana García",
+    cardLink: "Enlace de Zoom añadido",
+    cardTask: "Tarea: enviar la presentación a Ana",
+    notSaved: "No se guarda nada hasta que confirmas",
+    confirm: "Confirmar",
+    edit: "Editar",
+    agendaTitle: "Tu agenda",
+    agendaToday: "Hoy",
+    agendaOverdue: "Pendiente",
+    agendaTomorrow: "Mañana",
+    agendaItems: {
+      today: ["10:00 Llamada con inversores", "12:30 Comida con Ana", "16:00 Revisión de diseño"],
+      overdue: ["Enviar la presentación a Ana"],
+      tomorrow: ["09:00 Reunión diaria", "11:00 Reunión con cliente"],
+    },
+    reading: "Leyendo en voz alta",
+    summaryHello: "Buenos días",
+    summaryLine: "3 reuniones hoy. 1 tarea pendiente.",
+    summaryFirst: "Primero: Llamada con inversores a las 10:00",
+    summaryStart: "Empezar el día",
+    tasksTitle: "Tareas",
+    tasks: [
+      { title: "Enviar la presentación a Ana", due: "Hoy", link: "Llamada con inversores" },
+      { title: "Reservar vuelos a Madrid", due: "Viernes", link: "" },
+      { title: "Revisar el plan del Q4", due: "Próxima semana", link: "Revisión de diseño" },
+    ],
+    taskDone: "Hecha",
+  },
+
   whatsapp: {
     eyebrow: "WhatsApp",
     line1: "Agenda directamente",
     line2: "desde WhatsApp.",
-    body: "Vincula tu número una vez con un código de la app y luego chatea con MeetingGuard como lo harías con un asistente: reserva la reunión y se asegura de que no te la pierdas.",
+    body: "Vincula tu número una vez con un código de la app. Después escribe a MeetingGuard como a un asistente: reserva la reunión y se asegura de que no te la pierdas.",
     points: [
-      ["Agenda al instante para", "personas o grupos"],
-      ["Lenguaje natural para", "reservas complejas"],
-      ["Sincronización con varios", "calendarios (Google, Microsoft)"],
+      ["Reuniones y tareas", "por mensaje"],
+      ["Botones para confirmar", "antes de guardar nada"],
+      ["Ningún mensaje que", "no hayas pedido"],
     ],
     phones: [
       {
@@ -516,96 +807,110 @@ export const es: Dict = {
       { name: "Estándar", note: "Sonido y vibración" },
       { name: "Crítica", note: "Alarma a pantalla completa con voz" },
     ],
-    phrase: "Comida con Ana mañana a las 14:00",
-    confirmed: "Confirmado · añadido a tu calendario",
-    invite: "Invitar",
+    phrase: "Mueve mi reunión de las 15:00 con Mia al viernes",
+    confirmed: "Movida al viernes · confirmado",
     tiles: {
-      alarm: {
+      alarms: {
         title: "Alarmas imposibles de ignorar",
-        body: "Alarmas a pantalla completa con sonido y lectura en voz, recordatorios suaves, posponer y seguimientos, incluso con la app cerrada. Tú eliges la intensidad de cada reunión.",
+        body: "Una alarma a pantalla completa con sonido, posponer y descartar. Funciona con la app cerrada y sobrevive a un reinicio. Tú eliges la intensidad de cada reunión.",
       },
-      sync: {
-        title: "Sincronización bidireccional",
-        body: "Funciona con Google Calendar y Outlook. Las reuniones que creas aparecen en ambos, con invitaciones y enlaces de videollamada.",
+      "voice-assistant": {
+        title: "Asistente de voz",
+        body: "Crea, mueve y cancela reuniones con la voz en inglés o español. No se guarda nada hasta que confirmas.",
       },
-      join: {
-        title: "Únete al instante",
-        body: "Un toque y entras en la llamada de Zoom, Google Meet o Teams: el enlace se genera automáticamente.",
+      tasks: {
+        title: "Tareas y recordatorios",
+        body: "Tareas por voz con fecha límite, recordadas con las mismas alarmas y vinculadas a sus reuniones.",
       },
-      share: { title: "Comparte e invita", body: "Las invitaciones y el enlace llegan a todos con un toque." },
-      speak: {
-        title: "Habla o escribe",
-        body: "Dile al asistente lo que necesitas, en la app o por WhatsApp. Te muestra lo que entendió y solo guarda cuando confirmas.",
+      agenda: {
+        title: "Agenda en voz alta",
+        body: "Escucha lo de hoy, lo pendiente y lo de mañana, con un resumen diario a tu hora.",
       },
-      platforms: {
-        title: "iPhone y Android · English y Español",
-        body: "El mismo asistente y las mismas alarmas en cualquier teléfono, en inglés y en español.",
+      whatsapp: {
+        title: "WhatsApp",
+        body: "Crea reuniones y tareas por mensaje y confirma con un toque. Nunca enviamos mensajes que no hayas pedido.",
       },
+      integrations: {
+        title: "Calendarios y tareas sincronizados",
+        body: "Google Calendar desde hoy. Outlook, Microsoft To Do y Google Tasks están en camino.",
+      },
+    },
+    visuals: {
+      dueToday: "Hoy",
+      linked: "Llamada con inversores",
+      newTask: "Enviar la presentación a Ana",
+      reading: "Leyendo tu agenda",
+      chatAsk: "Comida con Ana el viernes a la 1",
+      chatCard: "Comida con Ana · vie 13:00",
+      chatDone: "Listo. Ya está en tu calendario.",
+      live: "Activo",
+      debrief: "Resúmenes",
+      tasks: [
+        { title: "Reservar vuelos", due: "vie" },
+        { title: "Revisar plan Q4", due: "lun" },
+      ],
+      newTaskShort: "Enviar la presentación",
     },
   },
 
-  cta: { line1: "Tu próxima reunión", line2: "ya está cubierta." },
+  briefing: {
+    eyebrow: "Resumen diario",
+    line1: "Tu día, leído para ti,",
+    line2: "a la hora que elijas.",
+    body: "Cada mañana MeetingGuard lee tus reuniones, lo pendiente y lo que viene. En Android, te espera un resumen a pantalla completa al despertar.",
+    points: ["Hoy, pendiente y mañana", "A la hora que configures", "Resumen a pantalla completa en Android"],
+    androidOnly: "Resumen a pantalla completa: solo Android",
+  },
+
+  pricingTeaser: {
+    eyebrow: "Precios",
+    line1: "Empieza gratis.",
+    line2: "Mejora cuando quieras.",
+    points: ["Plan gratuito, sin tarjeta", "3 días de prueba gratis", "Pro desde 7,99 USD al mes"],
+    note: "Las suscripciones se compran dentro de la app en Google Play o el App Store.",
+    cta: "Ver precios",
+  },
+
+  assistantTeaser: {
+    eyebrow: "Muy pronto",
+    line1: "Un asistente ejecutivo",
+    line2: "que trabaja para ti.",
+    body: "Delega con la voz. Escribe correos, hace seguimiento y reserva, y tú apruebas cada paso. Te copia en cada correo.",
+    addon: "Disponible como suscripción adicional.",
+    more: "Qué hará",
+    visual: {
+      ask: "Busca 30 minutos con Carlos la próxima semana",
+      to: "Para: Carlos",
+      cc: "Cc: tú",
+      subject: "¿30 minutos la próxima semana?",
+      steps: ["Correo enviado", "Seguimiento enviado", "Carlos eligió mar 11:00", "Lo aprobaste. Reservado."],
+      booked: "Mar 11:00 con Carlos, en tu calendario",
+    },
+  },
+
+  faqHome: { eyebrow: "Preguntas", title: "Preguntas, resueltas.", all: "Todas las preguntas" },
+
+  cta: { line1: "Tu próxima reunión", line2: "ya está cubierta.", sentence: "Gratis para empezar. Listo en un minuto." },
 
   footer: {
     blurb: "Mantente organizado y no vuelvas a perderte una reunión.",
+    product: "Producto",
+    featuresCol: "Funciones",
+    company: "Empresa",
+    legal: "Legal",
     contact: "Contacto",
     updates: "Novedades",
-    rights: "© 2026 MeetingGuard. Todos los derechos reservados.",
+    rights: "Todos los derechos reservados.",
+    companyLine: (company: string, number: string) =>
+      `MeetingGuard es un producto de ${company}, empresa registrada en Inglaterra y Gales${number ? `, número ${number}` : ""}.`,
     nav: "Pie de página",
     emailLabel: "Introduce tu correo electrónico",
     emailPlaceholder: "Tu correo para notificaciones",
     subscribe: "Suscribirme a novedades",
     done: "Gracias, ya estás en la lista.",
-    error: "Algo salió mal. Inténtalo de nuevo.",
-    soon: "Las suscripciones abrirán pronto.",
   },
 
-  legal: {
-    back: "Volver al inicio",
-    updated: "Última actualización: 24 de octubre de 2026",
-    privacy: {
-      title: "Política de privacidad",
-      sections: [
-        {
-          heading: "Qué recopilamos",
-          body: "Títulos, horarios, asistentes y enlaces de las reuniones de los calendarios que decidas conectar, además de diagnósticos básicos de la app.",
-        },
-        {
-          heading: "Cómo lo usamos",
-          body: "Solo para programar reuniones, enviar recordatorios y alertas, y permitirte unirte con un toque. Nunca vendemos tus datos.",
-        },
-        {
-          heading: "Tus controles",
-          body: "Puedes desconectar cualquier calendario en cualquier momento y solicitar la eliminación de tus datos desde la app.",
-        },
-        {
-          heading: "Seguridad",
-          body: "Los datos se cifran en tránsito y en reposo, y el acceso al calendario usa los permisos oficiales y revocables de cada proveedor.",
-        },
-      ],
-    },
-    terms: {
-      title: "Términos del servicio",
-      sections: [
-        {
-          heading: "1. Aceptación de los términos",
-          body: "Al descargar o usar MeetingGuard aceptas estos términos. Si no estás de acuerdo, no uses la app.",
-        },
-        {
-          heading: "2. Tu cuenta",
-          body: "Eres responsable de los calendarios y cuentas que conectas, y de mantener seguras tus credenciales de acceso.",
-        },
-        {
-          heading: "3. Uso aceptable",
-          body: "No hagas un uso indebido del servicio, no interfieras en su funcionamiento ni lo uses para enviar invitaciones no solicitadas.",
-        },
-        {
-          heading: "4. Cambios",
-          body: "Podemos actualizar estos términos ocasionalmente. Seguir usando la app después de los cambios implica que aceptas los términos revisados.",
-        },
-      ],
-    },
-  },
+  notFound: { title: "Esta página no existe.", body: "Puede que el enlace sea antiguo o tenga un error.", home: "Volver al inicio" },
 };
 
 export const dictionaries = { en, es } as const;
