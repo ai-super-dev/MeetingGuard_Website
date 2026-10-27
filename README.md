@@ -30,7 +30,7 @@ English and the Spanish text side by side; change both.
 | --- | --- |
 | Header, footer, buttons, forms, home page sections, phone screens | `src/lib/i18n.ts` |
 | The FAQ on the home page (5 questions) | `src/content/faq.ts` |
-| Legal pages | `src/views/LegalDocPage.tsx` |
+| Privacy policy and terms of service (English as approved, Spanish translation) | `src/content/legal.ts` |
 | Facts used everywhere: store links, email, phone, company number, release months, ratings, form and analytics settings | `src/lib/site.ts` |
 
 Writing rules from the brief: short, direct and friendly; plain punctuation (no
@@ -72,9 +72,9 @@ to `PhoneShot` with its `image` prop (`src/components/phone/PhoneShot.tsx`).
 - Spanish App Store badge: save Apple's Spanish artwork as
   `public/badges/app-store-es.svg` and point to it in
   `src/components/ui/StoreBadges.tsx`.
-- Privacy policy and terms: paste the current texts unchanged into
-  `src/views/LegalDocPage.tsx` and remove the draft notices; confirm the URLs
-  match Play Console, App Store Connect and the Meta app.
+- Privacy policy and terms: confirm the URLs (`/privacy-policy`,
+  `/terms-of-service`; `/privacy` and `/terms` redirect there) match Play
+  Console, App Store Connect and the Meta app.
 - Company number.
 - Forms: deploy `functions/` and set `formsEndpoint` in `src/lib/site.ts`.
 - Analytics: set `gaMeasurementId` in `src/lib/site.ts`; the consent banner

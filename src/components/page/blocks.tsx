@@ -71,36 +71,43 @@ export function CheckList({ items, className = "" }: { items: readonly ReactNode
   );
 }
 
-/** Long-form text sections (legal). Each body is plain paragraphs or a list. */
-export function Prose({ sections }: { sections: readonly { heading: string; body: readonly string[]; list?: readonly string[] }[] }) {
+/** Plain text with any email address turned into a mailto link. */
+function WithEmailLinks({ text }: { text: string }) {
+  return text.split(/([\w.+-]+@[\w-]+\.[\w.]+\w)/).map((part, i) =>
+    i % 2 ? (
+      <a key={i} href={`mailto:${part}`} className="text-white/85 underline underline-offset-2 hover:text-white">
+        {part}
+      </a>
+    ) : (
+      part
+    ),
+  );
+}
+
+/** Long-form text sections (legal). Each body item is a paragraph, or a bulleted list when it is an array. */
+export function Prose({ sections }: { sections: readonly { heading: string; body: readonly (string | readonly string[])[] }[] }) {
   return (
     <div className="surface mx-auto max-w-3xl space-y-9 rounded-2xl p-6 sm:p-10">
       {sections.map((s) => (
         <div key={s.heading}>
           <h2 className="text-[1.15rem] font-semibold text-white">{s.heading}</h2>
-          {s.body.map((p) => (
-            <p key={p} className="mt-3 leading-relaxed text-white/65">
-              {p}
-            </p>
-          ))}
-          {s.list && (
-            <ul className="mt-3 list-disc space-y-1.5 pl-5 text-white/65 marker:text-white/30">
-              {s.list.map((li) => (
-                <li key={li}>{li}</li>
-              ))}
-            </ul>
+          {s.body.map((block, i) =>
+            typeof block === "string" ? (
+              <p key={i} className="mt-3 leading-relaxed text-white/65">
+                <WithEmailLinks text={block} />
+              </p>
+            ) : (
+              <ul key={i} className="mt-3 list-disc space-y-1.5 pl-5 leading-relaxed text-white/65 marker:text-white/30">
+                {block.map((li) => (
+                  <li key={li}>
+                    <WithEmailLinks text={li} />
+                  </li>
+                ))}
+              </ul>
+            ),
           )}
         </div>
       ))}
     </div>
-  );
-}
-
-/** Amber notice for content that still has to be supplied (e.g. the final legal text). */
-export function DraftNotice({ children }: { children: ReactNode }) {
-  return (
-    <p className="mx-auto mb-6 max-w-3xl rounded-xl border border-[#ffd9a0]/25 bg-[#ffd9a0]/[0.07] px-4 py-3 text-[0.85rem] text-[#ffd9a0]">
-      {children}
-    </p>
   );
 }
