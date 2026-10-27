@@ -8,7 +8,7 @@ import { useT } from "@/lib/language";
 export function FinalCta() {
   const t = useT();
   return (
-    <section aria-labelledby="cta-title" className="relative overflow-x-clip pt-14 pb-28 sm:pt-[4.5rem] sm:pb-36">
+    <section id="download" aria-labelledby="cta-title" className="relative overflow-x-clip pt-14 pb-28 sm:pt-[4.5rem] sm:pb-36">
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[480px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(190,20,40,0.28),transparent)] blur-2xl"

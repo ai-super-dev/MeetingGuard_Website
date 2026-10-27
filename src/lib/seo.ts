@@ -4,7 +4,7 @@ import { siteConfig } from "./site";
 
 /**
  * Title, description, canonical URL, hreflang pair and social cards for one
- * page in one language. `path` is language-neutral (`/pricing`).
+ * page in one language. `path` is language-neutral (`/privacy-policy`).
  */
 export function pageMetadata({
   lang,

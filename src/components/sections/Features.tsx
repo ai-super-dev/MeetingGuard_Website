@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
-import { AlarmClock, ArrowUpRight, Bell, BellRing, CalendarDays, Check, ListChecks, Mic, Reply, Volume2 } from "lucide-react";
+import { AlarmClock, Bell, BellRing, CalendarDays, Check, ListChecks, Mic, Reply, Volume2 } from "lucide-react";
 import { featureAccents } from "@/components/icons/feature-icons";
 import { Reveal } from "@/components/motion";
 import { AvailableLabel } from "@/components/page/blocks";
 import { AppMark } from "@/components/ui/Logo";
-import { useHref, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 import type { FeatureSlug } from "@/lib/routes";
 import { availability } from "@/lib/site";
 
@@ -27,9 +26,8 @@ function useCycle(count: number, ms: number, active: boolean) {
 }
 
 /**
- * Bento tile linking to its feature page: quiet dark surface with a faint
- * accent tint, and a soft spotlight (plus border highlight) that follows the
- * cursor on hover.
+ * Bento tile: quiet dark surface with a faint accent tint, and a soft
+ * spotlight (plus border highlight) that follows the cursor on hover.
  */
 function Tile({
   slug,
@@ -46,11 +44,9 @@ function Tile({
   className?: string;
   delay?: number;
 }) {
-  const t = useT();
-  const href = useHref();
   const accent = featureAccents[slug];
-  const ref = useRef<HTMLAnchorElement>(null);
-  const onMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -60,11 +56,10 @@ function Tile({
 
   return (
     <Reveal delay={delay} className={className}>
-      <Link
-        href={href(`/features/${slug}`)}
+      <div
         ref={ref}
         onPointerMove={onMove}
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,#101014,#0a0a0d)] transition-colors duration-500 hover:border-white/[0.12] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,#101014,#0a0a0d)] transition-colors duration-500 hover:border-white/[0.12]"
         style={{ "--accent": accent } as CSSProperties}
       >
         {/* faint resting tint in the accent colour */}
@@ -96,12 +91,8 @@ function Tile({
         <div className="relative px-6 pt-5 pb-6">
           <h3 className="text-[1rem] font-semibold text-white">{title}</h3>
           <p className="mt-1.5 max-w-md text-[0.86rem] leading-relaxed text-white/60">{body}</p>
-          <span className="mt-3 inline-flex items-center gap-1 text-[0.8rem] font-medium text-white/45 transition-colors duration-300 group-hover:text-white">
-            {t.learnMore}
-            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
-          </span>
         </div>
-      </Link>
+      </div>
     </Reveal>
   );
 }

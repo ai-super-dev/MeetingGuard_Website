@@ -1,7 +1,7 @@
-import { AlarmClock, Briefcase, ListChecks, MessageCircle, Mic, RefreshCw, Rocket, TrendingUp, Volume2, type LucideIcon } from "lucide-react";
-import type { FeatureSlug, UseCaseSlug } from "@/lib/routes";
+import { AlarmClock, ListChecks, MessageCircle, Mic, RefreshCw, Volume2, type LucideIcon } from "lucide-react";
+import type { FeatureSlug } from "@/lib/routes";
 
-/** Neutral icons for the six features and three use cases (no third-party logos). */
+/** Neutral icons for the six features (no third-party logos). */
 export const featureIcons: Record<FeatureSlug, LucideIcon> = {
   "voice-assistant": Mic,
   alarms: AlarmClock,
@@ -11,13 +11,7 @@ export const featureIcons: Record<FeatureSlug, LucideIcon> = {
   integrations: RefreshCw,
 };
 
-export const useCaseIcons: Record<UseCaseSlug, LucideIcon> = {
-  consultants: Briefcase,
-  sales: TrendingUp,
-  founders: Rocket,
-};
-
-/** Accent per feature, shared by the home tiles, the menu and the feature pages. */
+/** Accent per feature, used by the home tiles. */
 export const featureAccents: Record<FeatureSlug, string> = {
   alarms: "#ff4d5e",
   "voice-assistant": "#a78bfa",

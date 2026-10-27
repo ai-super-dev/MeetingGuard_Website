@@ -2,7 +2,7 @@
 
 import { siteConfig } from "./site";
 
-export type FormKind = "waitlist" | "contact" | "send-link" | "updates";
+export type FormKind = "waitlist" | "updates";
 export type SubmitResult = "ok" | "error" | "offline";
 
 /** Name of the hidden field bots fill in and people never see. */

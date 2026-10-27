@@ -17,17 +17,10 @@ export const siteConfig = {
   // TODO: the real store listings.
   appStoreUrl: "#",
   playStoreUrl: "#",
-  // TODO: store review links (support page) once the listings are live.
-  appStoreReviewUrl: "#",
-  playStoreReviewUrl: "#",
-  // TODO: store ratings for the social proof strip, e.g. { appStore: 4.8, googlePlay: 4.7 }.
-  ratings: null as null | { appStore?: number; googlePlay?: number },
-  // TODO: URL of the Cloud Function that receives the waitlist, contact, send-link and update forms.
+  // TODO: URL of the Cloud Function that receives the waitlist and update forms.
   formsEndpoint: "",
   // TODO: GA4 measurement ID (G-XXXXXXX). Analytics loads only after consent and only when this is set.
   gaMeasurementId: "",
-  // TODO: hosted product video (mp4) and its captions; the video block shows a poster until then.
-  video: { src: "", poster: "", captionsEn: "", captionsEs: "" },
 };
 
 /** Social profiles; an icon only appears once its link is filled in. */

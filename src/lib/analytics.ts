@@ -57,10 +57,10 @@ export function loadAnalytics() {
 }
 
 /**
- * The events the brief asks for: badge_click (store), waitlist_submit,
- * contact_submit, video_play, scroll_75.
+ * The events: badge_click (store), waitlist_submit, updates_submit and
+ * scroll_75.
  */
-export function track(event: "badge_click" | "waitlist_submit" | "contact_submit" | "send_link_submit" | "updates_submit" | "video_play" | "scroll_75", params: Record<string, string> = {}) {
+export function track(event: "badge_click" | "waitlist_submit" | "updates_submit" | "scroll_75", params: Record<string, string> = {}) {
   if (readConsent() !== "granted") return;
   window.gtag?.("event", event, params);
 }

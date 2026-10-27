@@ -3,12 +3,10 @@
 import { Check, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/motion";
 import { WhatsAppFlow } from "@/components/phone/WhatsAppFlow";
-import { ArrowLink } from "@/components/page/blocks";
-import { useHref, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 
 export function WhatsAppSection() {
   const t = useT();
-  const href = useHref();
   return (
     <section id="whatsapp" aria-labelledby="whatsapp-title" className="relative py-14 sm:py-[4.5rem] overflow-x-clip">
       <div className="container-page">
@@ -44,9 +42,6 @@ export function WhatsAppSection() {
 
         <div className="mt-16 lg:mt-20">
           <WhatsAppFlow />
-        </div>
-        <div className="-mt-6 text-center">
-          <ArrowLink href={href("/features/whatsapp")}>{t.learnMore}</ArrowLink>
         </div>
       </div>
     </section>

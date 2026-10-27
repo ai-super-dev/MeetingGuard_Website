@@ -1,11 +1,10 @@
 "use client";
 
 import { useId, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Plus } from "lucide-react";
 
-export type FaqItem = { q: string; a: string; link?: { href: string; label: string } };
+export type FaqItem = { q: string; a: string };
 
 /** FAQ accordion: one answer open at a time, keyboard and screen-reader friendly. */
 export function FaqAccordion({ items, defaultOpen = -1 }: { items: readonly FaqItem[]; defaultOpen?: number }) {
@@ -47,17 +46,7 @@ export function FaqAccordion({ items, defaultOpen = -1 }: { items: readonly FaqI
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="px-5 pb-5 text-[0.92rem] leading-relaxed text-white/60 sm:px-7">
-                    {item.a}
-                    {item.link && (
-                      <>
-                        {" "}
-                        <Link href={item.link.href} className="text-white underline underline-offset-2 hover:text-white">
-                          {item.link.label}
-                        </Link>
-                      </>
-                    )}
-                  </div>
+                  <div className="px-5 pb-5 text-[0.92rem] leading-relaxed text-white/60 sm:px-7">{item.a}</div>
                 </motion.div>
               )}
             </AnimatePresence>

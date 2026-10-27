@@ -2,21 +2,19 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Reveal } from "@/components/motion";
 import { DraftNotice, Headline, Prose } from "@/components/page/blocks";
-import { ConsentSettings } from "@/components/page/ConsentSettings";
 import { localize, type Lang } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
 /*
  * Legal pages at the URLs the store listings and the Meta app point to:
- * /privacy-policy, /terms-of-service, /delete-account, /cookies.
+ * /privacy-policy and /terms-of-service.
  *
  * TODO before launch: replace the privacy policy and terms below with the
- * existing texts, unchanged, and remove their `draft` notices. The
- * delete-account steps should be checked against the app.
+ * existing texts, unchanged, and remove their `draft` notices.
  */
 
-type Doc = "privacy" | "terms" | "deleteAccount" | "cookies";
+type Doc = "privacy" | "terms";
 type Section = { heading: string; body: string[]; list?: string[] };
 type LegalDoc = { path: string; title: string; description: string; draft?: string; sections: Section[] };
 
@@ -51,52 +49,6 @@ const docs: Record<Lang, Record<Doc, LegalDoc>> = {
         { heading: "5. Changes", body: ["We may update these terms. Continued use after changes take effect means you accept the revised terms."] },
       ],
     },
-    deleteAccount: {
-      path: "/delete-account",
-      title: "Delete your account",
-      description: "How to delete your MeetingGuard account and all the data that goes with it.",
-      sections: [
-        {
-          heading: "In the app",
-          body: ["The quickest way. Your account and data are deleted straight away."],
-          list: ["Open MeetingGuard and go to Settings.", "Tap Account, then Delete account.", "Confirm. You are signed out and your data is deleted."],
-        },
-        {
-          heading: "By email",
-          body: [`If you no longer have the app, email ${siteConfig.supportEmail} from the address you signed up with, with the subject "Delete my account". We confirm by email when it is done.`],
-        },
-        {
-          heading: "What is deleted",
-          body: ["Everything MeetingGuard stores about you:"],
-          list: [
-            "Your account and settings.",
-            "Meetings and tasks created in MeetingGuard, and the connection to your calendars.",
-            "Your linked WhatsApp number and the messages you sent to MeetingGuard.",
-            "Voice requests and their text.",
-          ],
-        },
-        {
-          heading: "What is not deleted",
-          body: [
-            "Events already in your own Google Calendar stay there; delete them in your calendar if you want to.",
-            "Subscriptions are managed by Google Play or the App Store. Cancel yours there so you are not charged again; the stores keep their own purchase records.",
-          ],
-        },
-      ],
-    },
-    cookies: {
-      path: "/cookies",
-      title: "Cookies",
-      description: "Which cookies and similar storage the MeetingGuard website uses, and how to change your choice.",
-      sections: [
-        { heading: "Strictly necessary", body: ["The site stores your analytics choice in your browser so it does not ask again. This is not used to identify you."] },
-        {
-          heading: "Analytics, only with your consent",
-          body: ["If you accept, we use Google Analytics to understand how the site is used: pages visited, store badge clicks, form submissions, video plays and how far pages are scrolled. It sets cookies such as _ga. If you decline, no analytics cookies are set."],
-        },
-        { heading: "No advertising cookies", body: ["We do not use advertising or tracking cookies, and we never sell data."] },
-      ],
-    },
   },
   es: {
     privacy: {
@@ -125,58 +77,7 @@ const docs: Record<Lang, Record<Doc, LegalDoc>> = {
         { heading: "5. Cambios", body: ["Podemos actualizar estos términos. Seguir usando la app después de los cambios implica que aceptas los términos revisados."] },
       ],
     },
-    deleteAccount: {
-      path: "/delete-account",
-      title: "Eliminar tu cuenta",
-      description: "Cómo eliminar tu cuenta de MeetingGuard y todos los datos asociados.",
-      sections: [
-        {
-          heading: "En la app",
-          body: ["La forma más rápida. Tu cuenta y tus datos se eliminan al momento."],
-          list: ["Abre MeetingGuard y ve a Ajustes.", "Toca Cuenta y después Eliminar cuenta.", "Confirma. Se cierra tu sesión y tus datos se eliminan."],
-        },
-        {
-          heading: "Por correo",
-          body: [`Si ya no tienes la app, escribe a ${siteConfig.supportEmail} desde la dirección con la que te registraste, con el asunto "Eliminar mi cuenta". Te confirmamos por correo cuando esté hecho.`],
-        },
-        {
-          heading: "Qué se elimina",
-          body: ["Todo lo que MeetingGuard guarda sobre ti:"],
-          list: [
-            "Tu cuenta y tus ajustes.",
-            "Las reuniones y tareas creadas en MeetingGuard, y la conexión con tus calendarios.",
-            "Tu número de WhatsApp vinculado y los mensajes que enviaste a MeetingGuard.",
-            "Las peticiones de voz y su texto.",
-          ],
-        },
-        {
-          heading: "Qué no se elimina",
-          body: [
-            "Los eventos que ya están en tu propio Google Calendar siguen allí; elimínalos en tu calendario si quieres.",
-            "Las suscripciones las gestionan Google Play o el App Store. Cancela la tuya allí para que no se te vuelva a cobrar; las tiendas guardan sus propios registros de compra.",
-          ],
-        },
-      ],
-    },
-    cookies: {
-      path: "/cookies",
-      title: "Cookies",
-      description: "Qué cookies y almacenamiento similar usa el sitio web de MeetingGuard, y cómo cambiar tu elección.",
-      sections: [
-        { heading: "Estrictamente necesarias", body: ["El sitio guarda tu elección sobre la analítica en tu navegador para no volver a preguntarte. No se usa para identificarte."] },
-        {
-          heading: "Analítica, solo con tu consentimiento",
-          body: ["Si aceptas, usamos Google Analytics para entender cómo se usa el sitio: páginas visitadas, clics en las insignias de las tiendas, envíos de formularios, reproducciones de vídeo y hasta dónde se desplazan las páginas. Usa cookies como _ga. Si rechazas, no se instala ninguna cookie de analítica."],
-        },
-        { heading: "Sin cookies publicitarias", body: ["No usamos cookies publicitarias ni de seguimiento, y nunca vendemos datos."] },
-      ],
-    },
   },
-};
-
-const consentLabels = {
-  en: { current: "Your analytics choice", granted: "Allowed", denied: "Declined", unset: "Not chosen yet", allow: "Allow analytics", refuse: "Decline analytics" },
-  es: { current: "Tu elección de analítica", granted: "Permitida", denied: "Rechazada", unset: "Sin elegir", allow: "Permitir analítica", refuse: "Rechazar analítica" },
 };
 
 export function legalMetadata(lang: Lang, doc: Doc) {
@@ -204,7 +105,6 @@ export function LegalDocPage({ lang, doc }: { lang: Lang; doc: Doc }) {
         <Reveal delay={0.1} className="mt-10">
           {d.draft && <DraftNotice>{d.draft}</DraftNotice>}
           <Prose sections={d.sections} />
-          {doc === "cookies" && <ConsentSettings labels={consentLabels[lang]} />}
         </Reveal>
       </div>
     </section>

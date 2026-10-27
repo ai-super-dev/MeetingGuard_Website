@@ -22,7 +22,7 @@ export function useT(): Dict {
   return dictionaries[useLang()];
 }
 
-/** Builds a link in the page's language: `href("/pricing")` is `/es/pricing` on Spanish pages. */
+/** Builds a link in the page's language: `href("/privacy-policy")` is `/es/privacy-policy` on Spanish pages. */
 export function useHref() {
   const lang = useLang();
   return (path: string) => localize(path, lang);

@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { HONEYPOT, submitForm, type FormKind, type SubmitResult } from "@/lib/forms";
-import { useHref, useLang, useT } from "@/lib/language";
+import { useLang, useT } from "@/lib/language";
 import { siteConfig } from "@/lib/site";
 
 export const inputClass =
@@ -13,13 +12,11 @@ export const inputClass =
 const buttonClass =
   "h-11 shrink-0 rounded-xl bg-[#f4f4f5] px-5 text-[0.88rem] font-medium text-[#0b0b0e] transition hover:bg-white disabled:opacity-60";
 
-const EVENTS = { waitlist: "waitlist_submit", contact: "contact_submit", "send-link": "send_link_submit", updates: "updates_submit" } as const;
+const EVENTS = { waitlist: "waitlist_submit", updates: "updates_submit" } as const;
 
-/** Submit handling shared by every form: honeypot, analytics event, thanks page or inline message. */
-function useSubmit(kind: FormKind, thanksPage: boolean) {
+/** Submit handling shared by every form: honeypot, analytics event and an inline message. */
+function useSubmit(kind: FormKind) {
   const lang = useLang();
-  const href = useHref();
-  const router = useRouter();
   const [status, setStatus] = useState<"idle" | "sending" | SubmitResult>("idle");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -28,7 +25,6 @@ function useSubmit(kind: FormKind, thanksPage: boolean) {
     const result = await submitForm(kind, e.currentTarget, lang);
     if (result === "ok") {
       track(EVENTS[kind]);
-      if (thanksPage) return router.push(href("/thanks"));
       e.currentTarget?.reset();
     }
     setStatus(result);
@@ -80,19 +76,11 @@ function Select({ id, name, defaultValue, children }: { id: string; name: string
   );
 }
 
-function Label({ children, htmlFor }: { children: ReactNode; htmlFor: string }) {
-  return (
-    <label htmlFor={htmlFor} className="mb-1.5 block text-[0.8rem] text-white/65">
-      {children}
-    </label>
-  );
-}
-
 /** Assistant waitlist: email and language. */
 export function WaitlistForm({ id = "waitlist", className = "" }: { id?: string; className?: string }) {
   const t = useT();
   const lang = useLang();
-  const { status, onSubmit } = useSubmit("waitlist", true);
+  const { status, onSubmit } = useSubmit("waitlist");
   return (
     <form onSubmit={onSubmit} className={`relative ${className}`}>
       <Honeypot />
@@ -116,69 +104,7 @@ export function WaitlistForm({ id = "waitlist", className = "" }: { id?: string;
           {t.forms.joinList}
         </button>
       </div>
-      <Status status={status} />
-    </form>
-  );
-}
-
-/** Support contact form. */
-export function ContactForm() {
-  const t = useT();
-  const { status, onSubmit } = useSubmit("contact", true);
-  return (
-    <form onSubmit={onSubmit} className="relative grid gap-4">
-      <Honeypot />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="contact-name">{t.forms.name}</Label>
-          <input id="contact-name" name="name" required autoComplete="name" className={inputClass} />
-        </div>
-        <div>
-          <Label htmlFor="contact-email">{t.forms.email}</Label>
-          <input id="contact-email" name="email" type="email" required autoComplete="email" placeholder={t.forms.emailPlaceholder} className={inputClass} />
-        </div>
-      </div>
-      <div>
-        <Label htmlFor="contact-topic">{t.forms.topic}</Label>
-        <Select id="contact-topic" name="topic" defaultValue="question">
-          {Object.entries(t.forms.topics).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="contact-message">{t.forms.message}</Label>
-        <textarea id="contact-message" name="message" required rows={5} className={`${inputClass} h-auto py-3`} />
-      </div>
-      <div>
-        <button type="submit" disabled={status === "sending"} className={buttonClass}>
-          {t.forms.sendMessage}
-        </button>
-        <Status status={status} />
-      </div>
-    </form>
-  );
-}
-
-/** Download page: "send me the link" by email. */
-export function SendLinkForm({ done }: { done: string }) {
-  const t = useT();
-  const { status, onSubmit } = useSubmit("send-link", false);
-  return (
-    <form onSubmit={onSubmit} className="relative">
-      <Honeypot />
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <label htmlFor="send-link-email" className="sr-only">
-          {t.forms.email}
-        </label>
-        <input id="send-link-email" name="email" type="email" required autoComplete="email" placeholder={t.forms.emailPlaceholder} className={inputClass} />
-        <button type="submit" disabled={status === "sending"} className={buttonClass}>
-          {t.forms.sendLink}
-        </button>
-      </div>
-      <Status status={status} done={done} />
+      <Status status={status} done={t.forms.joined} />
     </form>
   );
 }
@@ -186,7 +112,7 @@ export function SendLinkForm({ done }: { done: string }) {
 /** Footer: "Subscribe for updates", as one pill (email field with the button inside). */
 export function NewsletterForm() {
   const t = useT();
-  const { status, onSubmit } = useSubmit("updates", false);
+  const { status, onSubmit } = useSubmit("updates");
   return (
     <form onSubmit={onSubmit} className="relative w-full max-w-[400px]">
       <Honeypot />

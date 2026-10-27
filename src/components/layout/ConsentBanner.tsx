@@ -42,7 +42,7 @@ export function ConsentBanner() {
         >
           <p className="text-[0.86rem] leading-relaxed text-white/75">
             {t.consent.text}{" "}
-            <Link href={href("/cookies")} className="text-white underline underline-offset-2">
+            <Link href={href("/privacy-policy")} className="text-white underline underline-offset-2">
               {t.consent.more}
             </Link>
           </p>

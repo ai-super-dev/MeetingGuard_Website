@@ -21,11 +21,11 @@ export function QrSvg({ value, className }: { value: string; className?: string 
   );
 }
 
-/** Desktop-only corner card: scanning it opens the download page, which picks the right store. */
+/** Desktop-only corner card: scanning it opens the site on the phone. */
 export function QrDownload({ lang }: { lang: Lang }) {
   return (
     <FooterAwareDock className="fixed right-5 bottom-5 z-40 hidden flex-col items-center gap-2 rounded-2xl border border-white/10 bg-[#0d0d10]/90 p-3 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-md lg:flex">
-      <QrSvg value={`${siteConfig.url}${localize("/download", lang)}`} className="h-[104px] w-[104px] rounded-md" />
+      <QrSvg value={`${siteConfig.url}${localize("/", lang)}`} className="h-[104px] w-[104px] rounded-md" />
     </FooterAwareDock>
   );
 }

@@ -2,12 +2,11 @@
 
 import { Fragment } from "react";
 import { Reveal } from "@/components/motion";
-import { ArrowLink } from "@/components/page/blocks";
 import { ConfirmScreen, VoiceScreen } from "@/components/phone/flows";
 import { FramedPhone } from "@/components/phone/FramedPhone";
 import { MeetingAlarmScreen } from "@/components/phone/MeetingAlarmScreen";
 import { BLUE_FRAME, PURPLE_FRAME, RED_FRAME } from "@/components/phone/geometry";
-import { useHref, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 import { StepShowcase } from "./StepShowcase";
 
 /** One meeting: said on Monday afternoon, confirmed a moment later, never missed on Wednesday. */
@@ -29,7 +28,6 @@ const SCREENS = [
 
 export function HowItWorks() {
   const t = useT();
-  const href = useHref();
   const steps = t.how.steps.map((s, i) => ({ ...s, time: TIMES[i] }));
   return (
     <section id="how-it-works" aria-labelledby="how-title" className="relative overflow-x-clip py-14 sm:py-[4.5rem]">
@@ -57,9 +55,6 @@ export function HowItWorks() {
             glows={["rgba(150,70,255,0.22)", "rgba(40,140,255,0.22)", "rgba(220,25,50,0.36)"]}
           />
         </Reveal>
-        <div className="mt-2 text-center">
-          <ArrowLink href={href("/how-it-works")}>{t.how.more}</ArrowLink>
-        </div>
       </div>
     </section>
   );

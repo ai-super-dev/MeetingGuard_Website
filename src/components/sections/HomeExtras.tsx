@@ -10,17 +10,16 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/rea
 import { CalendarCheck2, Check, Gift, Mail, Sparkles, Timer, Volume2 } from "lucide-react";
 import { WaitlistForm } from "@/components/forms/Forms";
 import { Reveal } from "@/components/motion";
-import { ArrowLink, ButtonLink, CheckList, Headline, Tag } from "@/components/page/blocks";
+import { CheckList, Headline, Tag } from "@/components/page/blocks";
 import { FaqAccordion, type FaqItem } from "@/components/page/FaqAccordion";
 import { SummaryScreen } from "@/components/phone/flows";
 import { PhoneShot } from "@/components/phone/PhoneShot";
-import { useHref, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 
 /* ---------- daily briefing ---------- */
 
 export function Briefing() {
   const t = useT();
-  const href = useHref();
   const b = t.briefing;
   return (
     <section id="briefing" aria-labelledby="briefing-title" className="relative overflow-x-clip py-14 sm:py-[4.5rem]">
@@ -34,9 +33,6 @@ export function Briefing() {
             <Headline id="briefing-title" line1={b.line1} line2={b.line2} className="mt-3" />
             <p className="mx-auto mt-4 max-w-md text-[0.98rem] leading-relaxed text-white/60 md:mx-0">{b.body}</p>
             <CheckList items={b.points} className="mx-auto mt-6 w-fit text-left md:mx-0" />
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-4 md:justify-start">
-              <ArrowLink href={href("/features/agenda")}>{t.learnMore}</ArrowLink>
-            </div>
           </Reveal>
           <Reveal delay={0.1} className="relative order-1 flex flex-col items-center md:order-2">
             <div
@@ -62,7 +58,6 @@ export function Briefing() {
 
 export function PricingTeaser() {
   const t = useT();
-  const href = useHref();
   const p = t.pricingTeaser;
   const icons = [Gift, Timer, Sparkles];
   return (
@@ -88,12 +83,7 @@ export function PricingTeaser() {
               );
             })}
           </ul>
-          <div className="relative mt-9 flex justify-center">
-            <ButtonLink href={href("/pricing")} primary>
-              {p.cta}
-            </ButtonLink>
-          </div>
-          <p className="relative mt-5 text-[0.8rem] text-white/45">{p.note}</p>
+          <p className="relative mt-9 text-[0.8rem] text-white/45">{p.note}</p>
         </Reveal>
       </div>
     </section>
@@ -161,7 +151,6 @@ export function AssistantVisual() {
 
 export function AssistantTeaser() {
   const t = useT();
-  const href = useHref();
   const a = t.assistantTeaser;
   return (
     <section id="assistant" aria-labelledby="assistant-title" className="relative overflow-x-clip py-14 sm:py-[4.5rem]">
@@ -175,10 +164,7 @@ export function AssistantTeaser() {
             <Headline id="assistant-title" line1={a.line1} line2={a.line2} className="mt-3" />
             <p className="mx-auto mt-4 max-w-md text-[0.98rem] leading-relaxed text-white/60 md:mx-0">{a.body}</p>
             <WaitlistForm id="home-waitlist" className="mx-auto mt-7 max-w-md text-left md:mx-0" />
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 md:justify-start">
-              <span className="text-[0.8rem] text-white/45">{a.addon}</span>
-              <ArrowLink href={href("/assistant")}>{a.more}</ArrowLink>
-            </div>
+            <p className="mt-2 text-[0.8rem] text-white/45">{a.addon}</p>
           </Reveal>
           <Reveal delay={0.1} className="flex justify-center">
             <AssistantVisual />
@@ -193,7 +179,6 @@ export function AssistantTeaser() {
 
 export function FaqHome({ items }: { items: readonly FaqItem[] }) {
   const t = useT();
-  const href = useHref();
   return (
     <section id="faq" aria-labelledby="faq-title" className="relative overflow-x-clip py-14 sm:py-[4.5rem]">
       <div className="container-page">
@@ -204,9 +189,6 @@ export function FaqHome({ items }: { items: readonly FaqItem[] }) {
         <Reveal delay={0.1} className="mx-auto mt-10 max-w-3xl">
           <FaqAccordion items={items} defaultOpen={0} />
         </Reveal>
-        <div className="mt-6 text-center">
-          <ArrowLink href={href("/faq")}>{t.faqHome.all}</ArrowLink>
-        </div>
       </div>
     </section>
   );

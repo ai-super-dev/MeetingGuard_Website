@@ -28,16 +28,6 @@ export const en = {
   lang: "en",
   skip: "Skip to content",
   available: (m: Month) => `Available ${MONTHS_EN[m]}`,
-  comingSoon: "Coming soon",
-  learnMore: "Learn more",
-  tbc: "TBC",
-  common: {
-    androidOnly: "Android only",
-    related: "Keep exploring",
-    availableNow: "Available now",
-    getApp: "Get the app",
-    questions: "Questions",
-  },
 
   meta: {
     homeTitle: "MeetingGuard: never miss a meeting",
@@ -50,85 +40,40 @@ export const en = {
     primary: "Main",
     openMenu: "Open menu",
     closeMenu: "Close menu",
-    language: "Language",
-    nav: { how: "How it works", features: "Features", pricing: "Pricing", assistant: "Assistant" },
+    nav: { privacy: "Privacy Policy", terms: "Terms of Service" },
     download: "Download",
-    featuresMenu: {
-      features: "Features",
-      useCases: "Use cases",
-      all: "All features on the home page",
-    },
     theme: { toLight: "Light theme (coming soon)", toDark: "Dark theme" },
   },
 
-  // short names for every page, used by menus and the footer
+  // short names for the legal pages, used by the footer
   pages: {
-    how: "How it works",
-    pricing: "Pricing",
-    assistant: "Assistant",
-    download: "Download",
-    blog: "Blog",
-    about: "About",
-    security: "Security",
-    faq: "FAQ",
-    support: "Support",
-    press: "Press",
     privacy: "Privacy policy",
     terms: "Terms of service",
-    deleteAccount: "Delete account",
-    cookies: "Cookies",
-    features: {
-      "voice-assistant": "Voice assistant",
-      alarms: "Alarms",
-      tasks: "Tasks and reminders",
-      agenda: "Agenda aloud",
-      whatsapp: "WhatsApp",
-      integrations: "Calendars and tasks",
-    },
-    featureBlurbs: {
-      "voice-assistant": "Create, move and cancel by voice",
-      alarms: "Full-screen alarms you can't miss",
-      tasks: "Tasks with due dates and reminders",
-      agenda: "Today and tomorrow, read to you",
-      whatsapp: "Meetings and tasks by message",
-      integrations: "Google Calendar and more",
-    },
-    useCases: { consultants: "For consultants", sales: "For sales", founders: "For founders" },
-    useCaseBlurbs: {
-      consultants: "Back-to-back clients, no slips",
-      sales: "Every call, on time",
-      founders: "Investors, team and hiring",
-    },
   },
 
   badges: {
     appStore: "Download on the App Store",
     googlePlay: "Get it on Google Play",
   },
-  qr: { scan: "Scan to download", aria: "QR code that opens the MeetingGuard download page" },
+  qr: { scan: "Scan to download", aria: "QR code that opens the MeetingGuard website" },
 
   consent: {
     text: "We use analytics to improve this site, only if you agree.",
     accept: "Accept",
     decline: "Decline",
-    more: "Cookies",
+    more: "Privacy policy",
   },
 
   forms: {
     email: "Email",
     emailPlaceholder: "you@company.com",
-    name: "Name",
-    message: "Message",
-    topic: "Topic",
-    topics: { question: "A question", problem: "Something is not working", billing: "Billing", other: "Other" },
     language: "Language",
     languages: { en: "English", es: "Spanish" },
     sending: "Sending",
     error: "Something went wrong. Please try again, or email us.",
     offline: "This form opens at launch. Until then, email us.",
     joinList: "Join the list",
-    sendLink: "Send me the link",
-    sendMessage: "Send message",
+    joined: "You're on the list. We'll email you when it opens.",
     honeypot: "Leave this field empty",
   },
 
@@ -200,7 +145,6 @@ export const en = {
     body: "One meeting, from the sentence you say to the moment it starts.",
     group: "How it works steps",
     show: "Show step",
-    more: "See the full walkthrough",
     steps: [
       {
         day: "Mon",
@@ -424,7 +368,6 @@ export const en = {
     line2: "Upgrade when you're ready.",
     points: ["Free plan, no card needed", "3-day free trial", "Pro from USD 7.99 a month"],
     note: "Subscriptions are bought inside the app on Google Play or the App Store.",
-    cta: "See pricing",
   },
 
   assistantTeaser: {
@@ -433,7 +376,6 @@ export const en = {
     line2: "that works for you.",
     body: "Delegate by voice. It emails, follows up and books, and you approve every step. You are copied on every email.",
     addon: "Available as an add-on subscription.",
-    more: "What it will do",
     visual: {
       ask: "Find 30 minutes with Carlos next week",
       to: "To: Carlos",
@@ -444,21 +386,16 @@ export const en = {
     },
   },
 
-  faqHome: { eyebrow: "FAQ", title: "Questions, answered.", all: "All questions" },
+  faqHome: { eyebrow: "FAQ", title: "Questions, answered." },
 
   cta: { line1: "Your next meeting", line2: "is already covered.", sentence: "Free to start. Set up in a minute." },
 
   footer: {
     blurb: "Stay organized and never miss a meeting again.",
-    product: "Product",
-    featuresCol: "Features",
-    company: "Company",
-    legal: "Legal",
-    contact: "Contact",
     updates: "Stay updated",
+    updatesBody: "Launch news and new features, now and then. No spam.",
+    contact: "Contact",
     rights: "All rights reserved.",
-    companyLine: (company: string, number: string) =>
-      `MeetingGuard is a product of ${company}, a company registered in England and Wales${number ? `, number ${number}` : ""}.`,
     nav: "Footer",
     emailLabel: "Enter your email address here",
     emailPlaceholder: "Your email for notifications",
@@ -476,16 +413,6 @@ export const es: Dict = {
   lang: "es",
   skip: "Saltar al contenido",
   available: (m: Month) => `Disponible en ${MONTHS_ES[m]}`,
-  comingSoon: "Muy pronto",
-  learnMore: "Más información",
-  tbc: "Por confirmar",
-  common: {
-    androidOnly: "Solo Android",
-    related: "Sigue explorando",
-    availableNow: "Disponible ya",
-    getApp: "Descarga la app",
-    questions: "Preguntas",
-  },
 
   meta: {
     homeTitle: "MeetingGuard: no te pierdas ninguna reunión",
@@ -498,84 +425,40 @@ export const es: Dict = {
     primary: "Principal",
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
-    language: "Idioma",
-    nav: { how: "Cómo funciona", features: "Funciones", pricing: "Precios", assistant: "Asistente" },
+    nav: { privacy: "Política de privacidad", terms: "Términos del servicio" },
     download: "Descargar",
-    featuresMenu: {
-      features: "Funciones",
-      useCases: "Casos de uso",
-      all: "Todas las funciones en la página de inicio",
-    },
     theme: { toLight: "Tema claro (muy pronto)", toDark: "Tema oscuro" },
   },
 
+  // short names for the legal pages, used by the footer
   pages: {
-    how: "Cómo funciona",
-    pricing: "Precios",
-    assistant: "Asistente",
-    download: "Descargar",
-    blog: "Blog",
-    about: "Quiénes somos",
-    security: "Seguridad",
-    faq: "Preguntas frecuentes",
-    support: "Soporte",
-    press: "Prensa",
     privacy: "Política de privacidad",
     terms: "Términos del servicio",
-    deleteAccount: "Eliminar la cuenta",
-    cookies: "Cookies",
-    features: {
-      "voice-assistant": "Asistente de voz",
-      alarms: "Alarmas",
-      tasks: "Tareas y recordatorios",
-      agenda: "Agenda en voz alta",
-      whatsapp: "WhatsApp",
-      integrations: "Calendarios y tareas",
-    },
-    featureBlurbs: {
-      "voice-assistant": "Crea, mueve y cancela con la voz",
-      alarms: "Alarmas a pantalla completa",
-      tasks: "Tareas con fecha y recordatorio",
-      agenda: "Hoy y mañana, leídos para ti",
-      whatsapp: "Reuniones y tareas por mensaje",
-      integrations: "Google Calendar y más",
-    },
-    useCases: { consultants: "Para consultores", sales: "Para ventas", founders: "Para fundadores" },
-    useCaseBlurbs: {
-      consultants: "Clientes seguidos, sin despistes",
-      sales: "Cada llamada, a tiempo",
-      founders: "Inversores, equipo y contratación",
-    },
   },
 
   badges: {
     appStore: "Descárgalo en el App Store",
     googlePlay: "Disponible en Google Play",
   },
-  qr: { scan: "Escanea para descargar", aria: "Código QR que abre la página de descarga de MeetingGuard" },
+  qr: { scan: "Escanea para descargar", aria: "Código QR que abre el sitio web de MeetingGuard" },
 
   consent: {
     text: "Usamos analítica para mejorar este sitio, solo si lo aceptas.",
     accept: "Aceptar",
     decline: "Rechazar",
-    more: "Cookies",
+    more: "Política de privacidad",
   },
 
   forms: {
     email: "Correo electrónico",
     emailPlaceholder: "tu@empresa.com",
-    name: "Nombre",
-    message: "Mensaje",
-    topic: "Tema",
-    topics: { question: "Una pregunta", problem: "Algo no funciona", billing: "Facturación", other: "Otro" },
     language: "Idioma",
     languages: { en: "Inglés", es: "Español" },
     sending: "Enviando",
     error: "Algo salió mal. Inténtalo de nuevo o escríbenos.",
     offline: "Este formulario se activa en el lanzamiento. Mientras tanto, escríbenos.",
     joinList: "Unirme a la lista",
-    sendLink: "Envíame el enlace",
-    sendMessage: "Enviar mensaje",
+    joined: "Ya estás en la lista. Te escribiremos cuando abra.",
     honeypot: "Deja este campo vacío",
   },
 
@@ -647,7 +530,6 @@ export const es: Dict = {
     body: "Una reunión, desde la frase que dices hasta el momento en que empieza.",
     group: "Pasos de cómo funciona",
     show: "Mostrar paso",
-    more: "Ver el recorrido completo",
     steps: [
       {
         day: "Lun",
@@ -869,7 +751,6 @@ export const es: Dict = {
     line2: "Mejora cuando quieras.",
     points: ["Plan gratuito, sin tarjeta", "3 días de prueba gratis", "Pro desde 7,99 USD al mes"],
     note: "Las suscripciones se compran dentro de la app en Google Play o el App Store.",
-    cta: "Ver precios",
   },
 
   assistantTeaser: {
@@ -878,7 +759,6 @@ export const es: Dict = {
     line2: "que trabaja para ti.",
     body: "Delega con la voz. Escribe correos, hace seguimiento y reserva, y tú apruebas cada paso. Te copia en cada correo.",
     addon: "Disponible como suscripción adicional.",
-    more: "Qué hará",
     visual: {
       ask: "Busca 30 minutos con Carlos la próxima semana",
       to: "Para: Carlos",
@@ -889,21 +769,16 @@ export const es: Dict = {
     },
   },
 
-  faqHome: { eyebrow: "Preguntas", title: "Preguntas, resueltas.", all: "Todas las preguntas" },
+  faqHome: { eyebrow: "Preguntas", title: "Preguntas, resueltas." },
 
   cta: { line1: "Tu próxima reunión", line2: "ya está cubierta.", sentence: "Gratis para empezar. Listo en un minuto." },
 
   footer: {
     blurb: "Mantente organizado y no vuelvas a perderte una reunión.",
-    product: "Producto",
-    featuresCol: "Funciones",
-    company: "Empresa",
-    legal: "Legal",
-    contact: "Contacto",
     updates: "Novedades",
+    updatesBody: "Noticias del lanzamiento y nuevas funciones, de vez en cuando. Sin spam.",
+    contact: "Contacto",
     rights: "Todos los derechos reservados.",
-    companyLine: (company: string, number: string) =>
-      `MeetingGuard es un producto de ${company}, empresa registrada en Inglaterra y Gales${number ? `, número ${number}` : ""}.`,
     nav: "Pie de página",
     emailLabel: "Introduce tu correo electrónico",
     emailPlaceholder: "Tu correo para notificaciones",

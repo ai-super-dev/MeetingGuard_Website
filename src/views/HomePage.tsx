@@ -1,4 +1,4 @@
-import { faqItems, HOME_FAQ } from "@/content/faq";
+import { faq } from "@/content/faq";
 import { SectionSnap } from "@/components/layout/SectionSnap";
 import { Features } from "@/components/sections/Features";
 import { FinalCta } from "@/components/sections/FinalCta";
@@ -40,7 +40,7 @@ export function HomePage({ lang }: { lang: Lang }) {
       <Briefing />
       <PricingTeaser />
       <AssistantTeaser />
-      <FaqHome items={faqItems(lang, HOME_FAQ)} />
+      <FaqHome items={faq[lang]} />
       <FinalCta />
       <QrDownload lang={lang} />
     </>
