@@ -1,9 +1,15 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useT } from "@/lib/language";
-import { readTheme, setTheme, subscribeTheme, type Theme } from "@/lib/theme";
+import { readTheme, restoreSavedTheme, setTheme, subscribeTheme, type Theme } from "@/lib/theme";
+
+/** Keeps the saved theme once React has taken over the page (renders nothing). */
+export function ThemeRestore() {
+  useEffect(restoreSavedTheme, []);
+  return null;
+}
 
 /** Light / dark switch: shows the current theme's icon and previews the other on hover. */
 export function ThemeToggle({ className = "", withLabel = false }: { className?: string; withLabel?: boolean }) {

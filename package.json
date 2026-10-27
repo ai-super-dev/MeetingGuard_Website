@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "node scripts/optimize-images.mjs",
+    "postbuild": "node scripts/optimize-images.mjs && node scripts/fix-segment-files.mjs",
     "preview": "node scripts/serve-out.mjs 3000",
     "lint": "eslint"
   },

@@ -12,6 +12,7 @@ import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { ScrollDepth } from "./ScrollDepth";
 import { SkipLink } from "./SkipLink";
+import { ThemeRestore } from "./ThemeToggle";
 
 export const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 export const mono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
@@ -43,6 +44,7 @@ export function SiteShell({ lang, children }: { lang: Lang; children: ReactNode 
     <html lang={lang} data-theme="dark" data-scroll-behavior="smooth" className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
       <body className="min-h-screen overflow-x-clip">
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <ThemeRestore />
         <LangProvider lang={lang}>
           <MotionProvider>
             <SkipLink />

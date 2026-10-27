@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useInView } from "motion/react";
 import { ArrowLeft, CheckCheck, Menu, Mic, EllipsisVertical, Plus, Reply, Sun } from "lucide-react";
+import { useReducedMotionSafe } from "@/components/motion";
 import { AppMark } from "@/components/ui/Logo";
 import { useT } from "@/lib/language";
 import { siteConfig } from "@/lib/site";
@@ -268,7 +269,7 @@ function FlowPhone({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const beats = PHONE_BEATS[index];
   const [played, setPlayed] = useState(0); // beats of this phone already shown
 

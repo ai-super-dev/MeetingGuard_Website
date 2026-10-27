@@ -28,6 +28,16 @@ export function setTheme(theme: Theme) {
   window.dispatchEvent(new Event(EVENT));
 }
 
+/**
+ * Puts the saved theme back if <html> lost it after the script ran, for
+ * example when React rebuilds the page after a hydration error.
+ */
+export function restoreSavedTheme() {
+  try {
+    if (localStorage.getItem(KEY) === "light" && readTheme() !== "light") setTheme("light");
+  } catch {}
+}
+
 export function subscribeTheme(onChange: () => void) {
   window.addEventListener(EVENT, onChange);
   return () => window.removeEventListener(EVENT, onChange);

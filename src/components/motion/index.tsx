@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useRef, useSyncExternalStore, type ReactNode } from "react";
 import {
   MotionConfig,
   motion,
@@ -13,6 +13,24 @@ import {
 } from "motion/react";
 
 const ease = [0.22, 1, 0.36, 1] as const;
+
+const REDUCE_QUERY = "(prefers-reduced-motion: reduce)";
+const subscribeReduce = (onChange: () => void) => {
+  const query = window.matchMedia(REDUCE_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+};
+
+/**
+ * The visitor's reduced-motion setting, for components that render
+ * differently with it. Unlike motion's useReducedMotion it is false while the
+ * page hydrates (the prerendered HTML can't know the setting) and switches
+ * right after, so the first render matches the HTML. A mismatch makes React
+ * rebuild the whole page.
+ */
+export function useReducedMotionSafe() {
+  return useSyncExternalStore(subscribeReduce, () => window.matchMedia(REDUCE_QUERY).matches, () => false);
+}
 
 export function MotionProvider({ children }: { children: ReactNode }) {
   return <MotionConfig reducedMotion="user">{children}</MotionConfig>;

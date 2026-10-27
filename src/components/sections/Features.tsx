@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useInView } from "motion/react";
 import { AlarmClock, Bell, BellRing, CalendarDays, Check, ListChecks, Mic, Reply, Volume2 } from "lucide-react";
 import { featureAccents } from "@/components/icons/feature-icons";
-import { Reveal } from "@/components/motion";
+import { Reveal, useReducedMotionSafe } from "@/components/motion";
 import { AvailableLabel } from "@/components/page/blocks";
 import { AppMark } from "@/components/ui/Logo";
 import { useT } from "@/lib/language";
@@ -15,7 +15,7 @@ import { availability } from "@/lib/site";
 
 /** Ticks through `count` states every `ms` while `active`; frozen on the last state for reduced motion. */
 function useCycle(count: number, ms: number, active: boolean) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [i, setI] = useState(0);
   useEffect(() => {
     if (!active || reduce) return;
@@ -188,7 +188,7 @@ function SpeakVisual() {
   const phrase = t.features.phrase;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   // 0 listening · 1 typed · 2 confirmed
   const [phase, setPhase] = useState(0);
   const [chars, setChars] = useState(0);

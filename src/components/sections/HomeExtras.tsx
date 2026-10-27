@@ -6,10 +6,10 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useInView } from "motion/react";
 import { CalendarCheck2, Check, Gift, Mail, Sparkles, Timer, Volume2 } from "lucide-react";
 import { WaitlistForm } from "@/components/forms/Forms";
-import { Reveal } from "@/components/motion";
+import { Reveal, useReducedMotionSafe } from "@/components/motion";
 import { CheckList, Headline, Tag } from "@/components/page/blocks";
 import { FaqAccordion, type FaqItem } from "@/components/page/FaqAccordion";
 import { SummaryScreen } from "@/components/phone/flows";
@@ -98,7 +98,7 @@ export function AssistantVisual() {
   const v = t.assistantTeaser.visual;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [step, setStep] = useState(0);
   useEffect(() => {
     if (!inView || reduce) return;
