@@ -437,7 +437,7 @@ export const es: Dict = {
   },
 
   badges: {
-    appStore: "Descárgalo en el App Store",
+    appStore: "Consíguelo en el App Store",
     googlePlay: "Disponible en Google Play",
   },
   qr: { scan: "Escanea para descargar", aria: "Código QR que abre el sitio web de MeetingGuard" },

@@ -69,9 +69,6 @@ to `PhoneShot` with its `image` prop (`src/components/phone/PhoneShot.tsx`).
 ## Before launch (open items)
 
 - Store links: `src/lib/site.ts`.
-- Spanish App Store badge: save Apple's Spanish artwork as
-  `public/badges/app-store-es.svg` and point to it in
-  `src/components/ui/StoreBadges.tsx`.
 - Privacy policy and terms: confirm the URLs (`/privacy-policy`,
   `/terms-of-service`; `/privacy` and `/terms` redirect there) match Play
   Console, App Store Connect and the Meta app.

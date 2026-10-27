@@ -6,13 +6,12 @@ import { usePlatform } from "@/lib/platform";
 import { siteConfig } from "@/lib/site";
 
 /*
- * Official store badges, used unmodified as Apple and Google require.
- * Google Play badges are localized; for the App Store the English badge is
- * used on Spanish pages until the localized artwork is added (download it from
- * Apple Marketing Tools and save it as /badges/app-store-es.svg).
+ * Official store badges in each language, used unmodified as Apple and Google
+ * require (App Store artwork from Apple Marketing Tools, Google Play from
+ * Google's badge generator).
  */
 const BADGE = {
-  appStore: { en: "/badges/app-store-en.svg", es: "/badges/app-store-en.svg", ratio: 119.664 / 40 },
+  appStore: { en: "/badges/app-store-en.svg", es: "/badges/app-store-es.svg", ratio: 119.664 / 40 },
   googlePlay: { en: "/badges/google-play-en.png", es: "/badges/google-play-es.png", ratio: { en: 564 / 168, es: 646 / 192 } },
 };
 
