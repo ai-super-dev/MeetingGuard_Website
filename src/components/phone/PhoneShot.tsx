@@ -8,9 +8,6 @@ import { ANDROID_FRAME, ANDROID_FRAME_RIGHT, SCREEN_W, STRAIGHT_FRAME } from "./
 /** Screen height (CSS px) used by every PhoneShot, so iPhone and Android shots line up. */
 export const SHOT_H = STRAIGHT_FRAME.screenH;
 
-/** Black bezel (CSS px at SCREEN_W) between the Android frame's rim and its screen. */
-const ANDROID_BEZEL = 10;
-
 /** Fits a real exported screenshot into the screen area. */
 function Screenshot({ src, alt, height = SHOT_H }: { src: StaticImageData | string; alt: string; height?: number }) {
   return (
@@ -43,9 +40,8 @@ export function PhoneShot({
   children?: ReactNode;
 }) {
   const frame = kind === "android" ? (facing === "right" ? ANDROID_FRAME_RIGHT : ANDROID_FRAME) : STRAIGHT_FRAME;
-  // the Android frame's opening is the inside of its metal rim, so the screen
-  // sits inside a thin black bezel drawn here
-  const bezel = kind === "android" ? ANDROID_BEZEL : 0;
+  // frames whose opening is the bare metal rim get a thin black bezel drawn here
+  const bezel = frame.bezel ?? 0;
   const k = (SCREEN_W - bezel * 2) / SCREEN_W;
   const screenH = Math.round((frame.screenH - bezel * 2) / k);
   // rebuilt screens take the opening's height so they fill it exactly

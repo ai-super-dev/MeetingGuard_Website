@@ -42,7 +42,7 @@ export const en = {
     closeMenu: "Close menu",
     nav: { privacy: "Privacy Policy", terms: "Terms of Service" },
     download: "Download",
-    theme: { toLight: "Light theme (coming soon)", toDark: "Dark theme" },
+    theme: { toLight: "Light theme", toDark: "Dark theme" },
   },
 
   // short names for the legal pages, used by the footer
@@ -427,7 +427,7 @@ export const es: Dict = {
     closeMenu: "Cerrar menú",
     nav: { privacy: "Política de privacidad", terms: "Términos del servicio" },
     download: "Descargar",
-    theme: { toLight: "Tema claro (muy pronto)", toDark: "Tema oscuro" },
+    theme: { toLight: "Tema claro", toDark: "Tema oscuro" },
   },
 
   // short names for the legal pages, used by the footer

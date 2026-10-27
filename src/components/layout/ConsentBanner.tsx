@@ -38,7 +38,7 @@ export function ConsentBanner() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
-          className="fixed inset-x-3 bottom-3 z-[55] rounded-2xl border border-white/10 bg-[#0d0d10]/95 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-md sm:inset-x-auto sm:bottom-5 sm:left-5 sm:max-w-[360px]"
+          className="fixed inset-x-3 bottom-3 z-[55] rounded-2xl border border-white/10 bg-bar/95 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-md sm:inset-x-auto sm:bottom-5 sm:left-5 sm:max-w-[360px]"
         >
           <p className="text-[0.86rem] leading-relaxed text-white/75">
             {t.consent.text}{" "}
@@ -50,7 +50,7 @@ export function ConsentBanner() {
             <button
               type="button"
               onClick={() => saveConsent("granted")}
-              className="h-9 rounded-lg bg-[#f4f4f5] px-4 text-[0.82rem] font-medium text-[#0b0b0e] hover:bg-white"
+              className="h-9 rounded-lg bg-inverse px-4 text-[0.82rem] font-medium text-on-inverse hover:bg-inverse-hover"
             >
               {t.consent.accept}
             </button>

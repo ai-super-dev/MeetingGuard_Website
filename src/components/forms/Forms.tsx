@@ -10,7 +10,7 @@ import { siteConfig } from "@/lib/site";
 export const inputClass =
   "h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 text-[0.9rem] text-white placeholder:text-white/40 transition-colors focus:border-white/30 focus:outline-none";
 const buttonClass =
-  "h-11 shrink-0 rounded-xl bg-[#f4f4f5] px-5 text-[0.88rem] font-medium text-[#0b0b0e] transition hover:bg-white disabled:opacity-60";
+  "h-11 shrink-0 rounded-xl bg-inverse px-5 text-[0.88rem] font-medium text-on-inverse transition hover:bg-inverse-hover disabled:opacity-60";
 
 const EVENTS = { waitlist: "waitlist_submit", updates: "updates_submit" } as const;
 
@@ -50,7 +50,7 @@ function Status({ status, done }: { status: string; done?: string }) {
   const text =
     status === "error" ? t.forms.error : status === "offline" ? t.forms.offline : status === "ok" ? done : status === "sending" ? t.forms.sending : "";
   return (
-    <p aria-live="polite" className={`mt-2 min-h-4 text-[0.78rem] ${status === "error" ? "text-[#ff8a95]" : "text-white/55"}`}>
+    <p aria-live="polite" className={`mt-2 min-h-4 text-[0.78rem] ${status === "error" ? "text-accent-soft" : "text-white/55"}`}>
       {text}
       {(status === "offline" || status === "error") && (
         <>
@@ -68,7 +68,7 @@ function Status({ status, done }: { status: string; done?: string }) {
 function Select({ id, name, defaultValue, children }: { id: string; name: string; defaultValue: string; children: ReactNode }) {
   return (
     <div className="relative">
-      <select id={id} name={name} defaultValue={defaultValue} className={`${inputClass} appearance-none pr-9 [&>option]:bg-[#141418]`}>
+      <select id={id} name={name} defaultValue={defaultValue} className={`${inputClass} appearance-none pr-9 [&>option]:bg-panel`}>
         {children}
       </select>
       <ChevronDown className="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-white/45" aria-hidden />
@@ -133,7 +133,7 @@ export function NewsletterForm() {
           type="submit"
           disabled={status === "sending"}
           aria-label={t.footer.subscribe}
-          className="group absolute top-1 right-1 inline-flex h-9 items-center gap-1.5 rounded-full bg-[#f4f4f5] pr-3 pl-4 text-[0.8rem] font-medium whitespace-nowrap text-[#0b0b0e] transition hover:bg-white disabled:opacity-60"
+          className="group absolute top-1 right-1 inline-flex h-9 items-center gap-1.5 rounded-full bg-inverse pr-3 pl-4 text-[0.8rem] font-medium whitespace-nowrap text-on-inverse transition hover:bg-inverse-hover disabled:opacity-60"
         >
           {t.footer.subscribeShort}
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden />

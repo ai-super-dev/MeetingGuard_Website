@@ -11,6 +11,17 @@
   --color-ink-800: #141418;
   --color-ink-700: #1c1c21;
 
+  /* Theme surfaces (switched by html[data-theme="light"] below) */
+  --color-bar: #0c0c0f; /* header, floating cards */
+  --color-panel: #131316; /* small raised cards, menus */
+  --color-card-from: #101014; /* card gradient */
+  --color-card-to: #0a0a0d;
+  --color-inverse: #f4f4f5; /* primary buttons */
+  --color-inverse-hover: #ffffff;
+  --color-on-inverse: #0b0b0e;
+  --color-accent-soft: #ff8a95; /* step numbers, small accent text */
+  --color-warm: #ffd9a0; /* "Available <month>" labels */
+
   /* The single brand accent — crimson, the colour of a critical alert */
   --color-accent: #ff4d5e;
   --color-accent-deep: #c4162b;
@@ -33,11 +44,65 @@ html {
   color-scheme: dark;
   scroll-behavior: smooth;
   scroll-padding-top: 6rem;
+  /* glossy-floor reflection under the phones */
+  --phone-reflect: below 6px linear-gradient(transparent 84%, rgba(255, 255, 255, 0.14));
+}
+
+/*
+ * Light theme. The site is written dark-first with white text and white
+ * tints (text-white/60, border-white/10, bg-white/[0.04]...), which all read
+ * --color-white; here "white" becomes the ink colour and the surfaces turn
+ * light, so every component follows without its own light styles.
+ */
+html[data-theme="light"] {
+  color-scheme: light;
+  --color-white: #0b0b0e;
+  --color-black: #ffffff;
+  --color-ink-950: #f5f5f7;
+  --color-ink-900: #ffffff;
+  --color-ink-850: #f7f7f9;
+  --color-ink-800: #ededf1;
+  --color-ink-700: #e2e2e8;
+  --color-bar: #ffffff;
+  --color-panel: #ffffff;
+  --color-card-from: #ffffff;
+  --color-card-to: #f8f8fa;
+  --color-inverse: #0b0b0e;
+  --color-inverse-hover: #26262c;
+  --color-on-inverse: #ffffff;
+  --color-accent: #e11d38;
+  --color-accent-soft: #d4183a;
+  --color-warm: #b45309;
+  /* on a light floor: a short, soft reflection of the phone's lower edge */
+  --phone-reflect: below 2px linear-gradient(transparent 91%, rgba(255, 255, 255, 0.3));
+}
+
+/* Phones show the real app screens, which stay dark in both themes. */
+html[data-theme="light"] .theme-dark {
+  color-scheme: dark;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-ink-950: #07070a;
+  --color-ink-900: #0b0b0e;
+  --color-ink-850: #0f0f13;
+  --color-ink-800: #141418;
+  --color-ink-700: #1c1c21;
+  --color-bar: #0c0c0f;
+  --color-panel: #131316;
+  --color-card-from: #101014;
+  --color-card-to: #0a0a0d;
+  --color-inverse: #f4f4f5;
+  --color-inverse-hover: #ffffff;
+  --color-on-inverse: #0b0b0e;
+  --color-accent: #ff4d5e;
+  --color-accent-soft: #ff8a95;
+  --color-warm: #ffd9a0;
+  color: var(--color-white);
 }
 
 body {
   background-color: var(--color-ink-950);
-  color: #fff;
+  color: var(--color-white);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
@@ -64,14 +129,14 @@ body {
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.55);
+  color: color-mix(in oklab, var(--color-white) 55%, transparent);
 }
 
 /* Dark card with a hairline border and a faint top highlight */
 @utility surface {
-  background: linear-gradient(180deg, #0f0f13 0%, #0a0a0d 100%);
-  border: 1px solid rgb(255 255 255 / 0.07);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  background: linear-gradient(180deg, var(--color-card-from) 0%, var(--color-card-to) 100%);
+  border: 1px solid color-mix(in oklab, var(--color-white) 7%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-white) 4%, transparent);
 }
 
 /* ---------- Motion ---------- */
@@ -225,66 +290,4 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
-}
-
-/* ---------- Blog post text (Markdown) ---------- */
-
-.prose-mg {
-  color: rgb(255 255 255 / 0.72);
-  font-size: 1.02rem;
-  line-height: 1.75;
-}
-.prose-mg > * + * {
-  margin-top: 1.1em;
-}
-.prose-mg h2 {
-  margin-top: 2.2em;
-  color: #fff;
-  font-size: 1.4rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.3;
-}
-.prose-mg h3 {
-  margin-top: 1.8em;
-  color: #fff;
-  font-size: 1.12rem;
-  font-weight: 600;
-}
-.prose-mg ul,
-.prose-mg ol {
-  padding-left: 1.3em;
-}
-.prose-mg ul {
-  list-style: disc;
-}
-.prose-mg ol {
-  list-style: decimal;
-}
-.prose-mg li + li {
-  margin-top: 0.45em;
-}
-.prose-mg li::marker {
-  color: rgb(255 77 94 / 0.8);
-}
-.prose-mg strong {
-  color: #fff;
-  font-weight: 600;
-}
-.prose-mg a {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgb(255 77 94 / 0.7);
-}
-.prose-mg blockquote {
-  border-left: 2px solid var(--color-accent);
-  padding-left: 1em;
-  color: rgb(255 255 255 / 0.85);
-}
-.prose-mg code {
-  border-radius: 6px;
-  background: rgb(255 255 255 / 0.07);
-  padding: 0.1em 0.35em;
-  font-size: 0.92em;
 }

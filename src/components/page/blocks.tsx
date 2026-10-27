@@ -11,7 +11,7 @@ import { Check, Clock } from "lucide-react";
 export function AvailableLabel({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border border-[#ffd9a0]/25 bg-[#ffd9a0]/10 px-2.5 py-1 text-[0.72rem] font-medium whitespace-nowrap text-[#ffd9a0] ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border border-warm/25 bg-warm/10 px-2.5 py-1 text-[0.72rem] font-medium whitespace-nowrap text-warm ${className}`}
     >
       <Clock className="h-3 w-3" aria-hidden />
       {children}
@@ -62,7 +62,7 @@ export function CheckList({ items, className = "" }: { items: readonly ReactNode
       {items.map((p, i) => (
         <li key={i} className="flex items-start gap-3 text-[0.95rem] text-white/80">
           <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/15">
-            <Check className="h-3 w-3 text-[#ff8a95]" strokeWidth={3} aria-hidden />
+            <Check className="h-3 w-3 text-accent-soft" strokeWidth={3} aria-hidden />
           </span>
           {p}
         </li>

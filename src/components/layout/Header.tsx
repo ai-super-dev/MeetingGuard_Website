@@ -38,8 +38,8 @@ export function Header() {
       <div
         className={`mx-auto max-w-[1200px] rounded-2xl border transition-colors duration-300 ${
           scrolled || open
-            ? "border-white/[0.09] bg-[#0c0c0f]/90 backdrop-blur-xl"
-            : "border-white/[0.07] bg-[#0c0c0f]/60 backdrop-blur-md"
+            ? "border-white/[0.09] bg-bar/90 backdrop-blur-xl"
+            : "border-white/[0.07] bg-bar/60 backdrop-blur-md"
         }`}
       >
         <div className="flex h-16 items-center px-4 sm:px-6">
@@ -65,7 +65,7 @@ export function Header() {
             <ThemeToggle className="hidden lg:block" />
             <Link
               href={download}
-              className="ml-2 hidden h-9 items-center gap-2 rounded-lg bg-[#f4f4f5] px-3.5 text-[0.85rem] font-medium text-[#0b0b0e] transition hover:bg-white sm:inline-flex"
+              className="ml-2 hidden h-9 items-center gap-2 rounded-lg bg-inverse px-3.5 text-[0.85rem] font-medium text-on-inverse transition hover:bg-inverse-hover sm:inline-flex"
             >
               <Download className="h-4 w-4" aria-hidden />
               {t.header.download}
@@ -99,7 +99,7 @@ export function Header() {
                     <Link
                       href={href(item.path)}
                       onClick={closeAll}
-                      className="block rounded-lg px-3 py-3 text-white/80 hover:bg-white/5 hover:text-white"
+                      className="block rounded-lg px-3 py-3 text-white/80 hover:bg-inverse-hover/5 hover:text-white"
                     >
                       {t.header.nav[item.key]}
                     </Link>
@@ -110,7 +110,7 @@ export function Header() {
                   <Link
                     href={download}
                     onClick={closeAll}
-                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#f4f4f5] px-4 text-[0.88rem] font-medium text-[#0b0b0e] sm:hidden"
+                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-inverse px-4 text-[0.88rem] font-medium text-on-inverse sm:hidden"
                   >
                     <Download className="h-4 w-4" aria-hidden />
                     {t.header.download}

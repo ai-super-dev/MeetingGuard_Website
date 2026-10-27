@@ -11,7 +11,7 @@ export function FaqAccordion({ items, defaultOpen = -1 }: { items: readonly FaqI
   const [open, setOpen] = useState(defaultOpen);
   const base = useId();
   return (
-    <div className="divide-y divide-white/[0.07] rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,#0f0f13,#0a0a0d)]">
+    <div className="divide-y divide-white/[0.07] rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,var(--color-card-from),var(--color-card-to))]">
       {items.map((item, i) => {
         const isOpen = open === i;
         const id = `${base}-${i}`;

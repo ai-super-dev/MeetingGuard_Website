@@ -37,7 +37,7 @@ export function PhoneMockup({
   }, [frame.w]);
 
   return (
-    <div ref={ref} className={`relative ${className}`} style={{ aspectRatio: `${frame.w} / ${frame.h}`, ...style }}>
+    <div ref={ref} className={`theme-dark relative ${className}`} style={{ aspectRatio: `${frame.w} / ${frame.h}`, ...style }}>
       <div
         className="absolute top-0 left-0 origin-top-left transition-opacity duration-500"
         style={{ width: frame.w, height: frame.h, transform: `scale(${scale})`, opacity: scale ? 1 : 0 }}

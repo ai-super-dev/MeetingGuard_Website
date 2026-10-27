@@ -59,7 +59,7 @@ function Tile({
       <div
         ref={ref}
         onPointerMove={onMove}
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,#101014,#0a0a0d)] transition-colors duration-500 hover:border-white/[0.12]"
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-[linear-gradient(180deg,var(--color-card-from),var(--color-card-to))] transition-colors duration-500 hover:border-white/[0.12]"
         style={{ "--accent": accent } as CSSProperties}
       >
         {/* faint resting tint in the accent colour */}
@@ -137,7 +137,7 @@ function AlarmVisual() {
   const level = useCycle(levels.length, 2800, inView);
 
   return (
-    <div ref={ref} className="w-full max-w-[340px] rounded-[24px] border border-white/[0.08] bg-[#131316] px-6 pt-8 pb-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+    <div ref={ref} className="w-full max-w-[340px] rounded-[24px] border border-white/[0.08] bg-panel px-6 pt-8 pb-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
       <div className="relative mx-auto grid h-16 w-16 place-items-center">
         <motion.span
           aria-hidden
@@ -159,7 +159,7 @@ function AlarmVisual() {
         </AnimatePresence>
       </div>
       <p className="mt-4 text-[1.05rem] font-semibold">{t.alarm.title}</p>
-      <p className="text-[0.8rem] font-medium text-[#ffd9a0]">{t.alarm.startsIn}</p>
+      <p className="text-[0.8rem] font-medium text-warm">{t.alarm.startsIn}</p>
 
       {/* intensity: Gentle / Standard / Critical */}
       <div className="relative mt-5 grid grid-cols-3 rounded-xl bg-white/[0.05] p-1 text-[0.72rem]">
@@ -285,7 +285,7 @@ function TasksVisual() {
                 <span
                   className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-500 ${done ? "border-emerald-400 bg-emerald-400" : "border-white/30"}`}
                 >
-                  {done && <Check className="h-2.5 w-2.5 text-[#0b0b0e]" strokeWidth={4} aria-hidden />}
+                  {done && <Check className="h-2.5 w-2.5 text-on-inverse" strokeWidth={4} aria-hidden />}
                 </span>
                 <span className={`min-w-0 flex-1 truncate text-[0.78rem] ${done ? "text-white/40 line-through" : "text-white/85"}`}>{r.title}</span>
                 <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[0.65rem] text-white/55">{r.due}</span>
@@ -364,7 +364,8 @@ function WhatsAppVisual() {
   const phase = useCycle(4, 1500, inView); // 0 ask · 1 card · 2 confirmed · 3 done
   const pop = { initial: { opacity: 0, y: 6, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { duration: 0.35 } };
   return (
-    <div ref={ref} className="flex h-[150px] w-full max-w-[340px] flex-col justify-end gap-2 text-[0.78rem]">
+    // WhatsApp's own dark chat colours, kept in both site themes
+    <div ref={ref} className="theme-dark flex h-[150px] w-full max-w-[340px] flex-col justify-end gap-2 text-[0.78rem]">
       <motion.p {...pop} className="ml-auto max-w-[78%] rounded-xl rounded-tr-sm bg-[#005c4b] px-3 py-1.5 text-white/90">
         {v.chatAsk}
       </motion.p>
@@ -423,7 +424,7 @@ function IntegrationsVisual() {
               <Icon className={`h-4 w-4 ${s.month ? "text-white/35" : "text-[#8ab4ff]"}`} aria-hidden />
               <span className={`text-[0.78rem] whitespace-nowrap ${s.month ? "text-white/45" : "text-white"}`}>{s.name}</span>
               {s.month ? (
-                <span className="ml-1 rounded-full bg-[#ffd9a0]/10 px-1.5 py-0.5 text-[0.6rem] whitespace-nowrap text-[#ffd9a0]">{t.available(s.month)}</span>
+                <span className="ml-1 rounded-full bg-warm/10 px-1.5 py-0.5 text-[0.6rem] whitespace-nowrap text-warm">{t.available(s.month)}</span>
               ) : (
                 <span className="ml-1 flex items-center gap-1 text-[0.6rem] text-emerald-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -440,7 +441,7 @@ function IntegrationsVisual() {
             <path
               d={path(ys[i])}
               fill="none"
-              stroke={s.month ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.2)"}
+              style={{ stroke: `color-mix(in oklab, var(--color-white) ${s.month ? 8 : 20}%, transparent)` }}
               strokeWidth="1"
               strokeDasharray={s.month ? "3 4" : undefined}
             />

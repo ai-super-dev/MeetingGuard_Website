@@ -3,12 +3,14 @@ import { PhoneMockup } from "./PhoneMockup";
 import type { FrameSpec } from "./geometry";
 
 /**
- * Glossy-floor reflection. The mask is laid over the reflection before it's
- * flipped, so its bottom (opaque) end sits right at the phone's edge and the
- * reflection fades out as it goes down.
+ * Glossy-floor reflection (--phone-reflect in globals.css, one per theme). The
+ * mask is laid over the reflection before it's flipped, so its bottom (opaque)
+ * end sits right at the phone's edge and the reflection fades out going down.
  */
-const MIRROR_REFLECT = "below 6px linear-gradient(transparent 84%, rgba(255,255,255,0.14))";
-const MIRROR: CSSProperties = { WebkitBoxReflect: MIRROR_REFLECT };
+const MIRROR: CSSProperties = {
+  // the fallback is the dark-theme reflection, in case the variable is missing
+  WebkitBoxReflect: "var(--phone-reflect, below 6px linear-gradient(transparent 84%, rgba(255,255,255,0.14)))",
+};
 
 /**
  * A frame PNG drawn so its phone body is `bodyHeight` px tall. The layout box
@@ -32,7 +34,7 @@ export function FramedPhone({
   const body = frame.body ?? { x: 0, y: 0, w: frame.w, h: frame.h };
   const k = bodyHeight / body.h;
   return (
-    <div className="relative" style={{ width: body.w * k, height: body.h * k, ...(mirror ? MIRROR : null) }}>
+    <div className="theme-dark relative" style={{ width: body.w * k, height: body.h * k, ...(mirror ? MIRROR : null) }}>
       <PhoneMockup
         frame={frame}
         sizes={`${Math.ceil(frame.w * k)}px`}

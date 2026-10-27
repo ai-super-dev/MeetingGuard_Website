@@ -148,7 +148,7 @@ export function StepShowcase({
           <span aria-hidden className="absolute inset-x-0 h-px bg-white/10" />
           <motion.span
             aria-hidden
-            className="absolute inset-x-0 -top-px h-[2px] origin-left bg-[linear-gradient(90deg,#ff4d5e,#ff8a95)] shadow-[0_0_12px_rgba(255,77,94,0.7)]"
+            className="absolute inset-x-0 -top-px h-[2px] origin-left bg-[linear-gradient(90deg,#ff4d5e,var(--color-accent-soft))] shadow-[0_0_12px_rgba(255,77,94,0.7)]"
             style={{ scaleX: fill }}
           />
           {/* glowing "now" head riding the end of the line */}
@@ -214,7 +214,7 @@ export function StepShowcase({
               exit={{ opacity: 0, y: -6, filter: "blur(4px)", transition: { duration: 0.55, ease: SOFT } }}
             >
               <p className="flex items-baseline justify-center gap-3 font-mono text-[0.75rem] tracking-[0.06em] md:justify-start">
-                <span className="text-[#ff8a95]">0{active + 1}</span>
+                <span className="text-accent-soft">0{active + 1}</span>
                 <span className="text-white/55 uppercase">
                   {step.day} · {step.time}
                 </span>

@@ -106,8 +106,8 @@ function CalendarWeek() {
   const hour = (h: number) => (t.lang === "es" ? `${h}:00` : `${((h - 1) % 12) + 1} ${h < 12 ? "AM" : "PM"}`);
   return (
     <div
-      className="overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#0f0f13,#0a0a0d)] shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
-      style={{ border: "2px solid rgba(255,255,255,0.13)" }}
+      className="overflow-hidden rounded-2xl bg-[linear-gradient(180deg,var(--color-card-from),var(--color-card-to))] shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
+      style={{ border: "2px solid color-mix(in oklab, var(--color-white) 13%, transparent)" }}
     >
       {/* app bar */}
       <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3 text-white/70 sm:gap-3 lg:pr-9">
@@ -165,7 +165,7 @@ function CalendarWeek() {
             className={`${dayVisibility(d.wide)} relative border-l border-white/[0.06]`}
             style={{
               height: HOURS * ROW,
-              backgroundImage: `repeating-linear-gradient(180deg, transparent 0 ${ROW - 1}px, rgba(255,255,255,0.05) ${ROW - 1}px ${ROW}px)`,
+              backgroundImage: `repeating-linear-gradient(180deg, transparent 0 ${ROW - 1}px, color-mix(in oklab, var(--color-white) 5%, transparent) ${ROW - 1}px ${ROW}px)`,
             }}
           >
             {EVENTS.filter((e) => e.day === di).map((e) => (
@@ -221,7 +221,7 @@ function LaneCard({ lane }: { lane: Lane }) {
     <div
       className={`relative h-full overflow-hidden rounded-2xl p-6 sm:p-7 ${
         lane.good
-          ? "border border-accent/30 bg-[radial-gradient(90%_70%_at_100%_0%,rgba(255,60,80,0.16),transparent_70%),linear-gradient(180deg,#121014,#0b0a0d)]"
+          ? "border border-accent/30 bg-[radial-gradient(90%_70%_at_100%_0%,rgba(255,60,80,0.16),transparent_70%),linear-gradient(180deg,var(--color-card-from),var(--color-card-to))]"
           : "surface"
       }`}
     >
@@ -253,13 +253,13 @@ function LaneCard({ lane }: { lane: Lane }) {
         />
         {lane.steps.map((text, i) => (
           <li key={LANE_TIMES[i]} className="relative grid grid-cols-[44px_12px_minmax(0,1fr)] items-start gap-x-3">
-            <span className={`pt-px font-mono text-[0.74rem] ${lane.good ? "text-[#ff8a95]" : "text-white/50"}`}>
+            <span className={`pt-px font-mono text-[0.74rem] ${lane.good ? "text-accent-soft" : "text-white/50"}`}>
               {LANE_TIMES[i]}
             </span>
             <span
               className={`mt-1 h-3 w-3 rounded-full border-2 ${
                 lane.good
-                  ? "border-accent bg-[#1a0b0e] shadow-[0_0_10px_rgba(255,77,94,0.7)]"
+                  ? "border-accent bg-[color-mix(in_oklab,var(--color-accent)_12%,var(--color-ink-950))] shadow-[0_0_10px_rgba(255,77,94,0.7)]"
                   : i === lane.steps.length - 1
                     ? "border-white/30 bg-white/30"
                     : "border-white/20 bg-ink-950"
@@ -306,7 +306,7 @@ export function Problem() {
           <div className="relative grid items-center gap-4 lg:translate-x-[4.5%] lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-0">
             <Reveal>
               {/* reflection only when the calendar sits beside the phone; stacked (tablet/phone) it would show behind the phone */}
-              <div className="lg:[transform:perspective(800px)_rotateY(18deg)] lg:[-webkit-box-reflect:below_6px_linear-gradient(transparent_84%,rgba(255,255,255,0.14))]">
+              <div className="lg:[transform:perspective(800px)_rotateY(18deg)] lg:[-webkit-box-reflect:var(--phone-reflect,below_6px_linear-gradient(transparent_84%,rgba(255,255,255,0.14)))]">
                 <CalendarWeek />
               </div>
             </Reveal>

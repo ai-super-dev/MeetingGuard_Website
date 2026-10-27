@@ -75,7 +75,7 @@ export function PricingTeaser() {
               const Icon = icons[i];
               return (
                 <li key={point} className="flex flex-col items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-5">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/12 text-[#ff8a95]">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/12 text-accent-soft">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
                   <span className="text-[0.92rem] font-medium text-white/85">{point}</span>
@@ -110,11 +110,11 @@ export function AssistantVisual() {
   return (
     <div ref={ref} className="w-full max-w-[360px] space-y-3">
       <p className="ml-auto w-fit max-w-[90%] rounded-2xl rounded-tr-md bg-white/[0.08] px-4 py-2.5 text-[0.85rem] text-white/90">&quot;{v.ask}&quot;</p>
-      <div className="rounded-2xl border border-white/[0.08] bg-[#131316] p-4">
+      <div className="rounded-2xl border border-white/[0.08] bg-panel p-4">
         <div className="flex items-center gap-2 text-[0.75rem] text-white/50">
           <Mail className="h-3.5 w-3.5" aria-hidden />
           <span>{v.to}</span>
-          <span className="ml-auto rounded-full bg-accent/12 px-2 py-0.5 text-[#ff8a95]">{v.cc}</span>
+          <span className="ml-auto rounded-full bg-accent/12 px-2 py-0.5 text-accent-soft">{v.cc}</span>
         </div>
         <p className="mt-2 text-[0.92rem] font-medium text-white">{v.subject}</p>
         <ol className="mt-4 space-y-2">
@@ -125,7 +125,7 @@ export function AssistantVisual() {
                   i < shown ? (i === v.steps.length - 1 ? "border-emerald-400 bg-emerald-400" : "border-white/60 bg-white/60") : "border-white/20"
                 }`}
               >
-                {i < shown && <Check className="h-2.5 w-2.5 text-[#0b0b0e]" strokeWidth={4} aria-hidden />}
+                {i < shown && <Check className="h-2.5 w-2.5 text-on-inverse" strokeWidth={4} aria-hidden />}
               </span>
               <span className={`transition-colors duration-500 ${i < shown ? "text-white/85" : "text-white/35"}`}>{s}</span>
             </li>
@@ -158,7 +158,7 @@ export function AssistantTeaser() {
         <div className="mx-auto grid max-w-[1000px] items-center gap-14 md:grid-cols-2 md:gap-16">
           <Reveal className="text-center md:text-left">
             <p className="eyebrow flex items-center justify-center gap-2 md:justify-start">
-              <Sparkles className="h-4 w-4 text-[#ffd9a0]" aria-hidden />
+              <Sparkles className="h-4 w-4 text-warm" aria-hidden />
               {a.eyebrow}
             </p>
             <Headline id="assistant-title" line1={a.line1} line2={a.line2} className="mt-3" />

@@ -43,6 +43,8 @@ export type FrameSpec = {
   matrix: string;
   /** Bounding box of the opaque phone body (frame px); the rest of the PNG is empty margin. */
   body?: { x: number; y: number; w: number; h: number };
+  /** Black border (CSS px at SCREEN_W) drawn around the screen, for frames whose opening is the bare metal rim. */
+  bezel?: number;
 };
 
 /**
@@ -94,13 +96,13 @@ const STEP_PHONE = {
   w: 1650,
   h: 1920,
   screenH: 936,
-  body: { x: 489, y: 151, w: 707, h: 1553 },
+  body: { x: 396, y: 196, w: 868, h: 1502 },
   matrix: quadMatrix(
     [
-      [520.0, 274.2],
-      [1078.1, 170.6],
-      [1127.6, 1594.7],
-      [531.0, 1649.6],
+      [643.4, 231.5],
+      [1211.0, 227.6],
+      [1013.0, 1637.5],
+      [415.7, 1588.4],
     ],
     936,
   ),
@@ -118,45 +120,45 @@ export const STRAIGHT_FRAME: FrameSpec = {
   src: images.phoneFrameStraight,
   w: 1024,
   h: 1536,
-  screenH: 847,
-  body: { x: 176, y: 81, w: 674, h: 1357 },
+  screenH: 845,
+  body: { x: 167, y: 66, w: 684, h: 1373 },
   matrix: quadMatrix(
     [
-      [216, 111],
-      [808, 111],
-      [808, 1397],
-      [216, 1397],
+      [206.0, 98.1],
+      [810.0, 96.9],
+      [810.0, 1406.0],
+      [206.0, 1406.0],
     ],
-    847,
+    845,
   ),
 };
 
 /**
  * android_phone_tilt.png: Android phone turned slightly (right edge nearer),
- * used for Android-only screens. Only the metal rim and camera are opaque;
- * the quad is the rim's inner edge.
+ * used for Android-only screens. The black border around the screen is part
+ * of the image; the quad is its inner edge.
  */
 export const ANDROID_FRAME: FrameSpec = {
   src: images.androidPhone,
-  w: 1024,
-  h: 1536,
-  screenH: 916,
-  body: { x: 122, y: 36, w: 758, h: 1454 },
+  w: 1650,
+  h: 1920,
+  screenH: 943,
+  body: { x: 419, y: 181, w: 846, h: 1531 },
   matrix: quadMatrix(
     [
-      [280.2, 101.7],
-      [830.5, 62],
-      [728.1, 1437.1],
-      [141.9, 1393.9],
+      [647.1, 231.2],
+      [1220.2, 210.3],
+      [1040.8, 1654.0],
+      [443.9, 1597.7],
     ],
-    916,
+    943,
   ),
 };
 
 /**
- * android_phone_tilt_left.png: the same phone turned the other way (screen
- * facing right), made from android_phone_tilt.png by mirroring it with the
- * side buttons painted out, since they are now on the far side.
+ * android_phone_tilt_left.png: the earlier Android phone turned the other way
+ * (screen facing right), made by mirroring it with the side buttons painted
+ * out. Only its metal rim is drawn, so the site adds the black screen border.
  */
 export const ANDROID_FRAME_RIGHT: FrameSpec = {
   src: images.androidPhoneLeft,
@@ -164,6 +166,7 @@ export const ANDROID_FRAME_RIGHT: FrameSpec = {
   h: 1536,
   screenH: 916,
   body: { x: 143, y: 36, w: 758, h: 1454 },
+  bezel: 10,
   matrix: quadMatrix(
     [
       [193.5, 62],

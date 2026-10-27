@@ -3,6 +3,7 @@ import Link from "next/link";
 import { inter, mono } from "@/components/layout/SiteShell";
 import { AppMark } from "@/components/ui/Logo";
 import { en, es } from "@/lib/i18n";
+import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,8 +14,9 @@ export const metadata: Metadata = {
 /** One page for every unmatched URL, in both languages (it renders outside the language layouts). */
 export default function GlobalNotFound() {
   return (
-    <html lang="en" data-theme="dark" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="en" data-theme="dark" className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
       <body className="grid min-h-screen place-items-center overflow-x-clip px-5">
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <div
           aria-hidden
           className="pointer-events-none absolute top-1/3 left-1/2 h-[420px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(190,20,40,0.25),transparent)] blur-2xl"
@@ -31,7 +33,7 @@ export default function GlobalNotFound() {
           </h1>
           <p className="mt-4 text-white/60">{en.notFound.body}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/" className="rounded-xl bg-[#f4f4f5] px-5 py-3 text-[0.9rem] font-medium text-[#0b0b0e] hover:bg-white">
+            <Link href="/" className="rounded-xl bg-inverse px-5 py-3 text-[0.9rem] font-medium text-on-inverse hover:bg-inverse-hover">
               {en.notFound.home}
             </Link>
             <Link

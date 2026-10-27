@@ -6,6 +6,7 @@ import { dictionaries } from "@/lib/i18n";
 import { LangProvider } from "@/lib/language";
 import type { Lang } from "@/lib/routes";
 import { siteConfig } from "@/lib/site";
+import { THEME_SCRIPT } from "@/lib/theme";
 import { ConsentBanner } from "./ConsentBanner";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
@@ -38,8 +39,10 @@ export const siteViewport: Viewport = {
  */
 export function SiteShell({ lang, children }: { lang: Lang; children: ReactNode }) {
   return (
-    <html lang={lang} data-theme="dark" data-scroll-behavior="smooth" className={`${inter.variable} ${mono.variable}`}>
+    // the theme script may switch data-theme to "light" before React loads
+    <html lang={lang} data-theme="dark" data-scroll-behavior="smooth" className={`${inter.variable} ${mono.variable}`} suppressHydrationWarning>
       <body className="min-h-screen overflow-x-clip">
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <LangProvider lang={lang}>
           <MotionProvider>
             <SkipLink />
