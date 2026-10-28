@@ -25,8 +25,12 @@ function Badge({ store, height }: { store: Store; height: number }) {
   const url = store === "appStore" ? siteConfig.appStoreUrl : siteConfig.playStoreUrl;
   return (
     <a
-      href={url}
-      onClick={() => track("badge_click", { store: store === "appStore" ? "app_store" : "google_play" })}
+      href={url || "#"}
+      onClick={(e) => {
+        // no store link yet: stay put instead of jumping to the top of the page
+        if (!url) return e.preventDefault();
+        track("badge_click", { store: store === "appStore" ? "app_store" : "google_play" });
+      }}
       className="inline-block rounded-[10px] transition duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- badge artwork is served as-is */}

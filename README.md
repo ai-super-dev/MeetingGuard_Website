@@ -66,9 +66,44 @@ Phone screens are rebuilt in code from the app's real screens. When the real
 screenshots are exported, put them in `public/images/screens/` and pass them
 to `PhoneShot` with its `image` prop (`src/components/phone/PhoneShot.tsx`).
 
+## The web agenda (front end)
+
+The web agenda (milestones S3 to S6) lives in the same project with its own
+layout: `/app` (Spanish `/es/app`). It is kept out of search engines. The
+header's Sign in button leads to it, but until the agenda is connected to the
+backend the button is shown disabled and says "coming soon"; set `agendaOpen`
+in `src/lib/site.ts` to `true` to turn it on. Until then, open the agenda by
+typing `/app`.
+
+| Page | URL |
+| --- | --- |
+| Sign in (Google, or email and password, as in the app) | `/app/sign-in` |
+| Agenda: day, week and month; meeting details; create, edit, move, cancel | `/app` |
+| Tasks: by due date, overdue and done; quick capture; edit, complete, delete | `/app/tasks` |
+| Account: plan, manage subscription in the store, sign out, delete account | `/app/account` |
+| Guest invitation (no account needed): accept, decline, propose a time | `/app/invite?t=<token>` |
+
+Today it runs on sample data kept in the browser (a "Preview" label says so).
+Every read and write goes through `src/lib/agenda/store.ts`; connecting the
+backend means replacing those functions with Firebase Authentication and
+Firestore calls (each one is marked `TODO(backend)`), and the screens stay as
+they are. Other files:
+
+- Words, English and Spanish: `src/lib/agenda/i18n.ts`.
+- Which plan includes which feature: `REQUIRED` in `src/lib/agenda/plans.ts`
+  (to be matched with the app's entitlement record).
+- Checks before saving (the app's validation): `src/lib/agenda/validation.ts`.
+- Repeating meetings, skipped and moved dates: `src/lib/agenda/recurrence.ts`.
+- Typed tasks ("Send the deck to Ana tomorrow at 5 pm"): `src/lib/agenda/capture.ts`.
+
+When the agenda moves to its own address (for example app.meetingguard.ai),
+point that address at `/app`, and rewrite `/invite/**` to `/app/invite` for
+the guest links; the guest page reads the token from either.
+
 ## Before launch (open items)
 
-- Store links: `src/lib/site.ts`.
+- App Store link: `appStoreUrl` in `src/lib/site.ts` (until it is set, the
+  App Store badge does nothing when clicked). The Google Play link is set.
 - Privacy policy and terms: confirm the URLs (`/privacy-policy`,
   `/terms-of-service`; `/privacy` and `/terms` redirect there) match Play
   Console, App Store Connect and the Meta app.

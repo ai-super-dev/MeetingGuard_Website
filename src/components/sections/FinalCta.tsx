@@ -1,14 +1,27 @@
 "use client";
 
+import { useEffect } from "react";
 import { Reveal } from "@/components/motion";
 import { AppIcon } from "@/components/ui/Logo";
 import { StoreBadges } from "@/components/ui/StoreBadges";
+import { DOWNLOAD_ID, takePendingDownload } from "@/lib/download";
 import { useT } from "@/lib/language";
 
 export function FinalCta() {
   const t = useT();
+
+  // opened from the header's Download button on another page: go straight to the badges
+  useEffect(() => {
+    if (!takePendingDownload()) return;
+    // after the page has moved to the top on arrival
+    const id = requestAnimationFrame(() =>
+      requestAnimationFrame(() => document.getElementById(DOWNLOAD_ID)?.scrollIntoView({ behavior: "instant" })),
+    );
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   return (
-    <section id="download" aria-labelledby="cta-title" className="relative overflow-x-clip pt-14 pb-28 sm:pt-[4.5rem] sm:pb-36">
+    <section id={DOWNLOAD_ID}aria-labelledby="cta-title" className="relative overflow-x-clip pt-14 pb-28 sm:pt-[4.5rem] sm:pb-36">
       <div
         aria-hidden
         className="absolute top-1/2 left-1/2 h-[480px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(190,20,40,0.28),transparent)] blur-2xl"

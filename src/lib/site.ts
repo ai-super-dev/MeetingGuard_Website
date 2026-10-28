@@ -14,9 +14,12 @@ export const siteConfig = {
   contactPhoneLabel: "+44 7400 752170",
   // The MeetingGuard WhatsApp business number (shown in the app's WhatsApp linking screen).
   whatsappNumberRaw: "+447403693109",
-  // TODO: the real store listings.
-  appStoreUrl: "#",
-  playStoreUrl: "#",
+  // TODO: the App Store listing. Until a link is set, its badge does nothing when clicked.
+  appStoreUrl: "",
+  playStoreUrl: "https://play.google.com/store/apps/details?id=com.meetingguard.ai",
+  // The header's Sign in button opens the web agenda (/app) only when this is true; until
+  // then it shows "coming soon". The agenda itself can still be opened by typing /app.
+  agendaOpen: false,
   // TODO: URL of the Cloud Function that receives the waitlist and update forms.
   formsEndpoint: "",
   // TODO: GA4 measurement ID (G-XXXXXXX). Analytics loads only after consent and only when this is set.

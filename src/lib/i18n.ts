@@ -9,7 +9,7 @@
  * the real app keeps the app's own wording.
  */
 
-type Widen<T> = T extends string
+export type Widen<T> = T extends string
   ? string
   : T extends (...args: never[]) => unknown
     ? T
@@ -42,6 +42,10 @@ export const en = {
     closeMenu: "Close menu",
     nav: { privacy: "Privacy Policy", terms: "Terms of Service" },
     download: "Download",
+    // opens the web agenda (it asks to sign in first)
+    signIn: "Sign in",
+    // shown when Sign in is clicked while the web agenda is not open yet
+    signInSoon: "The web agenda is coming soon.",
     theme: { toLight: "Light theme", toDark: "Dark theme" },
   },
 
@@ -427,6 +431,10 @@ export const es: Dict = {
     closeMenu: "Cerrar menú",
     nav: { privacy: "Política de privacidad", terms: "Términos del servicio" },
     download: "Descargar",
+    // opens the web agenda (it asks to sign in first)
+    signIn: "Iniciar sesión",
+    // shown when Sign in is clicked while the web agenda is not open yet
+    signInSoon: "La agenda web estará disponible pronto.",
     theme: { toLight: "Tema claro", toDark: "Tema oscuro" },
   },
 
