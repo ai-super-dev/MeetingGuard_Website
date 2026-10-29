@@ -1,5 +1,5 @@
-// Serves the static export in ./out the way Firebase Hosting does with
-// cleanUrls: /pricing -> pricing.html, unknown paths -> 404.html.
+// Serves the static export in ./out for a local check: /es/ -> es/index.html,
+// unknown paths -> 404.html.
 // Usage: node scripts/serve-out.mjs [port]
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";

@@ -2,13 +2,13 @@
   "hosting": {
     "public": "out",
     "cleanUrls": true,
-    "trailingSlash": false,
+    "trailingSlash": true,
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "redirects": [
-      { "source": "/privacy", "destination": "/privacy-policy", "type": 301 },
-      { "source": "/terms", "destination": "/terms-of-service", "type": 301 },
-      { "source": "/es/privacy", "destination": "/es/privacy-policy", "type": 301 },
-      { "source": "/es/terms", "destination": "/es/terms-of-service", "type": 301 }
+      { "source": "/privacy", "destination": "/privacy-policy/", "type": 301 },
+      { "source": "/terms", "destination": "/terms-of-service/", "type": 301 },
+      { "source": "/es/privacy", "destination": "/es/privacy-policy/", "type": 301 },
+      { "source": "/es/terms", "destination": "/es/terms-of-service/", "type": 301 }
     ],
     "headers": [
       {

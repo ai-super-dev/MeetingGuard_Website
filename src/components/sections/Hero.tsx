@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { WhatsAppLogo } from "@/components/icons/WhatsAppLogo";
 import { ScrollDrift, TiltPhone } from "@/components/motion";
 import { AlertScreen } from "@/components/phone/AlertScreen";
 import { PhoneMockup } from "@/components/phone/PhoneMockup";
@@ -117,7 +118,13 @@ export function Hero() {
             <span className="text-white/50 lg:whitespace-nowrap">{t.hero.line2}</span>
           </h1>
           <p className="rise mx-auto mt-6 max-w-xl text-[1.08rem] leading-relaxed text-white/65 sm:text-[1.2rem] lg:mx-0 lg:mt-7 lg:max-w-[34rem] lg:text-[1.3rem]" style={rise(380)}>
-            {t.hero.sentence}
+            {t.hero.sentence.before}
+            {/* highlighted, and the logo never ends up on a different line from the word */}
+            <span className="font-medium whitespace-nowrap text-white">
+              <WhatsAppLogo className="mr-[0.28em] ml-[0.06em] inline-block h-[1.02em] w-[1.02em] align-[-0.16em] text-[#25D366]" />
+              WhatsApp
+            </span>
+            {t.hero.sentence.after}
           </p>
           <div className="rise mt-9 lg:mt-11" style={rise(500)}>
             <StoreBadges className="justify-center lg:justify-start" height={58} />

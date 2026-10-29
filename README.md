@@ -112,6 +112,21 @@ the guest links; the guest page reads the token from either.
 - Analytics: set `gaMeasurementId` in `src/lib/site.ts`; the consent banner
   appears automatically once it is set.
 
+## Deploy (Hostinger)
+
+Every page is built as a folder with an `index.html` (`/es/` is
+`es/index.html`, `/privacy-policy/` is `privacy-policy/index.html`), so the
+host serves the files as they are. Addresses end with a slash; without it, the
+server adds it.
+
+```bash
+npm run build      # writes ./out, including .htaccess (from public/.htaccess)
+```
+
+Upload everything in `./out` to `public_html` by FTP (show hidden files so
+`.htaccess` goes too). `public/.htaccess` has the redirects from old URLs
+(`/privacy`, `/terms`), the 404 page and the security headers.
+
 ## Deploy (Firebase Hosting)
 
 ```bash
@@ -120,9 +135,9 @@ firebase hosting:channel:deploy preview   # a preview link for review
 firebase deploy --only hosting            # live
 ```
 
-`firebase.json` has the clean URLs, redirects from old URLs and the security
-headers for the site paths (not `/admin`). Merge it with the existing
-project's `firebase.json`, which also serves `/admin`.
+`firebase.json` has the redirects from old URLs and the security headers for
+the site paths (not `/admin`). Merge it with the existing project's
+`firebase.json`, which also serves `/admin`.
 
 ### The forms function
 

@@ -37,7 +37,7 @@ export default function GlobalNotFound() {
               {en.notFound.home}
             </Link>
             <Link
-              href="/es"
+              href="/es/"
               lang="es"
               className="rounded-xl border border-white/12 px-5 py-3 text-[0.9rem] font-medium text-white/85 hover:border-white/25"
             >

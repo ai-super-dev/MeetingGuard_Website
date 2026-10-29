@@ -1,13 +1,16 @@
 import type { NextConfig } from "next";
 
 /*
- * Static export for Firebase Hosting: `npm run build` writes plain HTML/CSS/JS
- * to ./out (one .html file per page, both languages), then
+ * Static export: `npm run build` writes plain HTML/CSS/JS to ./out, then
  * scripts/optimize-images.mjs adds the two WebP sizes for every image.
- * Redirects and security headers live in firebase.json, not here.
+ * Each page is a folder with an index.html (/es/ is es/index.html), so any
+ * host serves it as is; with one .html per page, Hostinger's server mixed up
+ * the file es.html and the folder es/. Redirects and security headers live in
+ * public/.htaccess (Hostinger) and firebase.json (Firebase), not here.
  */
 const nextConfig: NextConfig = {
   output: "export",
+  trailingSlash: true,
   images: {
     loader: "custom",
     loaderFile: "./src/lib/image-loader.ts",

@@ -84,7 +84,11 @@ export const en = {
   hero: {
     line1: "Never miss",
     line2: "what matters.",
-    sentence: "The AI meeting assistant that turns what you say into meetings, rings until you show up, and remembers your tasks.",
+    // the word WhatsApp, with its logo, goes between the two parts
+    sentence: {
+      before: "The AI meeting assistant: create meetings and tasks by voice or ",
+      after: ", with alarms that ring until you show up.",
+    },
     promises: ["Never miss a meeting", "Talk to your calendar", "Your tasks remembered"],
     proof: "Built for busy professionals",
     proofDetail: "iPhone and Android · English and Spanish",
@@ -480,7 +484,10 @@ export const es: Dict = {
   hero: {
     line1: "Nunca te pierdas",
     line2: "lo importante.",
-    sentence: "El asistente de reuniones con IA que convierte lo que dices en reuniones, suena hasta que llegas y recuerda tus tareas.",
+    sentence: {
+      before: "El asistente de reuniones con IA: crea reuniones y tareas por voz o ",
+      after: ", con alarmas que suenan hasta que llegas.",
+    },
     promises: ["Nunca te pierdas una reunión", "Habla con tu calendario", "Tus tareas, recordadas"],
     proof: "Creado para profesionales ocupados",
     proofDetail: "iPhone y Android · Inglés y español",
