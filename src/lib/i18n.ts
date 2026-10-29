@@ -334,6 +334,10 @@ export const en = {
         title: "WhatsApp",
         body: "Create meetings and tasks by message and confirm with one tap. We never send messages you didn't ask for.",
       },
+      "meeting-links": {
+        title: "Zoom and Teams links",
+        body: "Create a Zoom or Teams link straight from the app when you set up a meeting. When the alarm rings, one tap on Join now and you're in.",
+      },
       integrations: {
         title: "Calendars and tasks in sync",
         body: "Google Calendar today. Outlook, Microsoft To Do and Google Tasks are on the way.",
@@ -347,6 +351,9 @@ export const en = {
       chatAsk: "Lunch with Ana Friday at 1",
       chatCard: "Lunch with Ana · Fri 13:00",
       chatDone: "Done. It's in your calendar.",
+      chatOnline: "online",
+      linkWhen: "Wed · 10:00 - 10:45",
+      linkCreating: "Creating the link",
       live: "Live",
       debrief: "Debriefs",
       tasks: [
@@ -721,6 +728,10 @@ export const es: Dict = {
         title: "WhatsApp",
         body: "Crea reuniones y tareas por mensaje y confirma con un toque. Nunca enviamos mensajes que no hayas pedido.",
       },
+      "meeting-links": {
+        title: "Enlaces de Zoom y Teams",
+        body: "Crea un enlace de Zoom o Teams directamente desde la app al programar una reunión. Cuando suene la alarma, un toque en Unirse ahora y ya estás dentro.",
+      },
       integrations: {
         title: "Calendarios y tareas sincronizados",
         body: "Google Calendar desde hoy. Outlook, Microsoft To Do y Google Tasks están en camino.",
@@ -734,6 +745,9 @@ export const es: Dict = {
       chatAsk: "Comida con Ana el viernes a la 1",
       chatCard: "Comida con Ana · vie 13:00",
       chatDone: "Listo. Ya está en tu calendario.",
+      chatOnline: "en línea",
+      linkWhen: "mié · 10:00 - 10:45",
+      linkCreating: "Creando el enlace",
       live: "Activo",
       debrief: "Resúmenes",
       tasks: [

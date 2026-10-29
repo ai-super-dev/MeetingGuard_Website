@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView } from "motion/react";
-import { AlarmClock, Bell, BellRing, CalendarDays, Check, ListChecks, Mic, Reply, Volume2 } from "lucide-react";
+import { AlarmClock, Bell, BellRing, CalendarDays, Check, CheckCheck, Link2, ListChecks, Loader2, MessageCircle, Mic, Reply, Video, Volume2 } from "lucide-react";
 import { featureAccents } from "@/components/icons/feature-icons";
 import { Reveal, useReducedMotionSafe } from "@/components/motion";
 import { AvailableLabel } from "@/components/page/blocks";
@@ -183,6 +183,8 @@ function AlarmVisual() {
 
 /* ---------- voice assistant ---------- */
 
+const WAVE_BARS = 30;
+
 function SpeakVisual() {
   const t = useT();
   const phrase = t.features.phrase;
@@ -210,30 +212,39 @@ function SpeakVisual() {
   const shownPhase = reduce ? 2 : phase;
   const text = reduce ? phrase : phrase.slice(0, chars);
 
+  // stacked (mic over the words) so it fits a narrow tile; the words wrap instead of being cut off
   return (
-    <div ref={ref} className="w-full max-w-[380px]">
-      <div className="flex h-12 items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4">
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/[0.08]">
-          <Mic className="h-3.5 w-3.5 text-white/80" aria-hidden />
+    <div ref={ref} className="flex w-full max-w-[380px] flex-col items-center text-center">
+      <span className="relative grid h-11 w-11 place-items-center">
+        {shownPhase === 0 && <span className="absolute inset-0 rounded-full bg-[#a78bfa]/25 [animation:glow-pulse_1.8s_ease-in-out_infinite]" />}
+        <span className="relative grid h-9 w-9 place-items-center rounded-full bg-white/[0.08]">
+          <Mic className="h-4 w-4 text-white/80" aria-hidden />
         </span>
+      </span>
+      <div className="mt-3 flex min-h-[4.5rem] w-full items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-2">
         {shownPhase === 0 ? (
-          <span className="flex h-5 flex-1 items-center gap-[3px]" aria-hidden>
-            {Array.from({ length: 22 }, (_, i) => (
+          // spread over about 80% of the box (87% of the inside, past the padding), taller in the middle and lower at the ends, like a voice
+          <span className="flex h-7 w-[87%] items-center justify-between" aria-hidden>
+            {Array.from({ length: WAVE_BARS }, (_, i) => (
               <span
                 key={i}
                 className="w-[3px] rounded-full bg-[#a78bfa]/80"
-                style={{ height: "100%", animation: `listen-bar 1s ease-in-out ${(i % 7) * 0.12}s infinite` }}
+                style={{
+                  height: `${Math.round(35 + 65 * Math.sin((Math.PI * (i + 0.5)) / WAVE_BARS))}%`,
+                  animation: `listen-bar 1s ease-in-out ${((i * 5) % 11) * 0.09}s infinite`,
+                }}
               />
             ))}
           </span>
         ) : (
-          <span className="flex-1 truncate text-[0.88rem] text-white/85">
+          <span className="text-[0.86rem] leading-snug text-white/85">
             {text}
             {shownPhase === 1 && <span className="ml-px inline-block h-4 w-px translate-y-[3px] bg-white/70" />}
           </span>
         )}
       </div>
-      <div className="mt-3 h-7">
+      {/* room for two lines: in a narrow tile the note wraps */}
+      <div className="mt-3 flex min-h-[2.6rem] items-start justify-center">
         <AnimatePresence>
           {shownPhase === 2 && (
             <motion.span
@@ -241,7 +252,7 @@ function SpeakVisual() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35 }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-3 py-1 text-[0.75rem] font-medium text-emerald-300"
+              className="inline-flex items-center gap-1.5 rounded-2xl bg-emerald-400/10 px-3 py-1 text-[0.74rem] leading-snug font-medium text-emerald-300"
             >
               <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />
               {t.features.confirmed}
@@ -355,7 +366,7 @@ function AgendaVisual() {
 
 /* ---------- WhatsApp ---------- */
 
-/** A message, the confirm card, the tap, the reply. */
+/** A message, the confirm card, the tap, the reply, in a small WhatsApp chat window. */
 function WhatsAppVisual() {
   const t = useT();
   const v = t.features.visuals;
@@ -364,35 +375,117 @@ function WhatsAppVisual() {
   const phase = useCycle(4, 1500, inView); // 0 ask · 1 card · 2 confirmed · 3 done
   const pop = { initial: { opacity: 0, y: 6, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { duration: 0.35 } };
   return (
-    // WhatsApp's own dark chat colours, kept in both site themes
-    <div ref={ref} className="theme-dark flex h-[150px] w-full max-w-[340px] flex-col justify-end gap-2 text-[0.78rem]">
-      <motion.p {...pop} className="ml-auto max-w-[78%] rounded-xl rounded-tr-sm bg-[#005c4b] px-3 py-1.5 text-white/90">
-        {v.chatAsk}
-      </motion.p>
-      <AnimatePresence>
-        {phase >= 1 && (
-          <motion.div key="card" {...pop} className="max-w-[82%] overflow-hidden rounded-xl rounded-tl-sm bg-[#1f2c34]">
-            <p className="px-3 pt-2 pb-1.5 text-white/85">{v.chatCard}</p>
-            <div className="grid grid-cols-2 border-t border-white/[0.08] text-[0.72rem] font-medium">
-              <span
-                className={`flex items-center justify-center gap-1 py-1.5 transition-colors duration-300 ${phase >= 2 ? "bg-[#00a884]/20 text-white" : "text-[#00a884]"}`}
-              >
-                <Reply className="h-3 w-3" aria-hidden />
-                {t.whatsapp.chat.confirm}
-              </span>
-              <span className="flex items-center justify-center gap-1 border-l border-white/[0.08] py-1.5 text-[#00a884]">
-                <Reply className="h-3 w-3" aria-hidden />
-                {t.whatsapp.chat.cancel}
-              </span>
-            </div>
-          </motion.div>
+    // WhatsApp's own dark chat colours, kept in both site themes (the name and a generic chat icon, no logo)
+    <div
+      ref={ref}
+      className="theme-dark w-full max-w-[360px] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b141a] text-[0.78rem] shadow-[0_24px_60px_rgba(0,0,0,0.35)]"
+    >
+      <div className="flex items-center gap-2.5 bg-[#1f2c34] px-3 py-2">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#0e1a22]">
+          <AppMark className="h-6 w-6" sizes="48px" />
+        </span>
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block truncate text-[0.82rem] font-medium text-white">Meeting Guard AI</span>
+          <span className="block text-[0.66rem] text-white/50">{v.chatOnline}</span>
+        </span>
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-[#25D366]/15 px-2 py-1 text-[0.66rem] font-semibold text-[#25D366]">
+          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+          WhatsApp
+        </span>
+      </div>
+      <div className="flex h-[172px] flex-col justify-end gap-2 overflow-hidden px-3 py-2.5">
+        <motion.p {...pop} className="ml-auto flex max-w-[80%] items-end gap-1.5 rounded-xl rounded-tr-sm bg-[#005c4b] px-3 py-1.5 text-white/90">
+          {v.chatAsk}
+          <CheckCheck className="mb-px h-3.5 w-3.5 shrink-0 text-[#53bdeb]" aria-hidden />
+        </motion.p>
+        <AnimatePresence>
+          {phase >= 1 && (
+            <motion.div key="card" {...pop} className="max-w-[82%] overflow-hidden rounded-xl rounded-tl-sm bg-[#1f2c34]">
+              <p className="px-3 pt-2 pb-1.5 text-white/85">{v.chatCard}</p>
+              <div className="grid grid-cols-2 border-t border-white/[0.08] text-[0.72rem] font-medium">
+                <span
+                  className={`flex items-center justify-center gap-1 py-1.5 transition-colors duration-300 ${phase >= 2 ? "bg-[#00a884]/20 text-white" : "text-[#00a884]"}`}
+                >
+                  <Reply className="h-3 w-3" aria-hidden />
+                  {t.whatsapp.chat.confirm}
+                </span>
+                <span className="flex items-center justify-center gap-1 border-l border-white/[0.08] py-1.5 text-[#00a884]">
+                  <Reply className="h-3 w-3" aria-hidden />
+                  {t.whatsapp.chat.cancel}
+                </span>
+              </div>
+            </motion.div>
+          )}
+          {phase >= 3 && (
+            <motion.p key="done" {...pop} className="max-w-[78%] rounded-xl rounded-tl-sm bg-[#1f2c34] px-3 py-1.5 text-white/85">
+              {v.chatDone}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+      <div className="flex items-center gap-2 px-2.5 pb-2.5">
+        <span className="flex h-8 min-w-0 flex-1 items-center rounded-full bg-[#1f2c34] px-3 text-white/40">
+          <span className="truncate">{t.whatsapp.chat.message}</span>
+        </span>
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#00a884]">
+          <Mic className="h-4 w-4 text-[#0b141a]" aria-hidden />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Zoom and Teams links ---------- */
+
+/** A meeting gets a Zoom link, then a Teams one (names only, no third-party logos). */
+function LinksVisual() {
+  const t = useT();
+  const v = t.features.visuals;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  const phase = useCycle(4, 1500, inView); // 0 Zoom, creating · 1 Zoom link · 2 Teams, creating · 3 Teams link
+  const service = phase < 2 ? 0 : 1;
+  const ready = phase % 2 === 1;
+  const services = [
+    { name: "Zoom", url: "zoom.us/j/84629371054" },
+    { name: "Teams", url: "teams.microsoft.com/l/meetup-join" },
+  ];
+  return (
+    <div ref={ref} className="w-full max-w-[300px] rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-left">
+      <p className="truncate text-[0.84rem] font-medium text-white">{v.linked}</p>
+      <p className="mt-0.5 text-[0.72rem] text-white/50">{v.linkWhen}</p>
+      <div className="mt-3 grid grid-cols-2 rounded-lg bg-white/[0.05] p-0.5 text-[0.74rem]">
+        {services.map((s, i) => (
+          <span
+            key={s.name}
+            className={`relative z-10 flex items-center justify-center gap-1.5 py-1.5 transition-colors duration-500 ${i === service ? "text-white" : "text-white/50"}`}
+          >
+            {i === service && (
+              <motion.span
+                layoutId="link-service"
+                className="absolute inset-0 -z-10 rounded-md bg-white/[0.1]"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+            <Video className="h-3.5 w-3.5" aria-hidden />
+            {s.name}
+          </span>
+        ))}
+      </div>
+      <div className="mt-2 flex h-9 items-center gap-2 rounded-lg border border-white/[0.07] px-2.5 text-[0.74rem]">
+        {ready ? (
+          <>
+            <Link2 className="h-3.5 w-3.5 shrink-0 text-[#f472b6]" aria-hidden />
+            <span className="min-w-0 flex-1 truncate text-white/80">{services[service].url}</span>
+            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-300" strokeWidth={3} aria-hidden />
+          </>
+        ) : (
+          <>
+            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-white/45" aria-hidden />
+            <span className="truncate text-white/50">{v.linkCreating}</span>
+          </>
         )}
-        {phase >= 3 && (
-          <motion.p key="done" {...pop} className="max-w-[78%] rounded-xl rounded-tl-sm bg-[#1f2c34] px-3 py-1.5 text-white/85">
-            {v.chatDone}
-          </motion.p>
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -482,13 +575,15 @@ export function Features() {
           </h2>
         </Reveal>
 
+        {/* wide: two half-width tiles per row for the first two rows, then the voice tile half-width beside two small ones */}
         <div className="mx-auto mt-14 grid max-w-[1080px] gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Tile slug="alarms" className="md:col-span-2 lg:row-span-2" {...f.tiles.alarms} visual={<AlarmVisual />} />
+          <Tile slug="whatsapp" className="md:col-span-2" {...f.tiles.whatsapp} visual={<WhatsAppVisual />} />
+          <Tile slug="alarms" className="md:col-span-2" {...f.tiles.alarms} visual={<AlarmVisual />} delay={0.05} />
+          <Tile slug="meeting-links" className="md:col-span-2" {...f.tiles["meeting-links"]} visual={<LinksVisual />} delay={0.05} />
+          <Tile slug="integrations" className="md:col-span-2" {...f.tiles.integrations} visual={<IntegrationsVisual />} delay={0.1} />
           <Tile slug="voice-assistant" className="md:col-span-2" {...f.tiles["voice-assistant"]} visual={<SpeakVisual />} delay={0.05} />
           <Tile slug="tasks" {...f.tiles.tasks} visual={<TasksVisual />} delay={0.1} />
           <Tile slug="agenda" {...f.tiles.agenda} visual={<AgendaVisual />} delay={0.15} />
-          <Tile slug="whatsapp" className="md:col-span-2" {...f.tiles.whatsapp} visual={<WhatsAppVisual />} delay={0.05} />
-          <Tile slug="integrations" className="md:col-span-2" {...f.tiles.integrations} visual={<IntegrationsVisual />} delay={0.1} />
         </div>
       </div>
     </section>
@@ -496,4 +591,4 @@ export function Features() {
 }
 
 /* the visuals double as illustrations on the feature pages */
-export { AgendaVisual, AlarmVisual, IntegrationsVisual, SpeakVisual, TasksVisual, WhatsAppVisual };
+export { AgendaVisual, AlarmVisual, IntegrationsVisual, LinksVisual, SpeakVisual, TasksVisual, WhatsAppVisual };
