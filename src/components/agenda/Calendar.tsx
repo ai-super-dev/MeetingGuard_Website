@@ -4,6 +4,7 @@ import { useEffect, useRef, type MouseEvent } from "react";
 import { MapPin, Repeat, Video } from "lucide-react";
 import { useA } from "@/lib/agenda/i18n";
 import { addDays, dayKey, daysBetween, fmtDay, fmtHour, fmtRange, fmtTime, minuteOfDay, monthStart, weekStart, weekdayNames } from "@/lib/agenda/time";
+import { calendarOf, joinUrl } from "@/lib/agenda/store";
 import type { Occurrence } from "@/lib/agenda/types";
 import { useLang } from "@/lib/language";
 import { SOURCE_COLOR, tint } from "./look";
@@ -17,8 +18,10 @@ const select = (o: Occurrence): Selection => ({ id: o.meeting.id, key: o.key });
 export function byDay(occs: Occurrence[], zone: string) {
   const map = new Map<string, Occurrence[]>();
   for (const o of occs) {
-    const first = dayKey(o.start, zone);
-    const last = dayKey(new Date(Math.max(o.start.getTime(), o.end.getTime() - 1)), zone);
+    // an all-day meeting stays on its own dates, whatever zone it is seen from
+    const z = o.meeting.allDay ? o.meeting.timezone : zone;
+    const first = dayKey(o.start, z);
+    const last = dayKey(new Date(Math.max(o.start.getTime(), o.end.getTime() - 1)), z);
     const span = Math.min(daysBetween(first, last), 31);
     for (let i = 0; i <= span; i++) {
       const d = addDays(first, i);
@@ -31,7 +34,7 @@ export function byDay(occs: Occurrence[], zone: string) {
 function useLabel() {
   const lang = useLang();
   return (o: Occurrence, zone: string) =>
-    o.meeting.allDay ? o.meeting.title : `${o.meeting.title}, ${fmtRange(o.start, o.end, lang, zone)}`;
+    o.meeting.allDay ? o.title : `${o.title}, ${fmtRange(o.start, o.end, lang, zone)}`;
 }
 
 /* ---------- Day and week: time grid ---------- */
@@ -77,16 +80,16 @@ function placeDay(occs: Occurrence[], day: string, zone: string): Placed[] {
 
 function AllDayChip({ o, onOpen, zone }: { o: Occurrence; onOpen: (s: Selection) => void; zone: string }) {
   const label = useLabel();
-  const color = SOURCE_COLOR[o.meeting.source];
+  const color = SOURCE_COLOR[calendarOf(o.meeting)];
   return (
     <button
       type="button"
       onClick={() => onOpen(select(o))}
       aria-label={label(o, zone)}
-      className="block w-full truncate rounded-md px-2 py-1 text-left text-[0.74rem] font-medium text-white"
+      className={`block w-full truncate rounded-md px-2 py-1 text-left text-[0.74rem] font-medium text-white ${o.meeting.status === "cancelled" ? "line-through opacity-60" : ""}`}
       style={{ background: tint(color, 26), boxShadow: `inset 3px 0 0 ${color}` }}
     >
-      {o.meeting.title}
+      {o.title}
     </button>
   );
 }
@@ -202,7 +205,7 @@ export function TimeGrid({
               }}
             >
               {placeDay(perDay.get(d) ?? [], d, zone).map(({ o, start, end, col, cols }) => {
-                const color = SOURCE_COLOR[o.meeting.source];
+                const color = SOURCE_COLOR[calendarOf(o.meeting)];
                 const height = ((end - start) / 60) * HOUR;
                 const short = height < 30;
                 return (
@@ -211,7 +214,7 @@ export function TimeGrid({
                     type="button"
                     onClick={() => onOpen(select(o))}
                     aria-label={label(o, zone)}
-                    className={`absolute overflow-hidden rounded-md px-2 text-left transition-[filter] hover:brightness-110 focus-visible:z-10 ${short ? "py-0.5" : "py-1"}`}
+                    className={`absolute overflow-hidden rounded-md px-2 text-left transition-[filter] hover:brightness-110 focus-visible:z-10 ${short ? "py-0.5" : "py-1"} ${o.meeting.status === "cancelled" ? "opacity-60" : ""}`}
                     style={{
                       top: (start / 60) * HOUR + 1,
                       height: height - 2,
@@ -222,8 +225,8 @@ export function TimeGrid({
                     }}
                   >
                     <span className={`flex items-center gap-1 truncate font-semibold text-white ${short ? "text-[0.72rem] leading-[1.15]" : "text-[0.76rem] leading-tight"}`}>
-                      {o.meeting.repeat !== "none" && <Repeat className="h-3 w-3 shrink-0 opacity-60" aria-hidden />}
-                      <span className="truncate">{o.meeting.title}</span>
+                      {o.meeting.recurrence && <Repeat className="h-3 w-3 shrink-0 opacity-60" aria-hidden />}
+                      <span className={`truncate ${o.meeting.status === "cancelled" ? "line-through" : ""}`}>{o.title}</span>
                     </span>
                     {height > 34 && <span className="block truncate text-[0.7rem] text-white/60">{fmtRange(o.start, o.end, lang, zone)}</span>}
                   </button>
@@ -257,8 +260,9 @@ export function MeetingCard({ o, zone, onOpen }: { o: Occurrence; zone: string; 
   const a = useA();
   const lang = useLang();
   const m = o.meeting;
-  const color = SOURCE_COLOR[m.source];
-  const place = m.videoUrl ? hostOf(m.videoUrl) : m.location;
+  const color = SOURCE_COLOR[calendarOf(m)];
+  const url = joinUrl(m);
+  const place = url ? hostOf(url) : (m.location?.address ?? "");
   return (
     <button
       type="button"
@@ -269,16 +273,16 @@ export function MeetingCard({ o, zone, onOpen }: { o: Occurrence; zone: string; 
       <span className="min-w-0 flex-1">
         <span className="block text-[0.8rem] text-white/55">{m.allDay ? a.calendar.allDay : fmtRange(o.start, o.end, lang, zone)}</span>
         <span className="mt-0.5 flex items-center gap-1.5 text-[0.98rem] font-medium">
-          <span className="truncate">{m.title}</span>
-          {m.repeat !== "none" && <Repeat className="h-3.5 w-3.5 shrink-0 text-white/45" aria-label={a.repeat[m.repeat]} />}
+          <span className={`truncate ${m.status === "cancelled" ? "line-through opacity-60" : ""}`}>{o.title}</span>
+          {m.recurrence && <Repeat className="h-3.5 w-3.5 shrink-0 text-white/45" aria-label={a.details.repeats} />}
         </span>
         {place && (
           <span className="mt-1 flex items-center gap-1.5 text-[0.78rem] text-white/55">
-            {m.videoUrl ? <Video className="h-3.5 w-3.5" aria-hidden /> : <MapPin className="h-3.5 w-3.5" aria-hidden />}
+            {url ? <Video className="h-3.5 w-3.5" aria-hidden /> : <MapPin className="h-3.5 w-3.5" aria-hidden />}
             <span className="truncate">{place}</span>
           </span>
         )}
-        <span className="mt-1 block text-[0.72rem] text-white/45">{a.sources[m.source]}</span>
+        <span className="mt-1 block text-[0.72rem] text-white/45">{a.sources[calendarOf(m)]}</span>
       </span>
     </button>
   );
@@ -384,7 +388,7 @@ export function MonthGrid({
               {/* phone: dots */}
               <div className="mt-1 flex flex-wrap gap-1 px-1 md:hidden" aria-hidden>
                 {list.slice(0, 4).map((o) => (
-                  <span key={o.meeting.id + o.key} className="h-1.5 w-1.5 rounded-full" style={{ background: SOURCE_COLOR[o.meeting.source] }} />
+                  <span key={o.meeting.id + o.key} className="h-1.5 w-1.5 rounded-full" style={{ background: SOURCE_COLOR[calendarOf(o.meeting)] }} />
                 ))}
               </div>
               {/* computer: titles */}
@@ -396,9 +400,9 @@ export function MonthGrid({
                     onClick={() => onOpen(select(o))}
                     className="flex w-full items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-[0.72rem] hover:bg-white/[0.06]"
                   >
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: SOURCE_COLOR[o.meeting.source] }} />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: SOURCE_COLOR[calendarOf(o.meeting)] }} />
                     {!o.meeting.allDay && <span className="shrink-0 text-white/50 tabular-nums">{fmtTime(o.start, lang, zone)}</span>}
-                    <span className="truncate text-white/85">{o.meeting.title}</span>
+                    <span className={`truncate text-white/85 ${o.meeting.status === "cancelled" ? "line-through" : ""}`}>{o.title}</span>
                   </button>
                 ))}
                 {list.length > 3 && (

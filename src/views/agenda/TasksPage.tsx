@@ -4,20 +4,26 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Bell, ChevronDown, Link2, Plus, Sparkles } from "lucide-react";
 import { AgendaFrame } from "@/components/agenda/Frame";
-import { CaptureCard, LISTS, TaskEditor, useDueLabel, useListAvailable, type TaskDraft } from "@/components/agenda/TaskDialogs";
+import { CaptureCard, TaskEditor, useDueLabel, type TaskDraft } from "@/components/agenda/TaskDialogs";
 import { Button, useToast } from "@/components/agenda/ui";
 import { capture } from "@/lib/agenda/capture";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { displayZone, setTaskDone, useAgenda } from "@/lib/agenda/store";
 import { addDays, dayKey, fromZoned } from "@/lib/agenda/time";
-import type { Task, TaskList } from "@/lib/agenda/types";
+import type { Task } from "@/lib/agenda/types";
 import { useHref, useLang } from "@/lib/language";
 
 type Group = "overdue" | "today" | "tomorrow" | "upcoming" | "someday";
 const GROUPS: Group[] = ["overdue", "today", "tomorrow", "upcoming", "someday"];
 
-const dueAt = (t: Task) => `${t.dueDate || "9999"}T${t.dueTime || "99:99"}`;
+const dueAt = (t: Task) => `${t.dueDate ?? "9999"}T${t.dueTime ?? "99:99"}`;
+
+/** Open and past due: a timed task after its moment, a task with only a date after its day. */
+function isOverdue(t: Task, today: string, now: number) {
+  if (t.status !== "open" || !t.dueDate) return false;
+  return t.dueTime ? fromZoned(t.dueDate, t.dueTime, t.timezone).getTime() < now : t.dueDate < today;
+}
 
 export function TasksPage() {
   const a = useA();
@@ -33,27 +39,23 @@ function Tasks() {
   const lang = useLang();
   const s = useAgenda();
   const now = useNow();
-  const zone = displayZone(s.prefs);
+  const zone = displayZone(s);
   const today = dayKey(new Date(now), zone);
-  const available = useListAvailable();
 
   const [text, setText] = useState("");
   const [card, setCard] = useState<TaskDraft | null>(null);
   const [editing, setEditing] = useState<TaskDraft | null>(null);
-  const [lists, setLists] = useState<TaskList[]>([]);
   const [showDone, setShowDone] = useState(false);
 
-  const shown = s.tasks.filter((t) => !lists.length || lists.includes(t.list));
   const groupOf = (t: Task): Group => {
     if (!t.dueDate) return "someday";
-    const late = t.dueDate < today || (t.dueDate === today && t.dueTime && fromZoned(t.dueDate, t.dueTime, zone).getTime() < now);
-    if (late) return "overdue";
+    if (isOverdue(t, today, now)) return "overdue";
     if (t.dueDate === today) return "today";
     if (t.dueDate === addDays(today, 1)) return "tomorrow";
     return "upcoming";
   };
-  const open = shown.filter((t) => !t.done).sort((x, y) => dueAt(x).localeCompare(dueAt(y)));
-  const done = shown.filter((t) => t.done).sort((x, y) => y.doneAt - x.doneAt);
+  const open = s.tasks.filter((t) => t.status === "open").sort((x, y) => dueAt(x).localeCompare(dueAt(y)));
+  const done = s.tasks.filter((t) => t.status === "done").sort((x, y) => (y.completedAt ?? "").localeCompare(x.completedAt ?? ""));
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -63,9 +65,6 @@ function Tasks() {
     setCard({ title: c.title, dueDate: c.dueDate, dueTime: c.dueTime });
     setText("");
   };
-
-  // only lists that can hold tasks, or already do, are worth a filter
-  const filterLists = LISTS.filter((l) => available(l) || s.tasks.some((t) => t.list === l));
 
   return (
     <div className="mx-auto max-w-[760px]">
@@ -97,30 +96,6 @@ function Tasks() {
           {a.tasks.newTask}
         </button>
       </div>
-
-      {filterLists.length > 1 && (
-        <div role="group" aria-label={a.tasks.lists} className="mt-5 flex gap-2 overflow-x-auto pb-1 text-[0.8rem]">
-          <button
-            type="button"
-            aria-pressed={!lists.length}
-            onClick={() => setLists([])}
-            className={`shrink-0 rounded-lg border px-3 py-1.5 ${!lists.length ? "border-white/30 bg-white/[0.08]" : "border-white/10 text-white/60 hover:text-white"}`}
-          >
-            {a.tasks.allLists}
-          </button>
-          {filterLists.map((l) => (
-            <button
-              key={l}
-              type="button"
-              aria-pressed={lists.includes(l)}
-              onClick={() => setLists((x) => (x.includes(l) ? x.filter((y) => y !== l) : [...x, l]))}
-              className={`shrink-0 rounded-lg border px-3 py-1.5 ${lists.includes(l) ? "border-white/30 bg-white/[0.08]" : "border-white/10 text-white/60 hover:text-white"}`}
-            >
-              {a.taskLists[l]}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* the list */}
       <div className="mt-6 space-y-7">
@@ -184,8 +159,9 @@ function TaskRow({ task: t, overdue, onEdit }: { task: Task; overdue: boolean; o
   const href = useHref();
   const toast = useToast();
   const due = useDueLabel();
-  const zone = displayZone(s.prefs);
+  const zone = displayZone(s);
   const meeting = t.meetingId ? s.meetings.find((m) => m.id === t.meetingId) : undefined;
+  const isDone = t.status === "done";
 
   const toggle = async (done: boolean) => {
     try {
@@ -200,33 +176,33 @@ function TaskRow({ task: t, overdue, onEdit }: { task: Task; overdue: boolean; o
     <li className="flex items-start gap-3 px-4 py-3">
       <input
         type="checkbox"
-        checked={t.done}
+        checked={isDone}
         onChange={(e) => toggle(e.target.checked)}
-        aria-label={t.done ? a.tasks.markUndone(t.title) : a.tasks.markDone(t.title)}
+        aria-label={isDone ? a.tasks.markUndone(t.title) : a.tasks.markDone(t.title)}
         className="mt-1 h-[18px] w-[18px] shrink-0 cursor-pointer accent-[var(--color-accent)]"
       />
       <div className="min-w-0 flex-1">
-        <button type="button" onClick={onEdit} className={`block max-w-full text-left text-[0.95rem] hover:underline ${t.done ? "text-white/45 line-through" : "text-white"}`}>
+        <button type="button" onClick={onEdit} className={`block max-w-full text-left text-[0.95rem] hover:underline ${isDone ? "text-white/45 line-through" : "text-white"}`}>
           {t.title}
         </button>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.76rem] text-white/50">
           {t.dueDate && <span className={overdue ? "font-medium text-accent-soft" : ""}>{due(t)}</span>}
-          {t.reminder !== null && !t.done && (
+          {t.reminderMinutesBefore !== null && !isDone && (
             <span className="inline-flex items-center gap-1">
               <Bell className="h-3 w-3" aria-hidden />
-              {t.reminder === 0 ? a.taskEditor.atDueTime : a.reminder(t.reminder)}
+              {t.reminderMinutesBefore === 0 ? a.taskEditor.atDueTime : a.reminder(t.reminderMinutesBefore)}
             </span>
           )}
           {meeting && (
             <Link
-              href={`${href("/app")}?view=day&date=${dayKey(new Date(meeting.start), zone)}&open=${meeting.id}`}
+              href={`${href("/app")}?view=day&date=${dayKey(new Date(meeting.startAt), zone)}&open=${meeting.id}`}
               className="inline-flex max-w-full items-center gap-1 truncate rounded-md border border-white/10 px-1.5 py-0.5 hover:border-white/25 hover:text-white"
             >
               <Link2 className="h-3 w-3 shrink-0" aria-hidden />
               <span className="truncate">{meeting.title}</span>
             </Link>
           )}
-          {t.list !== "meetingguard" && <span>{a.taskLists[t.list]}</span>}
+          {t.meetingId && !meeting && <span>{a.tasks.meetingGone}</span>}
         </div>
       </div>
     </li>

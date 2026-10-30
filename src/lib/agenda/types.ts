@@ -1,116 +1,150 @@
 /*
- * The web agenda's records. They mirror the documents the app reads and
- * writes (meetings, tasks, the plan), so when the backend is connected the
- * web and the phone share one set of records and stay in sync both ways.
+ * The web agenda's records: the same documents the app reads and writes
+ * (src/core/types.ts in the app), so web and phone share one set of records.
+ * Instants are UTC ISO strings; optional values are null, never missing.
  */
 
-/** Where a meeting lives: MeetingGuard itself or a synced calendar. */
-export type Source = "meetingguard" | "google" | "outlook";
+export type MeetingSource = "manual" | "ai_chat" | "whatsapp" | "google" | "device" | "outlook";
 
-/** How a record was created (shown as a chip, as in the app). */
-export type Origin = "app" | "assistant" | "whatsapp" | "web" | "sync";
+/** Which calendar a meeting shows under (one colour and one filter each). */
+export type Calendar = "meetingguard" | "google" | "outlook" | "device";
 
-/** Alarm intensity, as in the app's alert settings. */
-export type Intensity = "gentle" | "standard" | "maximum";
+export type AlertIntensity = "max" | "medium" | "light";
 
-export type Repeat = "none" | "daily" | "weekdays" | "weekly" | "monthly";
+export type ConferenceProvider = "zoom" | "teams" | "google_meet" | "other";
+export type Conference = { provider: ConferenceProvider; url: string | null; password: string | null };
 
-export type Participant = { name: string; email: string };
+export type LocationType = "physical" | "virtual" | "hybrid";
+export type MeetingLocation = { type: LocationType; address: string | null; virtualUrl: string | null };
+
+export type Participant = { email: string; name: string | null; status: "needs_action" | "accepted" | "declined" | "tentative" | null };
+
+export type RecurrenceFreq = "daily" | "weekly" | "monthly";
+export type RecurrenceWeekday = "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | "SU";
+
+export type RecurrenceRule = {
+  freq: RecurrenceFreq;
+  interval: number;
+  byWeekday: RecurrenceWeekday[] | null;
+  byMonthDay: number | null;
+  /** Inclusive instant, compared with each meeting's original start. */
+  until: string | null;
+  count: number | null;
+};
+
+/** A change to one date of a series, keyed by that date in the meeting's zone. */
+export type RecurrenceOverride = { status: "cancelled" | "modified"; startAt: string | null; durationMinutes: number | null; title: string | null };
+export type RecurrenceOverrides = Record<string, RecurrenceOverride>;
+
+/** Links to the same meeting in other calendars. The web keeps them as they are. */
+export type ExternalRefs = Record<string, string | null>;
 
 export type Meeting = {
   id: string;
+  userId: string;
   title: string;
-  /** ISO instants (UTC). */
-  start: string;
-  end: string;
+  description: string;
+  startAt: string;
+  durationMinutes: number;
+  timezone: string;
   allDay: boolean;
-  /** The time zone the meeting was planned in (IANA name). */
-  timeZone: string;
-  location: string;
-  videoUrl: string;
-  passcode: string;
+  /** Local date and time of startAt in `timezone`; always derived from it. */
+  date: string;
+  time: string;
+  location: MeetingLocation | null;
+  conference: Conference | null;
   participants: Participant[];
-  notes: string;
-  /** Minutes before the start; 0 is "at start". */
-  reminders: number[];
-  intensity: Intensity;
-  source: Source;
-  origin: Origin;
-  repeat: Repeat;
-  /** Last day of the series (YYYY-MM-DD in the meeting's time zone). */
-  repeatUntil: string;
-  /**
-   * Changes to single meetings of a series, keyed by the day the meeting was
-   * due (YYYY-MM-DD in the meeting's time zone): skipped, or moved.
-   */
-  exceptions: Record<string, { skip?: true; start?: string; end?: string }>;
-  updatedAt: number;
+  source: MeetingSource;
+  confidence: number | null;
+  language: "en" | "es";
+  preparationTips: string[];
+  /** Minutes before the start; null follows the user's default reminders. */
+  customAlertTimes: number[] | null;
+  /** null follows the user's default intensity. */
+  alertIntensity: AlertIntensity | null;
+  notes: string | null;
+  status: "scheduled" | "cancelled";
+  external: ExternalRefs;
+  recurrence: RecurrenceRule | null;
+  recurrenceOverrides: RecurrenceOverrides | null;
+  seriesId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  /** Deleted meetings stay as an empty record so every device can sync the deletion. */
+  deletedAt: string | null;
 };
+
+/** What the forms may set on a meeting. */
+export type MeetingInput = Pick<Meeting, "title" | "startAt"> &
+  Partial<Pick<Meeting, "description" | "durationMinutes" | "timezone" | "allDay" | "location" | "conference" | "confidence" | "preparationTips" | "customAlertTimes" | "alertIntensity" | "notes" | "status" | "recurrence" | "recurrenceOverrides" | "language" | "source">> & {
+    participants?: Participant[];
+  };
+
+export type MeetingPatch = Partial<Omit<MeetingInput, "source">>;
 
 /** One meeting on the calendar: a single meeting, or one date of a series. */
 export type Occurrence = {
   meeting: Meeting;
-  /** Exception key for series ("" for single meetings). */
+  /** The date this one was due on, in the meeting's zone ("" for single meetings). */
   key: string;
   start: Date;
   end: Date;
-  moved: boolean;
+  title: string;
+  /** This date of the series was changed on its own. */
+  overridden: boolean;
 };
 
-export type TaskList = "meetingguard" | "microsoftToDo" | "googleTasks";
+export type TaskPerson = { name: string; email: string | null };
 
 export type Task = {
   id: string;
+  userId: string;
   title: string;
-  notes: string;
-  /** Due day (YYYY-MM-DD) and optional time (HH:mm), in the user's time zone. */
-  dueDate: string;
-  dueTime: string;
-  /** Minutes before the due time; null for no reminder. */
-  reminder: number | null;
-  meetingId: string;
-  list: TaskList;
-  done: boolean;
-  doneAt: number;
-  origin: Origin;
-  updatedAt: number;
+  description: string;
+  /** Local day and optional time in `timezone`. */
+  dueDate: string | null;
+  dueTime: string | null;
+  timezone: string;
+  reminderMinutesBefore: number | null;
+  status: "open" | "done";
+  meetingId: string | null;
+  people: TaskPerson[];
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
+
+export type TaskInput = Pick<Task, "title"> & Partial<Pick<Task, "description" | "dueDate" | "dueTime" | "timezone" | "reminderMinutesBefore" | "meetingId" | "people">>;
+export type TaskPatch = Partial<TaskInput> & { status?: Task["status"] };
 
 export type Plan = "free" | "pro" | "premium";
 
-/** The entitlement record the app also reads (plan, trial, store). */
+/** The server-owned plan record (entitlements/{uid}); the web only reads it. */
 export type Entitlement = {
   plan: Plan;
-  /** End of the free trial (ms), 0 when not on a trial. */
-  trialEndsAt: number;
-  store: "google_play" | "app_store" | null;
-  renewsAt: number;
+  status: "active" | "grace_period" | "expired" | "revoked";
+  expiresAt: string | null;
+  source: string;
+  updatedAt: string | null;
 };
 
 export type User = {
   uid: string;
   name: string;
   email: string;
-  provider: "google" | "password";
+  /** Firebase provider ids: "google.com", "apple.com", "password". */
+  providers: string[];
+  /** A verified email, or a Google or Apple account: the server's Zoom links need it. */
+  verified?: boolean;
 };
 
-/** Synced calendars and task lists, connected in the app. */
-export type Connections = { google: boolean; outlook: boolean; microsoftToDo: boolean; googleTasks: boolean };
-
-export type Prefs = {
-  /** The zone times are shown in; "" follows this device. */
-  timeZone: string;
-  defaultReminders: number[];
-  defaultIntensity: Intensity;
-};
-
-export type AgendaData = {
-  user: User | null;
-  entitlement: Entitlement;
-  meetings: Meeting[];
-  tasks: Task[];
-  connections: Connections;
-  prefs: Prefs;
+/** The parts of the app's preferences the agenda uses; the web doesn't change them. */
+export type Preferences = {
+  alertIntensity: AlertIntensity;
+  defaultAlertTimes: number[];
+  googleCalendarSyncEnabled: boolean;
+  deviceCalendarImportIds: string[];
+  deviceCalendarExportId: string | null;
 };
 
 /** A guest's answer to an invitation link. */

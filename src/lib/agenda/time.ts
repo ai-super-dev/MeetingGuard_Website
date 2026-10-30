@@ -17,6 +17,15 @@ export function deviceZone(): string {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 }
 
+export function isValidZone(zone: string) {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: zone }).format(0);
+    return !!zone;
+  } catch {
+    return false;
+  }
+}
+
 /** Every zone the browser knows, with a short list as fallback. */
 export function allZones(): string[] {
   try {
@@ -64,20 +73,27 @@ export function minuteOfDay(date: Date, zone: string) {
 }
 
 function offsetMinutes(utc: number, zone: string) {
-  const z = zoned(new Date(utc), zone);
-  return (Date.UTC(z.y, z.m - 1, z.d, z.h, z.min, z.s) - utc) / MINUTE;
+  const whole = Math.floor(utc / 1000) * 1000;
+  const z = zoned(new Date(whole), zone);
+  return Math.round((Date.UTC(z.y, z.m - 1, z.d, z.h, z.min, z.s) - whole) / MINUTE);
 }
 
-/** The instant of a wall-clock date and time in a zone ("2026-10-28", "10:00"). */
+/**
+ * The instant of a wall-clock date and time in a zone ("2026-10-28", "10:00"),
+ * worked out as in the app, so both get the same instant: a time skipped by a
+ * clock change moves to just after it.
+ */
 export function fromZoned(day: string, time: string, zone: string): Date {
   const [y, m, d] = day.split("-").map(Number);
   const [h, min] = (time || "00:00").split(":").map(Number);
-  const guess = Date.UTC(y, m - 1, d, h, min);
-  const first = offsetMinutes(guess, zone);
-  let utc = guess - first * MINUTE;
-  const second = offsetMinutes(utc, zone);
-  if (second !== first) utc = guess - second * MINUTE;
-  return new Date(utc);
+  const wall = Date.UTC(y, m - 1, d, h, min);
+  const first = offsetMinutes(wall, zone);
+  const utc1 = wall - first * MINUTE;
+  const second = offsetMinutes(utc1, zone);
+  if (first === second) return new Date(utc1);
+  const utc2 = wall - second * MINUTE;
+  if (offsetMinutes(utc2, zone) === second) return new Date(utc2);
+  return new Date(Math.max(utc1, utc2));
 }
 
 /** Start of a day in a zone. */
@@ -113,7 +129,12 @@ export function daysBetween(a: string, b: string) {
   return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / DAY);
 }
 
-export const isDayKey = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
+export function isDayKey(s: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const [y, m, d] = s.split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
+}
 export const isTimeKey = (s: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
 
 /* ---------- Formatting ---------- */

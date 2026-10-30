@@ -3,13 +3,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CircleUser, Info, ListChecks, WifiOff, X } from "lucide-react";
+import { CalendarDays, CircleAlert, CircleUser, Info, ListChecks, WifiOff, X } from "lucide-react";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { AppMark, Logo } from "@/components/ui/Logo";
 import { useNow, useOnline } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
-import { onTrial } from "@/lib/agenda/plans";
+import { LIVE } from "@/lib/agenda/config";
+import { effectivePlan } from "@/lib/agenda/plans";
 import { useAgenda } from "@/lib/agenda/store";
 import { useHref } from "@/lib/language";
 import { splitPath } from "@/lib/routes";
@@ -67,6 +68,19 @@ function OfflineBanner() {
   );
 }
 
+function LoadFailedBanner() {
+  const a = useA();
+  return (
+    <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-accent/30 bg-accent/10 px-4 py-2.5 text-[0.82rem] text-white/85 lg:px-8">
+      <CircleAlert className="h-4 w-4 shrink-0 text-accent-soft" aria-hidden />
+      <span className="flex-1">{a.errors.load}</span>
+      <button type="button" className="font-semibold text-accent-soft hover:underline" onClick={() => window.location.reload()}>
+        {a.common.retry}
+      </button>
+    </div>
+  );
+}
+
 /** Language and theme buttons, shared by every agenda page. */
 function Controls() {
   return (
@@ -95,8 +109,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
 
   if (!s.ready || !s.user) return <Spinner label={a.loading} />;
 
-  const plan = a.account.plans[s.entitlement.plan];
-  const trial = onTrial(s.entitlement, now);
+  const plan = a.account.plans[effectivePlan(s.entitlement, now)];
 
   return (
     <div className="min-h-dvh lg:pl-[244px]">
@@ -135,7 +148,6 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
               <span className="block truncate text-[0.85rem] font-medium">{s.user.name}</span>
               <span className="block truncate text-[0.75rem] text-white/50">
                 {plan}
-                {trial ? ` · ${a.account.trialShort}` : ""}
               </span>
             </span>
           </Link>
@@ -152,15 +164,18 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
             <AppMark className="h-7 w-7" sizes="56px" />
           </Link>
           <h1 className="min-w-0 flex-1 truncate text-[1.05rem] font-semibold tracking-[-0.01em] lg:text-[1.2rem]">{title}</h1>
-          <span className="hidden rounded-full border border-warm/40 px-2 py-0.5 text-[0.68rem] font-semibold tracking-wide text-warm uppercase sm:inline">
-            {a.demo.badge}
-          </span>
+          {!LIVE && (
+            <span className="hidden rounded-full border border-warm/40 px-2 py-0.5 text-[0.68rem] font-semibold tracking-wide text-warm uppercase sm:inline">
+              {a.demo.badge}
+            </span>
+          )}
           {actions}
           <Controls />
         </div>
       </header>
-      <DemoBanner />
+      {!LIVE && <DemoBanner />}
       <OfflineBanner />
+      {s.loadFailed && <LoadFailedBanner />}
 
       <main id="main" className="px-4 pt-4 pb-28 lg:px-8 lg:pb-10">
         {children}

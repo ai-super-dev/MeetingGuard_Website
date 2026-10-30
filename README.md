@@ -83,18 +83,31 @@ typing `/app`.
 | Account: plan, manage subscription in the store, sign out, delete account | `/app/account` |
 | Guest invitation (no account needed): accept, decline, propose a time | `/app/invite?t=<token>` |
 
-Today it runs on sample data kept in the browser (a "Preview" label says so).
-Every read and write goes through `src/lib/agenda/store.ts`; connecting the
-backend means replacing those functions with Firebase Authentication and
-Firestore calls (each one is marked `TODO(backend)`), and the screens stay as
-they are. Other files:
+It reads and writes the app's own records in the app's Firebase project, live
+both ways, under the same server rules. Set the values in `.env.example` (copy
+it to `.env.local`) and build. Without them, it runs as a preview with sample
+data kept in the browser, and a "Preview" label says so.
 
+To turn it on: register a Web app in the Firebase console and copy its config;
+add the site's domain under Authentication > Settings > Authorized domains; and
+for Apple, add a Services ID to the Apple provider and set
+`NEXT_PUBLIC_APPLE_SIGN_IN=1`.
+
+Every read and write goes through `src/lib/agenda/store.ts`. Other files:
+
+- Firebase connection: `src/lib/agenda/firebase.ts`.
+- The app's documents (build, change, parse): `src/lib/agenda/records.ts`,
+  following the app's `src/core/types.ts`.
+- Repeating meetings: `src/lib/agenda/recurrence.ts`, following the app's
+  `src/core/recurrence.ts`.
+- The meeting form's checks: `src/lib/agenda/validation.ts`, following the
+  app's `src/screens/meetings/meetingForm.ts`.
+- The plan: `src/lib/agenda/plans.ts`. In the app, plans differ only in AI
+  assistant requests, so nothing on the web agenda is locked.
 - Words, English and Spanish: `src/lib/agenda/i18n.ts`.
-- Which plan includes which feature: `REQUIRED` in `src/lib/agenda/plans.ts`
-  (to be matched with the app's entitlement record).
-- Checks before saving (the app's validation): `src/lib/agenda/validation.ts`.
-- Repeating meetings, skipped and moved dates: `src/lib/agenda/recurrence.ts`.
 - Typed tasks ("Send the deck to Ana tomorrow at 5 pm"): `src/lib/agenda/capture.ts`.
+
+Keep the first four in step with the app when its records change.
 
 When the agenda moves to its own address (for example app.meetingguard.ai),
 point that address at `/app`, and rewrite `/invite/**` to `/app/invite` for

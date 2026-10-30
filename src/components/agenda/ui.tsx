@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
-import { Loader2, Lock, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useA } from "@/lib/agenda/i18n";
 import type { ErrorCode } from "@/lib/agenda/validation";
 
@@ -96,16 +96,6 @@ export function Field({
         </p>
       )}
     </div>
-  );
-}
-
-/** "Pro" pill with a lock, for features the plan doesn't include. */
-export function LockBadge({ plan }: { plan: string }) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-warm/40 px-2 py-0.5 text-[0.68rem] font-semibold tracking-wide text-warm uppercase">
-      <Lock className="h-3 w-3" aria-hidden />
-      {plan}
-    </span>
   );
 }
 

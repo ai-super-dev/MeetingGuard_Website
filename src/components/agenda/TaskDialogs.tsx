@@ -4,23 +4,13 @@ import { useState, type FormEvent } from "react";
 import { Bell, CalendarDays, Link2 } from "lucide-react";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
-import { hasFeature, REQUIRED } from "@/lib/agenda/plans";
 import { expandAll } from "@/lib/agenda/recurrence";
-import { deleteTask, displayZone, newTaskId, saveTask, useAgenda } from "@/lib/agenda/store";
+import { createTask, deleteTask, displayZone, restoreTask, updateTask, useAgenda } from "@/lib/agenda/store";
 import { addDays, dayKey, dayStart, fmtDay, fmtTime, fromZoned } from "@/lib/agenda/time";
-import type { Task, TaskList } from "@/lib/agenda/types";
-import { hasErrors, validateTask, type Errors } from "@/lib/agenda/validation";
+import type { Task } from "@/lib/agenda/types";
+import { DESCRIPTION_MAX, hasErrors, TASK_REMINDERS, TITLE_MAX, validateTask, type Errors } from "@/lib/agenda/validation";
 import { useLang } from "@/lib/language";
-import { Button, Dialog, Field, inputClass, LockBadge, useToast } from "./ui";
-
-const REMINDERS = [0, 5, 15, 30, 60, 1440];
-export const LISTS: TaskList[] = ["meetingguard", "microsoftToDo", "googleTasks"];
-
-/** Whether a list can take tasks: connected in the app, and in the plan. */
-export function useListAvailable() {
-  const s = useAgenda();
-  return (list: TaskList) => list === "meetingguard" || (hasFeature(s.entitlement, "taskLists") && s.connections[list]);
-}
+import { Button, Dialog, Field, inputClass, useToast } from "./ui";
 
 /** "Today, 5:00 PM" / "Fri, Oct 30". */
 export function useDueLabel() {
@@ -28,13 +18,13 @@ export function useDueLabel() {
   const lang = useLang();
   const s = useAgenda();
   const now = useNow();
-  const zone = displayZone(s.prefs);
+  const zone = displayZone(s);
   const today = dayKey(new Date(now), zone);
-  return (t: Pick<Task, "dueDate" | "dueTime">) => {
+  return (t: Pick<Task, "dueDate" | "dueTime" | "timezone">) => {
     if (!t.dueDate) return a.tasks.noDue;
     const day =
       t.dueDate === today ? a.tasks.groups.today : t.dueDate === addDays(today, 1) ? a.tasks.groups.tomorrow : fmtDay(t.dueDate, lang, { weekday: "short", day: "numeric", month: "short" });
-    return t.dueTime ? `${day}, ${fmtTime(fromZoned(t.dueDate, t.dueTime, zone), lang, zone)}` : day;
+    return t.dueTime ? `${day}, ${fmtTime(fromZoned(t.dueDate, t.dueTime, t.timezone), lang, zone)}` : day;
   };
 }
 
@@ -43,7 +33,7 @@ function useMeetingChoices(current: string) {
   const s = useAgenda();
   const now = useNow();
   const lang = useLang();
-  const zone = displayZone(s.prefs);
+  const zone = displayZone(s);
   const today = dayKey(new Date(now), zone);
   const seen = new Set<string>();
   const choices: { id: string; label: string }[] = [];
@@ -57,53 +47,46 @@ function useMeetingChoices(current: string) {
   return choices;
 }
 
-export type TaskDraft = Partial<Task>;
+export type TaskDraft = { id?: string; title?: string; description?: string; dueDate?: string; dueTime?: string; meetingId?: string };
 
 /** Create or edit a task. A task with an id is edited; without one it is new. */
 export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () => void }) {
   const a = useA();
   const s = useAgenda();
   const toast = useToast();
-  const available = useListAvailable();
   const existing = draft.id ? s.tasks.find((t) => t.id === draft.id) : undefined;
   const [form, setForm] = useState(() => ({
     title: existing?.title ?? draft.title ?? "",
-    notes: existing?.notes ?? draft.notes ?? "",
+    description: existing?.description ?? draft.description ?? "",
     dueDate: existing?.dueDate ?? draft.dueDate ?? "",
     dueTime: existing?.dueTime ?? draft.dueTime ?? "",
-    reminder: existing ? existing.reminder : (draft.reminder ?? null),
+    reminder: existing ? existing.reminderMinutesBefore : null,
     meetingId: existing?.meetingId ?? draft.meetingId ?? "",
-    list: existing?.list ?? draft.list ?? ("meetingguard" as TaskList),
   }));
   const [errors, setErrors] = useState<Errors<string>>({});
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const meetings = useMeetingChoices(form.meetingId);
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((f) => ({ ...f, [key]: value }));
-  const listsLocked = !hasFeature(s.entitlement, "taskLists");
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     const found = validateTask(form);
     setErrors(found);
     if (hasErrors(found)) return;
-    const task: Task = {
-      id: existing?.id ?? newTaskId(),
+    // a time needs a date, and a reminder needs a time: clearing one clears the next
+    const fields = {
       title: form.title.trim(),
-      notes: form.notes.trim(),
-      dueDate: form.dueDate,
-      dueTime: form.dueTime,
-      reminder: form.dueTime ? form.reminder : null,
-      meetingId: form.meetingId,
-      list: form.list,
-      done: existing?.done ?? false,
-      doneAt: existing?.doneAt ?? 0,
-      origin: existing?.origin ?? "web",
-      updatedAt: 0,
+      description: form.description.replace(/\s+$/, ""),
+      dueDate: form.dueDate || null,
+      dueTime: form.dueDate ? form.dueTime || null : null,
+      reminderMinutesBefore: form.dueDate && form.dueTime ? form.reminder : null,
+      meetingId: form.meetingId || null,
     };
     setBusy(true);
     try {
-      await saveTask(task);
+      if (existing) await updateTask(existing.id, fields);
+      else await createTask(fields);
       toast(a.toast.taskSaved);
       onClose();
     } catch {
@@ -117,7 +100,7 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
     setBusy(true);
     try {
       await deleteTask(existing.id);
-      toast(a.toast.taskDeleted, { action: { label: a.toast.undo, run: () => void saveTask(existing) } });
+      toast(a.toast.taskDeleted, { action: { label: a.toast.undo, run: () => void restoreTask(existing) } });
       onClose();
     } catch {
       setBusy(false);
@@ -175,7 +158,7 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
     >
       <form id={formId} onSubmit={submit} noValidate className="grid gap-4 sm:grid-cols-2">
         <Field label={a.taskEditor.title} error={errors.title} className="sm:col-span-2">
-          {(p) => <input {...p} className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus maxLength={160} />}
+          {(p) => <input {...p} className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus maxLength={TITLE_MAX} />}
         </Field>
         <Field label={a.taskEditor.dueDate} error={errors.dueDate}>
           {(p) => <input {...p} type="date" className={inputClass} value={form.dueDate} onChange={(e) => set("dueDate", e.target.value)} />}
@@ -187,29 +170,32 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
               type="time"
               className={inputClass}
               value={form.dueTime}
+              disabled={!form.dueDate}
               onChange={(e) => {
                 const v = e.target.value;
-                // a time brings the reminder "at due time", as in the app
+                // a first time brings the reminder "at due time"; no time means no reminder
                 setForm((f) => ({ ...f, dueTime: v, reminder: v && f.reminder === null && !f.dueTime ? 0 : v ? f.reminder : null }));
               }}
             />
           )}
         </Field>
-        <Field label={a.taskEditor.reminder} error={errors.reminder}>
+        <Field label={a.taskEditor.reminder}>
           {(p) => (
             <select
               {...p}
               className={inputClass}
               value={form.reminder === null ? "" : String(form.reminder)}
-              disabled={!form.dueTime}
+              disabled={!form.dueDate || !form.dueTime}
               onChange={(e) => set("reminder", e.target.value === "" ? null : Number(e.target.value))}
             >
               <option value="">{a.taskEditor.reminderNone}</option>
-              {REMINDERS.map((min) => (
-                <option key={min} value={min}>
-                  {min === 0 ? a.taskEditor.atDueTime : a.reminder(min)}
-                </option>
-              ))}
+              {[...new Set([...TASK_REMINDERS, ...(form.reminder === null ? [] : [form.reminder])])]
+                .sort((x, y) => x - y)
+                .map((min) => (
+                  <option key={min} value={min}>
+                    {min === 0 ? a.taskEditor.atDueTime : a.reminder(min)}
+                  </option>
+                ))}
             </select>
           )}
         </Field>
@@ -217,6 +203,7 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
           {(p) => (
             <select {...p} className={inputClass} value={form.meetingId} onChange={(e) => set("meetingId", e.target.value)}>
               <option value="">{a.taskEditor.meetingNone}</option>
+              {form.meetingId && !meetings.some((m) => m.id === form.meetingId) && <option value={form.meetingId}>{a.tasks.meetingGone}</option>}
               {meetings.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.label}
@@ -225,28 +212,8 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
             </select>
           )}
         </Field>
-        <Field
-          label={
-            <span className="flex items-center gap-2">
-              {a.taskEditor.list} {listsLocked && <LockBadge plan={a.account.plans[REQUIRED.taskLists]} />}
-            </span>
-          }
-          hint={listsLocked ? a.lock.note(a.account.plans[REQUIRED.taskLists]) : !s.connections.microsoftToDo || !s.connections.googleTasks ? a.account.connectionsBody : undefined}
-          className="sm:col-span-2"
-        >
-          {(p) => (
-            <select {...p} className={inputClass} value={form.list} onChange={(e) => set("list", e.target.value as TaskList)}>
-              {LISTS.map((l) => (
-                <option key={l} value={l} disabled={!available(l) && form.list !== l}>
-                  {a.taskLists[l]}
-                  {!available(l) && l !== "meetingguard" ? ` (${s.connections[l] ? a.account.notIncluded : a.account.notConnected})` : ""}
-                </option>
-              ))}
-            </select>
-          )}
-        </Field>
-        <Field label={a.taskEditor.notes} className="sm:col-span-2">
-          {(p) => <textarea {...p} rows={3} className={`${inputClass} h-auto py-2`} value={form.notes} onChange={(e) => set("notes", e.target.value)} />}
+        <Field label={a.taskEditor.notes} error={errors.description} className="sm:col-span-2">
+          {(p) => <textarea {...p} rows={3} className={`${inputClass} h-auto py-2`} value={form.description} maxLength={DESCRIPTION_MAX} onChange={(e) => set("description", e.target.value)} />}
         </Field>
       </form>
     </Dialog>
@@ -259,27 +226,23 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
  */
 export function CaptureCard({ draft, onClose, onEdit }: { draft: TaskDraft; onClose: () => void; onEdit: () => void }) {
   const a = useA();
+  const s = useAgenda();
   const toast = useToast();
   const due = useDueLabel();
   const [busy, setBusy] = useState(false);
-  const meeting = useAgenda().meetings.find((m) => m.id === draft.meetingId);
+  const meeting = s.meetings.find((m) => m.id === draft.meetingId);
+  const timezone = displayZone(s);
 
   const confirm = async () => {
     setBusy(true);
     try {
-      await saveTask({
-        id: newTaskId(),
+      await createTask({
         title: draft.title ?? "",
-        notes: "",
-        dueDate: draft.dueDate ?? "",
-        dueTime: draft.dueTime ?? "",
-        reminder: draft.dueTime ? 0 : null,
-        meetingId: draft.meetingId ?? "",
-        list: "meetingguard",
-        done: false,
-        doneAt: 0,
-        origin: "web",
-        updatedAt: 0,
+        dueDate: draft.dueDate || null,
+        dueTime: draft.dueTime || null,
+        timezone,
+        reminderMinutesBefore: draft.dueTime ? 0 : null,
+        meetingId: draft.meetingId || null,
       });
       toast(a.toast.taskSaved);
       onClose();
@@ -307,7 +270,7 @@ export function CaptureCard({ draft, onClose, onEdit }: { draft: TaskDraft; onCl
         <p className="text-[1.02rem] font-semibold">{draft.title}</p>
         <p className="mt-2 flex items-center gap-2 text-[0.85rem] text-white/70">
           <CalendarDays className="h-4 w-4 text-white/45" aria-hidden />
-          {due({ dueDate: draft.dueDate ?? "", dueTime: draft.dueTime ?? "" })}
+          {due({ dueDate: draft.dueDate || null, dueTime: draft.dueTime || null, timezone })}
         </p>
         {draft.dueTime && (
           <p className="mt-1 flex items-center gap-2 text-[0.85rem] text-white/70">

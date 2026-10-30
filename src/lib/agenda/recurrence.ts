@@ -1,86 +1,110 @@
 /*
- * Recurring meetings. A series repeats at the same wall-clock time in the
- * zone it was planned in (so 9:00 stays 9:00 across daylight-saving changes);
- * single dates can be skipped or moved through `exceptions`, as in the app.
+ * Recurring meetings, the same rules as the app's src/core/recurrence.ts. A
+ * series is one stored meeting: its own start is the first date, and the other
+ * dates are worked out from its rule. Each keeps its wall-clock time in the
+ * meeting's zone (9:00 stays 9:00 across daylight-saving changes). Changes to
+ * single dates live in `recurrenceOverrides`, keyed by the date it was due.
  */
 
-import type { Meeting, Occurrence } from "./types";
-import { addDays, dayKey, daysBetween, fromZoned, timeKey, weekday } from "./time";
+import { addDays, daysBetween, fromZoned, isDayKey, weekday } from "./time";
+import type { Meeting, Occurrence, RecurrenceOverride, RecurrenceOverrides, RecurrenceRule, RecurrenceWeekday } from "./types";
 
-/** The next due day of a series after `day`, or null when the series has ended. */
-function nextDay(m: Meeting, day: string, firstDay: string): string | null {
-  let next: string;
-  switch (m.repeat) {
-    case "daily":
-      next = addDays(day, 1);
-      break;
-    case "weekdays":
-      next = addDays(day, weekday(day) === 5 ? 3 : weekday(day) === 6 ? 2 : 1);
-      break;
-    case "weekly":
-      next = addDays(day, 7);
-      break;
-    case "monthly": {
-      // same day of the month; months without it are left out
-      const dom = firstDay.slice(8);
-      let [y, mo] = day.split("-").map(Number);
-      for (;;) {
-        mo += 1;
-        if (mo > 12) [y, mo] = [y + 1, 1];
-        const candidate = `${y}-${String(mo).padStart(2, "0")}-${dom}`;
-        if (addDays(candidate, 0) === candidate) {
-          next = candidate;
-          break;
-        }
-      }
-      break;
-    }
-    default:
-      return null;
+export const WEEKDAYS: RecurrenceWeekday[] = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+
+const MAX_ITERATIONS = 5000;
+const MAX_OCCURRENCES = 500;
+/** How far past the window to look for a date that was moved back into it. */
+const OVERRIDE_LOOKAHEAD = 62 * 86_400_000;
+
+/** 0 = Monday ... 6 = Sunday. */
+const mondayIndex = (day: string) => (weekday(day) + 6) % 7;
+
+export const weekdayCode = (day: string) => WEEKDAYS[mondayIndex(day)];
+
+const daysInMonth = (year: number, month: number) => new Date(Date.UTC(year, month, 0)).getUTCDate();
+
+/** The original dates of a series in order, from its first date. Endless for endless rules. */
+function* candidateDates(anchor: string, rule: RecurrenceRule): Generator<string> {
+  if (rule.freq === "daily") {
+    for (let date = anchor; ; date = addDays(date, rule.interval)) yield date;
   }
-  return m.repeatUntil && next > m.repeatUntil ? null : next;
+  if (rule.freq === "weekly") {
+    const selected = new Set((rule.byWeekday?.length ? rule.byWeekday : [weekdayCode(anchor)]).map((c) => WEEKDAYS.indexOf(c)));
+    const monday = addDays(anchor, -mondayIndex(anchor));
+    for (let week = 0; ; week++) {
+      const start = addDays(monday, week * rule.interval * 7);
+      for (let offset = 0; offset < 7; offset++) {
+        if (!selected.has(offset)) continue;
+        const date = addDays(start, offset);
+        if (daysBetween(anchor, date) >= 0) yield date;
+      }
+    }
+  }
+  if (rule.freq === "monthly") {
+    const [year, month, firstDay] = anchor.split("-").map(Number);
+    const day = rule.byMonthDay ?? firstDay;
+    const first = year * 12 + (month - 1);
+    for (let step = 0; ; step++) {
+      const total = first + step * rule.interval;
+      const y = Math.floor(total / 12);
+      const m = (total % 12) + 1;
+      // a month without that day is left out and doesn't count
+      if (day > daysInMonth(y, m)) continue;
+      const date = `${y}-${String(m).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      if (daysBetween(anchor, date) >= 0) yield date;
+    }
+  }
+}
+
+const timeOf = (m: Pick<Meeting, "allDay" | "time">) => (m.allDay ? "00:00" : m.time);
+
+/** One date of a series with its own changes applied. */
+function build(m: Meeting, key: string, due: Date, override: RecurrenceOverride | undefined): Occurrence {
+  const overridden = override?.status === "modified";
+  const start = overridden && override.startAt ? new Date(override.startAt) : due;
+  const minutes = (overridden ? override.durationMinutes : null) ?? m.durationMinutes;
+  return { meeting: m, key, start, end: new Date(start.getTime() + minutes * 60_000), title: (overridden ? override.title : null) ?? m.title, overridden };
+}
+
+/** Every date of a series overlapping [from, to), without the cancelled ones. */
+function expandSeries(m: Meeting, rule: RecurrenceRule, from: Date, to: Date): Occurrence[] {
+  const untilMs = rule.until ? Date.parse(rule.until) : null;
+  const overrides = m.recurrenceOverrides ?? {};
+  const hasOverrides = Object.keys(overrides).length > 0;
+  const out: Occurrence[] = [];
+  let generated = 0;
+  let iterations = 0;
+  for (const key of candidateDates(m.date, rule)) {
+    if (++iterations > MAX_ITERATIONS) break;
+    const due = fromZoned(key, timeOf(m), m.timezone);
+    if (untilMs !== null && due.getTime() > untilMs) break;
+    generated++;
+    if (rule.count !== null && generated > rule.count) break;
+    const override = overrides[key];
+    if (override?.status === "cancelled") continue;
+    if (due >= to && override?.status !== "modified") {
+      if (!hasOverrides || due.getTime() - to.getTime() > OVERRIDE_LOOKAHEAD) break;
+      continue;
+    }
+    const o = build(m, key, due, override);
+    if (o.end > from && o.start < to) out.push(o);
+    if (out.length >= MAX_OCCURRENCES) break;
+  }
+  return out;
 }
 
 /** Every meeting of `m` that overlaps [from, to). */
 export function occurrences(m: Meeting, from: Date, to: Date): Occurrence[] {
-  const start = new Date(m.start);
-  const end = new Date(m.end);
-  if (m.repeat === "none") return end > from && start < to ? [{ meeting: m, key: "", start, end, moved: false }] : [];
-
-  const length = end.getTime() - start.getTime();
-  const firstDay = dayKey(start, m.timeZone);
-  const time = timeKey(start, m.timeZone);
-  const out: Occurrence[] = [];
-  const pushIfVisible = (o: Occurrence) => {
-    if (o.end > from && o.start < to) out.push(o);
-  };
-
-  // jump close to the window instead of walking a long series from its first day
-  let day: string | null = firstDay;
-  const gap = daysBetween(firstDay, dayKey(from, m.timeZone)) - 2;
-  if (gap > 0 && (m.repeat === "daily" || m.repeat === "weekly")) {
-    const step = m.repeat === "daily" ? 1 : 7;
-    day = addDays(firstDay, Math.floor(gap / step) * step);
-  }
-
-  for (let i = 0; day && i < 800; i++) {
-    const due = fromZoned(day, time, m.timeZone);
-    if (due.getTime() - length > to.getTime() + 2 * 86_400_000) break;
-    const ex = m.exceptions[day];
-    if (!ex?.skip) {
-      if (ex?.start && ex.end) pushIfVisible({ meeting: m, key: day, start: new Date(ex.start), end: new Date(ex.end), moved: true });
-      else pushIfVisible({ meeting: m, key: day, start: due, end: new Date(due.getTime() + length), moved: false });
-    }
-    day = nextDay(m, day, firstDay);
-  }
-  // single meetings moved from outside the window into it
-  for (const [key, ex] of Object.entries(m.exceptions)) {
-    if (ex.start && ex.end && !out.some((o) => o.key === key)) {
-      const o = { meeting: m, key, start: new Date(ex.start), end: new Date(ex.end), moved: true };
-      if (o.end > from && o.start < to) out.push(o);
+  if (m.recurrence) {
+    try {
+      return expandSeries(m, m.recurrence, from, to);
+    } catch {
+      // a stored rule that can't be worked out: show the meeting once rather than hide it
     }
   }
-  return out;
+  const start = new Date(m.startAt);
+  const end = new Date(start.getTime() + m.durationMinutes * 60_000);
+  return end > from && start < to ? [{ meeting: m, key: "", start, end, title: m.title, overridden: false }] : [];
 }
 
 /** All meetings in [from, to), sorted by start. */
@@ -88,13 +112,92 @@ export function expandAll(meetings: Meeting[], from: Date, to: Date) {
   return meetings.flatMap((m) => occurrences(m, from, to)).sort((a, b) => a.start.getTime() - b.start.getTime());
 }
 
-/** The occurrence of a series on a given key, or the single meeting itself. */
+/** The occurrence of a series on a given key, or the meeting's own first date. */
 export function findOccurrence(m: Meeting, key: string): Occurrence | null {
-  if (!key) return { meeting: m, key: "", start: new Date(m.start), end: new Date(m.end), moved: false };
-  const ex = m.exceptions[key];
-  if (ex?.skip) return null;
-  const length = new Date(m.end).getTime() - new Date(m.start).getTime();
-  if (ex?.start && ex.end) return { meeting: m, key, start: new Date(ex.start), end: new Date(ex.end), moved: true };
-  const start = fromZoned(key, timeKey(new Date(m.start), m.timeZone), m.timeZone);
-  return { meeting: m, key, start, end: new Date(start.getTime() + length), moved: false };
+  if (!key || !m.recurrence) {
+    const start = new Date(m.startAt);
+    return { meeting: m, key: "", start, end: new Date(start.getTime() + m.durationMinutes * 60_000), title: m.title, overridden: false };
+  }
+  const override = m.recurrenceOverrides?.[key];
+  if (override?.status === "cancelled") return null;
+  return build(m, key, fromZoned(key, timeOf(m), m.timezone), override);
+}
+
+/** The overrides with one date set (or removed with null); null when none are left. */
+export function withOverride(overrides: RecurrenceOverrides | null, key: string, override: RecurrenceOverride | null): RecurrenceOverrides | null {
+  const next = { ...(overrides ?? {}) };
+  if (override) next[key] = override;
+  else delete next[key];
+  return Object.keys(next).length ? next : null;
+}
+
+export type SeriesSplit = {
+  masterRule: RecurrenceRule;
+  masterOverrides: RecurrenceOverrides | null;
+  tailStartAt: string;
+  tailRule: RecurrenceRule;
+  tailOverrides: RecurrenceOverrides | null;
+};
+
+/**
+ * Splits a series at one of its dates ("this and following"). "series_edit"
+ * means it is the first date, so the change applies to the whole series; null
+ * means the date isn't part of the series.
+ */
+export function splitRecurrenceAt(m: Meeting, fromKey: string): SeriesSplit | "series_edit" | null {
+  const rule = m.recurrence;
+  if (!rule || !isDayKey(fromKey)) return null;
+  const untilMs = rule.until ? Date.parse(rule.until) : null;
+  let before = 0;
+  let first: string | null = null;
+  let found = false;
+  let iterations = 0;
+  for (const date of candidateDates(m.date, rule)) {
+    if (++iterations > MAX_ITERATIONS) break;
+    if (daysBetween(fromKey, date) > 0) break;
+    if (untilMs !== null && fromZoned(date, timeOf(m), m.timezone).getTime() > untilMs) break;
+    if (rule.count !== null && before + 1 > rule.count) break;
+    first ??= date;
+    if (date === fromKey) {
+      found = true;
+      break;
+    }
+    before++;
+  }
+  if (!found) return null;
+  if (first === fromKey) return "series_edit";
+
+  const tailStart = fromZoned(fromKey, timeOf(m), m.timezone);
+  const masterOverrides: RecurrenceOverrides = {};
+  const tailOverrides: RecurrenceOverrides = {};
+  for (const [key, override] of Object.entries(m.recurrenceOverrides ?? {})) {
+    if (daysBetween(fromKey, key) >= 0) tailOverrides[key] = override;
+    else masterOverrides[key] = override;
+  }
+  return {
+    masterRule: { ...rule, until: new Date(tailStart.getTime() - 1000).toISOString(), count: null },
+    masterOverrides: Object.keys(masterOverrides).length ? masterOverrides : null,
+    tailStartAt: tailStart.toISOString(),
+    tailRule: { ...rule, count: rule.count !== null ? rule.count - before : null },
+    tailOverrides: Object.keys(tailOverrides).length ? tailOverrides : null,
+  };
+}
+
+/** After a series moves to another date, its weekday or day of the month moves with it. */
+export function reconcileAnchor(rule: RecurrenceRule, oldDay: string, newDay: string): RecurrenceRule {
+  if (oldDay === newDay) return rule;
+  if (rule.freq === "weekly" && rule.byWeekday?.length) {
+    const before = weekdayCode(oldDay);
+    const after = weekdayCode(newDay);
+    if (before === after || !rule.byWeekday.includes(before)) return rule;
+    const days = new Set(rule.byWeekday);
+    days.delete(before);
+    days.add(after);
+    return { ...rule, byWeekday: WEEKDAYS.filter((d) => days.has(d)) };
+  }
+  if (rule.freq === "monthly" && rule.byMonthDay !== null) {
+    const before = Number(oldDay.slice(8, 10));
+    return rule.byMonthDay === before && before !== Number(newDay.slice(8, 10)) ? { ...rule, byMonthDay: Number(newDay.slice(8, 10)) } : rule;
+  }
+  return rule;
 }

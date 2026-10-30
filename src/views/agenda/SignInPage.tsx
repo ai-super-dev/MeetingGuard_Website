@@ -7,8 +7,9 @@ import { Eye, EyeOff } from "lucide-react";
 import { BareFrame } from "@/components/agenda/Frame";
 import { Button, Field, inputClass, Spinner } from "@/components/agenda/ui";
 import { GoogleIcon } from "@/components/icons/brand";
+import { APPLE_SIGN_IN } from "@/lib/agenda/config";
 import { useA } from "@/lib/agenda/i18n";
-import { AuthError, sendPasswordReset, signInWithGoogle, signInWithPassword, takeDeletedNotice, useAgenda } from "@/lib/agenda/store";
+import { AuthError, sendPasswordReset, signInWithApple, signInWithGoogle, signInWithPassword, takeDeletedNotice, useAgenda } from "@/lib/agenda/store";
 import { isEmail } from "@/lib/agenda/validation";
 import { useHref, useLang, useT } from "@/lib/language";
 
@@ -35,7 +36,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
-  const [busy, setBusy] = useState<"" | "google" | "password" | "reset">("");
+  const [busy, setBusy] = useState<"" | "google" | "apple" | "password" | "reset">("");
   const [deleted] = useState(takeDeletedNotice);
 
   // already signed in: straight to the agenda
@@ -51,16 +52,17 @@ function SignIn() {
   };
 
   const fail = (err: unknown) => {
-    const code = err instanceof AuthError ? err.code : navigator.onLine ? "wrongPassword" : "network";
-    setErrors({ form: a.signIn.errors[code] });
     setBusy("");
+    const code = err instanceof AuthError ? err.code : navigator.onLine ? "generic" : "network";
+    // closing the sign-in window isn't an error
+    if (code !== "cancelled") setErrors({ form: a.signIn.errors[code] });
   };
 
-  const google = async () => {
+  const withProvider = async (provider: "google" | "apple") => {
     setErrors({});
-    setBusy("google");
+    setBusy(provider);
     try {
-      await signInWithGoogle(lang);
+      await (provider === "google" ? signInWithGoogle : signInWithApple)(lang);
     } catch (err) {
       fail(err);
     }
@@ -75,9 +77,13 @@ function SignIn() {
     if (Object.keys(found).length) return;
     if (mode === "reset") {
       setBusy("reset");
-      await sendPasswordReset(email.trim());
-      setBusy("");
-      setMode("resetSent");
+      try {
+        await sendPasswordReset(email.trim());
+        setBusy("");
+        setMode("resetSent");
+      } catch (err) {
+        fail(err);
+      }
       return;
     }
     setBusy("password");
@@ -103,7 +109,7 @@ function SignIn() {
 
             <button
               type="button"
-              onClick={google}
+              onClick={() => withProvider("google")}
               disabled={!!busy}
               aria-busy={busy === "google" || undefined}
               className="mt-6 flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] text-[0.92rem] font-medium transition-colors hover:border-white/30 disabled:opacity-60"
@@ -111,6 +117,22 @@ function SignIn() {
               <GoogleIcon className="h-[18px] w-[18px]" />
               {a.signIn.google}
             </button>
+            {APPLE_SIGN_IN && (
+              <button
+                type="button"
+                onClick={() => withProvider("apple")}
+                disabled={!!busy}
+                aria-busy={busy === "apple" || undefined}
+                className="mt-2 flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] text-[0.92rem] font-medium transition-colors hover:border-white/30 disabled:opacity-60"
+              >
+                {a.signIn.apple}
+              </button>
+            )}
+            {errors.form && (
+              <p role="alert" className="mt-3 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-[0.85rem]">
+                {errors.form}
+              </p>
+            )}
 
             <div className="my-5 flex items-center gap-3 text-[0.75rem] text-white/40" aria-hidden>
               <span className="h-px flex-1 bg-white/10" />
@@ -154,11 +176,6 @@ function SignIn() {
                   </div>
                 )}
               </Field>
-            )}
-            {errors.form && (
-              <p role="alert" className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-[0.85rem]">
-                {errors.form}
-              </p>
             )}
             <Button variant="primary" type="submit" className="h-11 w-full" busy={busy === "password" || busy === "reset"} disabled={!!busy}>
               {mode === "signIn" ? a.signIn.submit : a.signIn.resetSend}

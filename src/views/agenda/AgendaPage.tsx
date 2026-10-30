@@ -2,22 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { DayList, MonthGrid, TimeGrid, monthDays, type Selection } from "@/components/agenda/Calendar";
+import { byDay, DayList, MonthGrid, TimeGrid, monthDays, type Selection } from "@/components/agenda/Calendar";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { SOURCE_COLOR } from "@/components/agenda/look";
-import { CancelDialog, MeetingDetails, MeetingEditor, MoveDialog, type EditorMode } from "@/components/agenda/MeetingDialogs";
+import { CancelDialog, EditScopeDialog, MeetingDetails, MeetingEditor, MoveDialog, OccurrenceEditor, type EditorMode } from "@/components/agenda/MeetingDialogs";
 import { Button, IconButton, Segmented } from "@/components/agenda/ui";
 import { shortcutBlocked, useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { expandAll } from "@/lib/agenda/recurrence";
-import { displayZone, useAgenda } from "@/lib/agenda/store";
+import { calendarOf, displayZone, useAgenda } from "@/lib/agenda/store";
 import { addDays, addMonths, dayKey, dayStart, fmtDay, fmtDayRange, fmtMonth, isDayKey, minuteOfDay, weekStart } from "@/lib/agenda/time";
-import type { Source } from "@/lib/agenda/types";
+import type { Calendar } from "@/lib/agenda/types";
 import { useLang } from "@/lib/language";
 
 type View = "day" | "week" | "month";
 const VIEWS: View[] = ["day", "week", "month"];
-const SOURCES: Source[] = ["meetingguard", "google", "outlook"];
+const SOURCES: Calendar[] = ["meetingguard", "google", "outlook", "device"];
 
 /** The view, day and open meeting from the address (?view=week&date=2026-10-28&open=id). */
 function readAddress() {
@@ -46,15 +46,17 @@ function Agenda() {
   const lang = useLang();
   const s = useAgenda();
   const now = useNow();
-  const zone = displayZone(s.prefs);
+  const zone = displayZone(s);
   const today = dayKey(new Date(now), zone);
 
   const [start] = useState(readAddress);
   const [view, setView] = useState<View>(start.view);
   const [date, setDate] = useState(start.date || today);
-  const [hidden, setHidden] = useState<Source[]>([]);
+  const [hidden, setHidden] = useState<Calendar[]>([]);
   const [open, setOpen] = useState<Selection | null>(start.open);
   const [editor, setEditor] = useState<EditorMode | null>(null);
+  const [askScope, setAskScope] = useState<Selection | null>(null);
+  const [occurrenceEdit, setOccurrenceEdit] = useState<{ sel: Selection; scope: "one" | "following" } | null>(null);
   const [moving, setMoving] = useState<Selection | null>(null);
   const [cancelling, setCancelling] = useState<Selection | null>(null);
 
@@ -69,10 +71,13 @@ function Agenda() {
   );
   const first = days[0];
   const last = days[days.length - 1];
-  const occs = useMemo(
-    () => expandAll(s.meetings.filter((m) => !hidden.includes(m.source)), dayStart(first, zone), dayStart(addDays(last, 1), zone)),
-    [s.meetings, hidden, first, last, zone],
-  );
+  const occs = useMemo(() => {
+    // a day of slack on each side, for all-day meetings planned in another zone
+    const found = expandAll(s.meetings.filter((m) => !hidden.includes(calendarOf(m))), dayStart(addDays(first, -1), zone), dayStart(addDays(last, 2), zone));
+    const perDay = byDay(found, zone);
+    const shown = new Set(days.flatMap((d) => perDay.get(d) ?? []));
+    return found.filter((o) => shown.has(o));
+  }, [s.meetings, hidden, days, first, last, zone]);
 
   const step = (dir: 1 | -1) => setDate((d) => (view === "day" ? addDays(d, dir) : view === "week" ? addDays(d, 7 * dir) : addMonths(d, dir)));
   const goDay = (d: string) => {
@@ -114,7 +119,7 @@ function Agenda() {
       : view === "week"
         ? fmtDayRange(days[0], days[6], lang)
         : fmtMonth(date, lang);
-  const visibleSources = SOURCES.filter((src) => src === "meetingguard" || s.connections[src] || s.meetings.some((m) => m.source === src));
+  const visibleSources = SOURCES.filter((src) => src === "meetingguard" || s.meetings.some((m) => calendarOf(m) === src));
   const dayEmpty = view === "day" && occs.length === 0;
 
   return (
@@ -214,7 +219,10 @@ function Agenda() {
           sel={open}
           onClose={() => setOpen(null)}
           onEdit={() => {
-            setEditor({ kind: "edit", id: open.id });
+            // one date of a series: ask which meetings the edit is for, as in the app
+            const isSeries = !!open.key && !!s.meetings.find((m) => m.id === open.id)?.recurrence;
+            if (isSeries) setAskScope(open);
+            else setEditor({ kind: "edit", id: open.id });
             setOpen(null);
           }}
           onMove={() => {
@@ -227,6 +235,18 @@ function Agenda() {
           }}
         />
       )}
+      {askScope && (
+        <EditScopeDialog
+          sel={askScope}
+          onClose={() => setAskScope(null)}
+          onChoose={(scope) => {
+            if (scope === "all") setEditor({ kind: "edit", id: askScope.id });
+            else setOccurrenceEdit({ sel: askScope, scope });
+            setAskScope(null);
+          }}
+        />
+      )}
+      {occurrenceEdit && <OccurrenceEditor sel={occurrenceEdit.sel} scope={occurrenceEdit.scope} onClose={() => setOccurrenceEdit(null)} />}
       {editor && <MeetingEditor mode={editor} onClose={() => setEditor(null)} />}
       {moving && <MoveDialog sel={moving} onClose={() => setMoving(null)} />}
       {cancelling && <CancelDialog sel={cancelling} onClose={() => setCancelling(null)} />}
