@@ -270,15 +270,49 @@ export function parseEntitlement(raw: Raw | null): Entitlement {
   return { plan: raw.plan as Plan, status: raw.status as Entitlement["status"], expiresAt: nullable(raw.expiresAt), source: str(raw.source, "default"), updatedAt: nullable(raw.updatedAt) };
 }
 
-export const DEFAULT_PREFERENCES: Preferences = { alertIntensity: "max", defaultAlertTimes: [15, 5, 0], googleCalendarSyncEnabled: false, deviceCalendarImportIds: [], deviceCalendarExportId: null };
+// the app's defaults (src/core/types.ts DEFAULT_PREFERENCES)
+export const DEFAULT_PREFERENCES: Preferences = {
+  language: "en",
+  alertEnabled: true,
+  alertIntensity: "max",
+  alertSoundType: "voice_and_sound",
+  alertVolume: 0.8,
+  vibrationEnabled: true,
+  defaultAlertTimes: [15, 5, 0],
+  snoozeMinutes: 5,
+  followUpEnabled: true,
+  briefingEnabled: false,
+  briefingTime: "08:00",
+  use24HourClock: null,
+  googleCalendarSyncEnabled: false,
+  deviceCalendarImportIds: [],
+  deviceCalendarExportId: null,
+  updatedAt: null,
+};
 
+const bool = (v: unknown, fallback: boolean) => (typeof v === "boolean" ? v : fallback);
+const isAlertMinutes = (v: unknown) => Array.isArray(v) && v.length > 0 && v.length <= 10 && v.every((x) => Number.isInteger(x) && x >= 0 && x <= 10080);
+
+/** As the app reads it: field by field, so one unreadable field falls back alone. */
 export function parsePreferences(raw: Raw | null): Preferences {
   if (!raw) return DEFAULT_PREFERENCES;
+  const d = DEFAULT_PREFERENCES;
   return {
+    language: raw.language === "es" ? "es" : "en",
+    alertEnabled: bool(raw.alertEnabled, d.alertEnabled),
     alertIntensity: raw.alertIntensity === "medium" || raw.alertIntensity === "light" ? raw.alertIntensity : "max",
-    defaultAlertTimes: Array.isArray(raw.defaultAlertTimes) ? normalizeAlertTimes(raw.defaultAlertTimes as number[]) : DEFAULT_PREFERENCES.defaultAlertTimes,
+    alertSoundType: raw.alertSoundType === "voice_only" || raw.alertSoundType === "sound_only" ? raw.alertSoundType : "voice_and_sound",
+    alertVolume: typeof raw.alertVolume === "number" && raw.alertVolume >= 0 && raw.alertVolume <= 1 ? raw.alertVolume : d.alertVolume,
+    vibrationEnabled: bool(raw.vibrationEnabled, d.vibrationEnabled),
+    defaultAlertTimes: isAlertMinutes(raw.defaultAlertTimes) ? normalizeAlertTimes(raw.defaultAlertTimes as number[]) : d.defaultAlertTimes,
+    snoozeMinutes: Number.isInteger(raw.snoozeMinutes) && (raw.snoozeMinutes as number) >= 1 && (raw.snoozeMinutes as number) <= 60 ? (raw.snoozeMinutes as number) : d.snoozeMinutes,
+    followUpEnabled: bool(raw.followUpEnabled, d.followUpEnabled),
+    briefingEnabled: bool(raw.briefingEnabled, d.briefingEnabled),
+    briefingTime: typeof raw.briefingTime === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(raw.briefingTime) ? raw.briefingTime : d.briefingTime,
+    use24HourClock: typeof raw.use24HourClock === "boolean" ? raw.use24HourClock : null,
     googleCalendarSyncEnabled: raw.googleCalendarSyncEnabled === true,
     deviceCalendarImportIds: Array.isArray(raw.deviceCalendarImportIds) ? (raw.deviceCalendarImportIds as string[]) : [],
     deviceCalendarExportId: nullable(raw.deviceCalendarExportId),
+    updatedAt: nullable(raw.updatedAt),
   };
 }

@@ -156,14 +156,21 @@ function keyDate(day: string) {
   return new Date(Date.UTC(y, m - 1, d, 12));
 }
 
-export const fmtTime = (date: Date, lang: Lang, zone: string) => format(lang, zone, { hour: "numeric", minute: "2-digit" }).format(date);
+/** The account's time format (Preferences.use24HourClock): null follows the language. */
+let clock24: boolean | null = null;
+export const setClock = (use24: boolean | null) => {
+  clock24 = use24;
+};
+const clock = (): Intl.DateTimeFormatOptions => (clock24 === null ? {} : { hourCycle: clock24 ? "h23" : "h12" });
+
+export const fmtTime = (date: Date, lang: Lang, zone: string) => format(lang, zone, { hour: "numeric", minute: "2-digit", ...clock() }).format(date);
 
 export const fmtDay = (day: string, lang: Lang, opts: Intl.DateTimeFormatOptions = { weekday: "long", month: "long", day: "numeric" }) =>
   format(lang, "UTC", opts).format(keyDate(day));
 
 /** Hour labels of the time grid: "10 AM" / "10:00". */
 export const fmtHour = (hour: number, lang: Lang) =>
-  format(lang, "UTC", lang === "en" ? { hour: "numeric" } : { hour: "2-digit", minute: "2-digit" }).format(new Date(Date.UTC(2026, 0, 1, hour)));
+  format(lang, "UTC", (clock24 ?? lang !== "en") ? { hour: "2-digit", minute: "2-digit", hourCycle: "h23" } : { hour: "numeric", hourCycle: "h12" }).format(new Date(Date.UTC(2026, 0, 1, hour)));
 
 /** "Oct 26 - Nov 1, 2026". */
 export const fmtDayRange = (first: string, last: string, lang: Lang) =>
@@ -173,7 +180,7 @@ export const fmtMonth = (day: string, lang: Lang) => format(lang, "UTC", { month
 
 /** "10:00 - 10:45 AM" style range. */
 export const fmtRange = (start: Date, end: Date, lang: Lang, zone: string) =>
-  format(lang, zone, { hour: "numeric", minute: "2-digit" }).formatRange(start, end);
+  format(lang, zone, { hour: "numeric", minute: "2-digit", ...clock() }).formatRange(start, end);
 
 /** "45 min", "1 h 30 min". */
 export function fmtDuration(minutes: number) {

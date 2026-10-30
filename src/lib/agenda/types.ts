@@ -138,14 +138,32 @@ export type User = {
   verified?: boolean;
 };
 
-/** The parts of the app's preferences the agenda uses; the web doesn't change them. */
+export type AlertSoundType = "voice_and_sound" | "voice_only" | "sound_only";
+
+/** The parts of the app's preferences the web reads. Account changes the alert ones and the time format. */
 export type Preferences = {
+  language: "en" | "es";
+  alertEnabled: boolean;
   alertIntensity: AlertIntensity;
+  alertSoundType: AlertSoundType;
+  alertVolume: number;
+  vibrationEnabled: boolean;
   defaultAlertTimes: number[];
+  snoozeMinutes: number;
+  followUpEnabled: boolean;
+  briefingEnabled: boolean;
+  /** "HH:mm". */
+  briefingTime: string;
+  /** null follows the language. */
+  use24HourClock: boolean | null;
   googleCalendarSyncEnabled: boolean;
   deviceCalendarImportIds: string[];
   deviceCalendarExportId: string | null;
+  updatedAt: string | null;
 };
+
+/** The settings the web changes. */
+export type PreferencesPatch = Partial<Pick<Preferences, "alertEnabled" | "alertIntensity" | "alertSoundType" | "alertVolume" | "vibrationEnabled" | "defaultAlertTimes" | "snoozeMinutes" | "followUpEnabled" | "briefingEnabled" | "briefingTime" | "use24HourClock">>;
 
 /** A guest's answer to an invitation link. */
 export type InviteAnswer = { kind: "accept" } | { kind: "decline" } | { kind: "propose"; start: string; end: string; note: string };

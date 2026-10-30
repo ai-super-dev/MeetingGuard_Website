@@ -20,7 +20,7 @@ import {
   signOut as firebaseSignOut,
   type User as FirebaseUser,
 } from "firebase/auth";
-import { collection, connectFirestoreEmulator, doc, getFirestore, initializeFirestore, memoryLocalCache, onSnapshot, runTransaction, type DocumentData, type Firestore } from "firebase/firestore";
+import { collection, connectFirestoreEmulator, doc, getFirestore, initializeFirestore, memoryLocalCache, onSnapshot, runTransaction, setDoc, type DocumentData, type Firestore } from "firebase/firestore";
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 import { EMULATOR_HOST, FIREBASE_CONFIG, FUNCTIONS_REGION } from "./config";
 import type { User } from "./types";
@@ -113,6 +113,16 @@ export const zoomSync = (meetingId: string) => callZoom<unknown>("zoomSyncMeetin
 /** Deletes the Zoom meeting of a deleted meeting. */
 export const zoomDelete = (zoomMeetingId: string) => callZoom<unknown>("zoomDeleteMeeting", { meetingId: null, zoomMeetingId });
 
+/* ---------- WhatsApp assistant (the app's server functions) ---------- */
+
+export type WhatsAppStatus = { enabled: boolean; linked: boolean; linkedLast4: string | null };
+
+/** Whether the bot is set up and this account's phone is linked. */
+export async function whatsappStatus(): Promise<WhatsAppStatus> {
+  const r = (await httpsCallable<unknown, Raw>(functions, "whatsappLinkStatus", { timeout: 10_000 })({})).data;
+  return { enabled: r.enabled === true, linked: r.linked === true, linkedLast4: typeof r.linkedLast4 === "string" ? r.linkedLast4 : null };
+}
+
 /* ---------- Live records ---------- */
 
 export type Handlers = {
@@ -181,6 +191,19 @@ export async function commit(writes: Write[]) {
   });
   try {
     await Promise.race([saved, limit]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Saves changed settings as the app does: only those fields, merged into the record, with a new time. */
+export async function savePreferences(uid: string, patch: Raw, updatedAt: string) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error("Save timed out")), SAVE_LIMIT_MS);
+  });
+  try {
+    await Promise.race([setDoc(doc(db, `users/${uid}/settings/preferences`), { ...patch, updatedAt }, { merge: true }), limit]);
   } finally {
     clearTimeout(timer);
   }

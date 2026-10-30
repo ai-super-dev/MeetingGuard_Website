@@ -19,9 +19,9 @@ import { LIVE } from "./config";
 import type * as Remote from "./firebase";
 import { applyMeetingPatch, applyTaskPatch, buildMeeting, buildTask, DEFAULT_PREFERENCES, FREE, meetingToDoc, nextTimestamp, parseEntitlement, parseMeeting, parsePreferences, parseTask, taskToDoc, tombstoneMeeting } from "./records";
 import { reconcileAnchor, splitRecurrenceAt, withOverride } from "./recurrence";
-import { addDays, dayKey, deviceZone, fromZoned, timeKey, weekStart } from "./time";
+import { addDays, dayKey, deviceZone, fromZoned, setClock, timeKey, weekStart } from "./time";
 import type { LinkState } from "./conference";
-import type { Calendar, Entitlement, InviteAnswer, Meeting, MeetingInput, MeetingPatch, Plan, Preferences, RecurrenceOverride, Task, TaskInput, TaskPatch, User } from "./types";
+import type { Calendar, Entitlement, InviteAnswer, Meeting, MeetingInput, MeetingPatch, Plan, Preferences, PreferencesPatch, RecurrenceOverride, Task, TaskInput, TaskPatch, User } from "./types";
 
 /** What the screens read: `ready` is false until the session and first records are known. */
 export type AgendaState = {
@@ -60,6 +60,8 @@ function emit() {
 }
 
 function setState(next: Partial<AgendaState>) {
+  // every time on the page follows the account's time format
+  if (next.prefs && next.prefs.use24HourClock !== state.prefs.use24HourClock) setClock(next.prefs.use24HourClock);
   state = { ...state, ...next };
   emit();
 }
@@ -304,6 +306,36 @@ export async function deleteAccount(password?: string) {
   try {
     sessionStorage.setItem(DELETED_KEY, "1");
   } catch {}
+}
+
+/* ---------- Settings shared with the app ---------- */
+
+/**
+ * Saves settings to the account, as the app's Settings does: the phone picks
+ * them up when it syncs and reschedules its alerts. Shown here at once.
+ */
+export async function updatePreferences(patch: PreferencesPatch) {
+  const uid = requireUid();
+  const previous = state.prefs;
+  const updatedAt = stamp(previous.updatedAt);
+  setState({ prefs: { ...previous, ...patch, updatedAt } });
+  if (!LIVE) return persistDemo();
+  try {
+    const r = await loadRemote();
+    await r.savePreferences(uid, patch, updatedAt);
+  } catch (err) {
+    if (state.user?.uid === uid && state.prefs.updatedAt === updatedAt) setState({ prefs: previous });
+    throw err;
+  }
+}
+
+export type { WhatsAppStatus } from "./firebase";
+
+/** The WhatsApp assistant's link, from the app's server (linked in the app). */
+export async function whatsappStatus(): Promise<Remote.WhatsAppStatus> {
+  if (!LIVE) return { enabled: true, linked: false, linkedLast4: null };
+  const r = await loadRemote();
+  return r.whatsappStatus();
 }
 
 /* ---------- Writing ---------- */
@@ -608,11 +640,11 @@ export async function answerInvite(token: string, answer: InviteAnswer) {
 
 /* ---------- The preview (a build without a Firebase config) ---------- */
 
-type DemoData = { user: User | null; entitlement: Entitlement; meetings: Meeting[]; tasks: Task[] };
+type DemoData = { user: User | null; entitlement: Entitlement; meetings: Meeting[]; tasks: Task[]; prefs?: Preferences };
 
 function persistDemo() {
   try {
-    const data: DemoData = { user: state.user, entitlement: state.entitlement, meetings: allMeetings, tasks: state.tasks };
+    const data: DemoData = { user: state.user, entitlement: state.entitlement, meetings: allMeetings, tasks: state.tasks, prefs: state.prefs };
     localStorage.setItem(DEMO_KEY, JSON.stringify(data));
   } catch {}
 }
@@ -635,7 +667,9 @@ function setDemo(data: Partial<DemoData>) {
 function startDemo() {
   const data = loadDemo();
   if (data) allMeetings = data.meetings;
-  state = { ...state, ready: true, user: data?.user ?? null, entitlement: data?.entitlement ?? FREE, tasks: data?.tasks ?? [], meetings: allMeetings.filter((m) => m.deletedAt === null) };
+  const prefs = data?.prefs ? { ...DEFAULT_PREFERENCES, ...data.prefs } : DEFAULT_PREFERENCES;
+  setClock(prefs.use24HourClock);
+  state = { ...state, ready: true, user: data?.user ?? null, entitlement: data?.entitlement ?? FREE, tasks: data?.tasks ?? [], prefs, meetings: allMeetings.filter((m) => m.deletedAt === null) };
   window.addEventListener("storage", (e) => {
     if (e.key !== DEMO_KEY) return;
     const next = loadDemo();
