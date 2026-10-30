@@ -307,6 +307,7 @@ export const agendaEn = {
     markUndone: (title: string) => `Mark "${title}" as not done`,
     noDue: "No due date",
     newTask: "New task",
+    progress: (done: number, total: number) => `${done} of ${total} tasks done`,
   },
 
   taskEditor: {
@@ -796,6 +797,7 @@ export const agendaEs: AgendaDict = {
     markUndone: (title: string) => `Marcar "${title}" como pendiente`,
     noDue: "Sin fecha",
     newTask: "Nueva tarea",
+    progress: (done: number, total: number) => `${done} de ${total} tareas hechas`,
   },
 
   taskEditor: {

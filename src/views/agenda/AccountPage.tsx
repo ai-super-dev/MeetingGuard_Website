@@ -25,7 +25,7 @@ const GREEN = "text-[#1fa37a]";
 function Section({ title, children, tone }: { title: string; children: ReactNode; tone?: "danger" }) {
   return (
     <section aria-label={title}>
-      <h2 className={`mb-3 px-1 text-[0.95rem] font-semibold ${tone === "danger" ? "text-accent-soft" : ""}`}>{title}</h2>
+      <h2 className={`mb-3.5 px-1 text-[1.02rem] font-semibold ${tone === "danger" ? "text-accent-soft" : ""}`}>{title}</h2>
       {children}
     </section>
   );
@@ -63,7 +63,8 @@ function Account() {
   const alertSummary = p.alertEnabled ? `${a.alertForm.level[p.alertIntensity].title} · ${p.defaultAlertTimes.map(a.reminder).join(", ")}` : a.account.alertsOff;
 
   return (
-    <div className="mx-auto max-w-[920px] space-y-9">
+    // fills the width up to 1180px; on wider screens it stays centred and grows to about 84%
+    <div className="mx-auto w-full max-w-[max(1180px,84%)] space-y-10">
       <Section title={a.account.title}>
         <Panel className="flex flex-wrap items-center gap-x-5 gap-y-4">
           <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-white/[0.08] text-[1.3rem] font-semibold">{user.name.charAt(0).toUpperCase()}</span>
