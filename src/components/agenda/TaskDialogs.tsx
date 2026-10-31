@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Bell, CalendarDays, Link2 } from "lucide-react";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { expandAll } from "@/lib/agenda/recurrence";
@@ -49,6 +48,44 @@ function useMeetingChoices(current: string) {
 
 export type TaskDraft = { id?: string; title?: string; description?: string; dueDate?: string; dueTime?: string; meetingId?: string };
 
+/** Asks before a task is deleted; the toast offers Undo. */
+export function DeleteTaskDialog({ task, onClose, onDeleted = onClose }: { task: Task; onClose: () => void; onDeleted?: () => void }) {
+  const a = useA();
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+
+  const remove = async () => {
+    setBusy(true);
+    try {
+      await deleteTask(task.id);
+      toast(a.toast.taskDeleted, { action: { label: a.toast.undo, run: () => void restoreTask(task) } });
+      onDeleted();
+    } catch {
+      setBusy(false);
+      toast(a.errors.save, { tone: "error" });
+    }
+  };
+
+  return (
+    <Dialog
+      title={a.taskEditor.deleteTitle}
+      onClose={onClose}
+      size="sm"
+      footer={
+        <>
+          <Button onClick={onClose}>{a.taskEditor.keep}</Button>
+          <Button variant="danger" onClick={remove} busy={busy}>
+            {a.taskEditor.deleteConfirm}
+          </Button>
+        </>
+      }
+    >
+      <p className="text-[0.95rem] font-medium">{task.title}</p>
+      <p className="mt-2 text-[0.88rem] text-white/65">{a.taskEditor.deleteBody}</p>
+    </Dialog>
+  );
+}
+
 /** Create or edit a task. A task with an id is edited; without one it is new. */
 export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () => void }) {
   const a = useA();
@@ -95,19 +132,6 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
     }
   };
 
-  const remove = async () => {
-    if (!existing) return;
-    setBusy(true);
-    try {
-      await deleteTask(existing.id);
-      toast(a.toast.taskDeleted, { action: { label: a.toast.undo, run: () => void restoreTask(existing) } });
-      onClose();
-    } catch {
-      setBusy(false);
-      toast(a.errors.save, { tone: "error" });
-    }
-  };
-
   if (draft.id && !existing) {
     return (
       <Dialog title={a.taskEditor.editTitle} onClose={onClose} size="sm" footer={<Button onClick={onClose}>{a.common.close}</Button>}>
@@ -116,26 +140,7 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
     );
   }
 
-  if (confirmDelete && existing) {
-    return (
-      <Dialog
-        title={a.taskEditor.deleteTitle}
-        onClose={() => setConfirmDelete(false)}
-        size="sm"
-        footer={
-          <>
-            <Button onClick={() => setConfirmDelete(false)}>{a.taskEditor.keep}</Button>
-            <Button variant="danger" onClick={remove} busy={busy}>
-              {a.taskEditor.deleteConfirm}
-            </Button>
-          </>
-        }
-      >
-        <p className="text-[0.95rem] font-medium">{existing.title}</p>
-        <p className="mt-2 text-[0.88rem] text-white/65">{a.taskEditor.deleteBody}</p>
-      </Dialog>
-    );
-  }
+  if (confirmDelete && existing) return <DeleteTaskDialog task={existing} onClose={() => setConfirmDelete(false)} onDeleted={onClose} />;
 
   const formId = "task-form";
   return (
@@ -159,6 +164,9 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
       <form id={formId} onSubmit={submit} noValidate className="grid gap-4 sm:grid-cols-2">
         <Field label={a.taskEditor.title} error={errors.title} className="sm:col-span-2">
           {(p) => <input {...p} className={inputClass} value={form.title} onChange={(e) => set("title", e.target.value)} autoFocus maxLength={TITLE_MAX} />}
+        </Field>
+        <Field label={a.taskEditor.description} error={errors.description} className="sm:col-span-2">
+          {(p) => <textarea {...p} rows={3} className={`${inputClass} h-auto py-2`} value={form.description} maxLength={DESCRIPTION_MAX} onChange={(e) => set("description", e.target.value)} />}
         </Field>
         <Field label={a.taskEditor.dueDate} error={errors.dueDate}>
           {(p) => <input {...p} type="date" className={inputClass} value={form.dueDate} onChange={(e) => set("dueDate", e.target.value)} />}
@@ -212,80 +220,7 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
             </select>
           )}
         </Field>
-        <Field label={a.taskEditor.notes} error={errors.description} className="sm:col-span-2">
-          {(p) => <textarea {...p} rows={3} className={`${inputClass} h-auto py-2`} value={form.description} maxLength={DESCRIPTION_MAX} onChange={(e) => set("description", e.target.value)} />}
-        </Field>
       </form>
-    </Dialog>
-  );
-}
-
-/**
- * The card a typed task lands on before it is saved: the app's rule,
- * "nothing is saved until you confirm".
- */
-export function CaptureCard({ draft, onClose, onEdit }: { draft: TaskDraft; onClose: () => void; onEdit: () => void }) {
-  const a = useA();
-  const s = useAgenda();
-  const toast = useToast();
-  const due = useDueLabel();
-  const [busy, setBusy] = useState(false);
-  const meeting = s.meetings.find((m) => m.id === draft.meetingId);
-  const timezone = displayZone(s);
-
-  const confirm = async () => {
-    setBusy(true);
-    try {
-      await createTask({
-        title: draft.title ?? "",
-        dueDate: draft.dueDate || null,
-        dueTime: draft.dueTime || null,
-        timezone,
-        reminderMinutesBefore: draft.dueTime ? 0 : null,
-        meetingId: draft.meetingId || null,
-      });
-      toast(a.toast.taskSaved);
-      onClose();
-    } catch {
-      setBusy(false);
-      toast(a.errors.save, { tone: "error" });
-    }
-  };
-
-  return (
-    <Dialog
-      title={a.tasks.cardTitle}
-      onClose={onClose}
-      size="sm"
-      footer={
-        <>
-          <Button onClick={onEdit}>{a.tasks.edit}</Button>
-          <Button variant="primary" onClick={confirm} busy={busy} data-autofocus>
-            {a.tasks.confirm}
-          </Button>
-        </>
-      }
-    >
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-        <p className="text-[1.02rem] font-semibold">{draft.title}</p>
-        <p className="mt-2 flex items-center gap-2 text-[0.85rem] text-white/70">
-          <CalendarDays className="h-4 w-4 text-white/45" aria-hidden />
-          {due({ dueDate: draft.dueDate || null, dueTime: draft.dueTime || null, timezone })}
-        </p>
-        {draft.dueTime && (
-          <p className="mt-1 flex items-center gap-2 text-[0.85rem] text-white/70">
-            <Bell className="h-4 w-4 text-white/45" aria-hidden />
-            {a.taskEditor.atDueTime}
-          </p>
-        )}
-        {meeting && (
-          <p className="mt-1 flex items-center gap-2 text-[0.85rem] text-white/70">
-            <Link2 className="h-4 w-4 text-white/45" aria-hidden />
-            {meeting.title}
-          </p>
-        )}
-      </div>
-      <p className="mt-3 text-[0.8rem] text-white/50">{a.tasks.notSaved}</p>
     </Dialog>
   );
 }
