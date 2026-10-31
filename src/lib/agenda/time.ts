@@ -173,8 +173,8 @@ export const fmtHour = (hour: number, lang: Lang) =>
   format(lang, "UTC", (clock24 ?? lang !== "en") ? { hour: "2-digit", minute: "2-digit", hourCycle: "h23" } : { hour: "numeric", hourCycle: "h12" }).format(new Date(Date.UTC(2026, 0, 1, hour)));
 
 /** "Oct 26 - Nov 1, 2026". */
-export const fmtDayRange = (first: string, last: string, lang: Lang) =>
-  format(lang, "UTC", { month: "short", day: "numeric", year: "numeric" }).formatRange(keyDate(first), keyDate(last));
+export const fmtDayRange = (first: string, last: string, lang: Lang, withYear = true) =>
+  format(lang, "UTC", { month: "short", day: "numeric", ...(withYear ? { year: "numeric" } : {}) }).formatRange(keyDate(first), keyDate(last));
 
 export const fmtMonth = (day: string, lang: Lang) => format(lang, "UTC", { month: "long", year: "numeric" }).format(keyDate(day));
 

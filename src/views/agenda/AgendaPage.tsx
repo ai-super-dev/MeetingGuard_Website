@@ -151,24 +151,33 @@ function Agenda() {
       : view === "week"
         ? fmtDayRange(days[0], days[6], lang)
         : fmtMonth(date, lang);
+  // on a phone the date stays on one line: shorter, and the year only when it is not this year
+  const thisYear = days[0].slice(0, 4) === today.slice(0, 4) && days[days.length - 1].slice(0, 4) === today.slice(0, 4);
+  const phoneTitle =
+    view === "day"
+      ? fmtDay(date, lang, { weekday: "short", day: "numeric", month: "short", ...(thisYear ? {} : { year: "numeric" }) })
+      : view === "week"
+        ? fmtDayRange(days[0], days[6], lang, !thisYear)
+        : title;
   const visibleSources = SOURCES.filter((src) => src === "meetingguard" || s.meetings.some((m) => calendarOf(m) === src));
   const dayEmpty = view === "day" && occs.length === 0;
 
   return (
     <>
-      {/* toolbar: pinned under the top bar. On a phone only the date and New meeting are; from a tablet up it is one row */}
+      {/* toolbar: pinned under the top bar. On a phone only the date and New meeting are, in a band with the other controls; from a tablet up it is one row */}
       <div className="max-md:contents md:sticky md:top-14 md:z-20 md:-mx-4 md:-mt-2 md:flex md:items-center md:gap-2 md:bg-ink-950 md:px-4 md:py-2 lg:top-16 lg:-mx-8 lg:px-8">
-        <div className="flex items-center gap-3 max-md:sticky max-md:top-14 max-md:z-20 max-md:-mx-4 max-md:-mt-2 max-md:bg-ink-950 max-md:px-4 max-md:py-2 md:contents">
+        <div className="flex items-center gap-3 max-md:sticky max-md:top-14 max-md:z-20 max-md:-mx-4 max-md:-mt-4 max-md:border-b max-md:border-white/[0.08] max-md:bg-bar max-md:px-4 max-md:py-2 max-md:shadow-[0_6px_14px_rgba(0,0,0,0.22)] md:contents">
           <h2 className="min-w-0 flex-1 text-[1.05rem] leading-tight font-semibold first-letter:uppercase md:order-2 md:truncate md:text-[1.15rem]" aria-live="polite">
-            {title}
+            <span className="md:hidden">{phoneTitle}</span>
+            <span className="max-md:hidden">{title}</span>
           </h2>
-          <Button variant="primary" onClick={() => newMeeting()} aria-keyshortcuts="N" title={`${a.toolbar.newMeeting} (N)`} className="h-9 shrink-0 px-3 md:order-4 lg:h-10 lg:px-4">
+          <Button variant="primary" onClick={() => newMeeting()} aria-keyshortcuts="N" title={`${a.toolbar.newMeeting} (N)`} className="shrink-0 max-md:h-9! max-md:px-3! md:order-4">
             <Plus className="h-4 w-4" aria-hidden />
             {a.toolbar.newMeeting}
           </Button>
         </div>
-        <div className="flex items-center gap-1 sm:gap-2 md:contents">
-          <Button onClick={() => setDate(today)} aria-keyshortcuts="T" title={`${a.toolbar.today} (T)`} className="h-9 px-2.5 sm:px-3 md:order-1">
+        <div className="flex items-center gap-1 max-md:-mx-4 max-md:bg-bar max-md:px-4 max-md:pt-2.5 sm:gap-2 md:contents">
+          <Button onClick={() => setDate(today)} aria-keyshortcuts="T" title={`${a.toolbar.today} (T)`} className="max-md:h-9! max-md:px-2.5! md:order-1 md:px-3">
             {a.toolbar.today}
           </Button>
           <div className="flex md:order-1">
@@ -195,7 +204,7 @@ function Agenda() {
       </div>
 
       {/* calendars shown, and the keyboard list where there is a keyboard */}
-      <div className="mt-3 flex items-start gap-2 md:mt-1">
+      <div className="flex items-start gap-2 max-md:-mx-4 max-md:border-b max-md:border-white/10 max-md:bg-bar max-md:px-4 max-md:pt-2.5 max-md:pb-1.5 md:mt-1">
         <div role="group" aria-label={a.toolbar.sources} className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 text-[0.8rem]">
           <button
             type="button"
