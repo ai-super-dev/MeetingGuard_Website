@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CircleAlert, CircleUser, Info, ListChecks, WifiOff, X } from "lucide-react";
+import { CalendarDays, CircleAlert, CircleUser, House, Info, ListChecks, WifiOff, X } from "lucide-react";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { AppMark, Logo } from "@/components/ui/Logo";
@@ -139,7 +139,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
             })}
           </ul>
         </nav>
-        <div className="mt-auto space-y-3 px-1">
+        <div className="mt-auto px-1">
           <Link href={href("/app/account")} className="flex items-center gap-3 rounded-xl border border-white/[0.07] p-3 hover:border-white/15">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/[0.08] text-[0.85rem] font-semibold">
               {s.user.name.charAt(0).toUpperCase()}
@@ -151,9 +151,6 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
               </span>
             </span>
           </Link>
-          <a href={href("/")} className="block px-2 text-[0.75rem] text-white/40 hover:text-white/70">
-            {a.nav.site}
-          </a>
         </div>
       </aside>
 
@@ -170,6 +167,16 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
             </span>
           )}
           {actions}
+          {/* back to the website: the label on a computer or tablet, the house alone on a phone */}
+          <a
+            href={href("/")}
+            aria-label={a.nav.site}
+            title={a.nav.site}
+            className="inline-flex h-8 shrink-0 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3 text-[0.8rem] font-medium text-white/85 transition-colors hover:border-white/25 hover:bg-white/[0.09] hover:text-white max-sm:w-8 max-sm:px-0"
+          >
+            <House className="h-4 w-4" aria-hidden />
+            <span className="max-sm:hidden">{a.nav.site}</span>
+          </a>
           <Controls />
         </div>
       </header>

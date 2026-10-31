@@ -272,6 +272,7 @@ export function Segmented<T extends string>({
           role="radio"
           aria-checked={value === o.value}
           aria-keyshortcuts={o.shortcut}
+          title={o.shortcut && `${o.label} (${o.shortcut})`}
           onClick={() => onChange(o.value)}
           className={`h-8 rounded-md px-3 text-[0.82rem] font-medium transition-colors ${
             value === o.value ? "bg-white/[0.12] text-white" : "text-white/60 hover:text-white"

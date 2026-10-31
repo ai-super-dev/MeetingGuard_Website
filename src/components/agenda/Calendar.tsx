@@ -184,7 +184,7 @@ export function TimeGrid({
       )}
 
       {/* hours */}
-      <div ref={scroller} className="relative h-[calc(100dvh-300px)] min-h-[380px] overflow-y-auto lg:h-[calc(100dvh-250px)]">
+      <div ref={scroller} className="relative h-[calc(100dvh-366px)] min-h-[380px] overflow-y-auto md:h-[calc(100dvh-316px)] lg:h-[calc(100dvh-292px)]">
         <div className="relative grid" style={{ gridTemplateColumns: columns, height: 24 * HOUR }}>
           <div className="relative" aria-hidden>
             {Array.from({ length: 23 }, (_, i) => (

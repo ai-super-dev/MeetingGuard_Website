@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Keyboard, Plus } from "lucide-react";
 import { byDay, DayList, MonthGrid, TimeGrid, monthDays, type Selection } from "@/components/agenda/Calendar";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { SOURCE_COLOR } from "@/components/agenda/look";
 import { CancelDialog, EditScopeDialog, MeetingDetails, MeetingEditor, MoveDialog, OccurrenceEditor, type EditorMode } from "@/components/agenda/MeetingDialogs";
-import { Button, IconButton, Segmented } from "@/components/agenda/ui";
+import { Button, Dialog, IconButton, Segmented } from "@/components/agenda/ui";
 import { shortcutBlocked, useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { expandAll } from "@/lib/agenda/recurrence";
@@ -40,6 +40,36 @@ export function AgendaPage() {
   );
 }
 
+/** The list behind the "Keyboard shortcuts" button. */
+function ShortcutsDialog({ onClose }: { onClose: () => void }) {
+  const a = useA();
+  const rows = [
+    { keys: ["N"], label: a.toolbar.newMeeting },
+    { keys: ["T"], label: a.toolbar.today },
+    { keys: ["D", "W", "M"], label: a.toolbar.keyViews },
+    { keys: ["←", "→"], label: a.toolbar.keyMove },
+    { keys: ["?"], label: a.toolbar.keyHelp },
+  ];
+  return (
+    <Dialog title={a.toolbar.shortcuts} onClose={onClose} size="sm">
+      <dl className="space-y-3">
+        {rows.map((r) => (
+          <div key={r.label} className="flex items-center gap-4">
+            <dt className="flex w-24 shrink-0 gap-1">
+              {r.keys.map((k) => (
+                <kbd key={k} className="grid h-7 min-w-7 place-items-center rounded-md border border-white/15 bg-white/[0.06] px-1.5 font-sans text-[0.8rem] font-semibold">
+                  {k}
+                </kbd>
+              ))}
+            </dt>
+            <dd className="text-[0.88rem] text-white/80">{r.label}</dd>
+          </div>
+        ))}
+      </dl>
+    </Dialog>
+  );
+}
+
 /** Rendered once the agenda has loaded in the browser, so it can read the address directly. */
 function Agenda() {
   const a = useA();
@@ -59,6 +89,7 @@ function Agenda() {
   const [occurrenceEdit, setOccurrenceEdit] = useState<{ sel: Selection; scope: "one" | "following" } | null>(null);
   const [moving, setMoving] = useState<Selection | null>(null);
   const [cancelling, setCancelling] = useState<Selection | null>(null);
+  const [showKeys, setShowKeys] = useState(false);
 
   // keep the address in step, so a reload or a shared link opens the same view
   useEffect(() => {
@@ -94,7 +125,7 @@ function Agenda() {
     setEditor({ kind: "new", day, time: at });
   };
 
-  // N new meeting, T today, D W M views, arrows back and forward
+  // N new meeting, T today, D W M views, arrows back and forward, ? this list
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (shortcutBlocked(e)) return;
@@ -106,6 +137,7 @@ function Agenda() {
       else if (k === "m") setView("month");
       else if (e.key === "ArrowLeft") step(-1);
       else if (e.key === "ArrowRight") step(1);
+      else if (e.key === "?") setShowKeys(true);
       else return;
       e.preventDefault();
     };
@@ -124,70 +156,86 @@ function Agenda() {
 
   return (
     <>
-      {/* toolbar */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Button onClick={() => setDate(today)} aria-keyshortcuts="T" className="h-9 px-3">
-          {a.toolbar.today}
-        </Button>
-        <div className="flex">
-          <IconButton label={a.toolbar.prev} onClick={() => step(-1)} aria-keyshortcuts="ArrowLeft">
-            <ChevronLeft className="h-5 w-5" />
-          </IconButton>
-          <IconButton label={a.toolbar.next} onClick={() => step(1)} aria-keyshortcuts="ArrowRight">
-            <ChevronRight className="h-5 w-5" />
-          </IconButton>
+      {/* toolbar: pinned under the top bar. On a phone only the date and New meeting are; from a tablet up it is one row */}
+      <div className="max-md:contents md:sticky md:top-14 md:z-20 md:-mx-4 md:-mt-2 md:flex md:items-center md:gap-2 md:bg-ink-950 md:px-4 md:py-2 lg:top-16 lg:-mx-8 lg:px-8">
+        <div className="flex items-center gap-3 max-md:sticky max-md:top-14 max-md:z-20 max-md:-mx-4 max-md:-mt-2 max-md:bg-ink-950 max-md:px-4 max-md:py-2 md:contents">
+          <h2 className="min-w-0 flex-1 text-[1.05rem] leading-tight font-semibold first-letter:uppercase md:order-2 md:truncate md:text-[1.15rem]" aria-live="polite">
+            {title}
+          </h2>
+          <Button variant="primary" onClick={() => newMeeting()} aria-keyshortcuts="N" title={`${a.toolbar.newMeeting} (N)`} className="h-9 shrink-0 px-3 md:order-4 lg:h-10 lg:px-4">
+            <Plus className="h-4 w-4" aria-hidden />
+            {a.toolbar.newMeeting}
+          </Button>
         </div>
-        <h2 className="min-w-0 flex-1 truncate text-[1.05rem] font-semibold first-letter:uppercase max-sm:order-first max-sm:basis-full sm:text-[1.15rem]" aria-live="polite">
-          {title}
-        </h2>
-        <div className="max-sm:ml-auto">
-        <Segmented
-          label={a.toolbar.view}
-          value={view}
-          onChange={setView}
-          options={[
-            { value: "day", label: a.toolbar.day, shortcut: "D" },
-            { value: "week", label: a.toolbar.week, shortcut: "W" },
-            { value: "month", label: a.toolbar.month, shortcut: "M" },
-          ]}
-        />
+        <div className="flex items-center gap-1 sm:gap-2 md:contents">
+          <Button onClick={() => setDate(today)} aria-keyshortcuts="T" title={`${a.toolbar.today} (T)`} className="h-9 px-2.5 sm:px-3 md:order-1">
+            {a.toolbar.today}
+          </Button>
+          <div className="flex md:order-1">
+            <IconButton label={a.toolbar.prev} title={`${a.toolbar.prev} (←)`} onClick={() => step(-1)} aria-keyshortcuts="ArrowLeft" className="max-sm:w-8">
+              <ChevronLeft className="h-5 w-5" />
+            </IconButton>
+            <IconButton label={a.toolbar.next} title={`${a.toolbar.next} (→)`} onClick={() => step(1)} aria-keyshortcuts="ArrowRight" className="max-sm:w-8">
+              <ChevronRight className="h-5 w-5" />
+            </IconButton>
+          </div>
+          <div className="max-md:ml-auto max-sm:[&_button]:px-2 md:order-3">
+            <Segmented
+              label={a.toolbar.view}
+              value={view}
+              onChange={setView}
+              options={[
+                { value: "day", label: a.toolbar.day, shortcut: "D" },
+                { value: "week", label: a.toolbar.week, shortcut: "W" },
+                { value: "month", label: a.toolbar.month, shortcut: "M" },
+              ]}
+            />
+          </div>
         </div>
-        <Button variant="primary" onClick={() => newMeeting()} aria-keyshortcuts="N" className="max-lg:hidden">
-          <Plus className="h-4 w-4" aria-hidden />
-          {a.toolbar.newMeeting}
-        </Button>
       </div>
 
-      {/* calendars shown */}
-      <div role="group" aria-label={a.toolbar.sources} className="mt-3 flex gap-2 overflow-x-auto pb-1 text-[0.8rem]">
+      {/* calendars shown, and the keyboard list where there is a keyboard */}
+      <div className="mt-3 flex items-start gap-2 md:mt-1">
+        <div role="group" aria-label={a.toolbar.sources} className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 text-[0.8rem]">
+          <button
+            type="button"
+            aria-pressed={hidden.length === 0}
+            onClick={() => setHidden([])}
+            className={`shrink-0 rounded-lg border px-3 py-1.5 ${hidden.length === 0 ? "border-white/30 bg-white/[0.08] text-white" : "border-white/10 text-white/60 hover:text-white"}`}
+          >
+            {a.toolbar.allSources}
+          </button>
+          {visibleSources.map((src) => {
+            const shown = !hidden.includes(src);
+            return (
+              <button
+                key={src}
+                type="button"
+                aria-pressed={shown}
+                onClick={() => setHidden((h) => (shown ? [...h, src] : h.filter((x) => x !== src)))}
+                className={`flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1.5 ${shown ? "border-white/15 text-white" : "border-white/[0.07] text-white/40 line-through"}`}
+              >
+                <span className="h-2 w-2 rounded-full" style={{ background: SOURCE_COLOR[src], opacity: shown ? 1 : 0.4 }} />
+                {a.sources[src]}
+              </button>
+            );
+          })}
+        </div>
         <button
           type="button"
-          aria-pressed={hidden.length === 0}
-          onClick={() => setHidden([])}
-          className={`shrink-0 rounded-lg border px-3 py-1.5 ${hidden.length === 0 ? "border-white/30 bg-white/[0.08] text-white" : "border-white/10 text-white/60 hover:text-white"}`}
+          onClick={() => setShowKeys(true)}
+          aria-keyshortcuts="?"
+          title={`${a.toolbar.shortcuts} (?)`}
+          className="hidden shrink-0 items-center gap-2 rounded-lg border border-white/10 px-3 py-1.5 text-[0.8rem] text-white/70 transition-colors hover:border-white/25 hover:text-white lg:[@media(pointer:fine)]:flex"
         >
-          {a.toolbar.allSources}
+          <Keyboard className="h-4 w-4" aria-hidden />
+          {a.toolbar.shortcuts}
         </button>
-        {visibleSources.map((src) => {
-          const shown = !hidden.includes(src);
-          return (
-            <button
-              key={src}
-              type="button"
-              aria-pressed={shown}
-              onClick={() => setHidden((h) => (shown ? [...h, src] : h.filter((x) => x !== src)))}
-              className={`flex shrink-0 items-center gap-2 rounded-lg border px-3 py-1.5 ${shown ? "border-white/15 text-white" : "border-white/[0.07] text-white/40 line-through"}`}
-            >
-              <span className="h-2 w-2 rounded-full" style={{ background: SOURCE_COLOR[src], opacity: shown ? 1 : 0.4 }} />
-              {a.sources[src]}
-            </button>
-          );
-        })}
       </div>
 
       {dayEmpty && <p className="mt-3 text-[0.85rem] text-white/50">{a.calendar.emptyDay}</p>}
 
-      <div className="mt-3">
+      <div className="mt-3 max-lg:-mb-10">
         {view === "day" && <TimeGrid days={days} occs={occs} zone={zone} today={today} now={now} onOpen={setOpen} onNew={newMeeting} />}
         {view === "week" && (
           <>
@@ -202,17 +250,7 @@ function Agenda() {
         {view === "month" && <MonthGrid date={date} occs={occs} zone={zone} today={today} onOpen={setOpen} onDay={goDay} />}
       </div>
 
-      <p className="mt-4 hidden text-[0.75rem] text-white/35 lg:block">{a.toolbar.shortcuts}</p>
-
-      {/* new meeting on a phone, where the app has it */}
-      <button
-        type="button"
-        onClick={() => newMeeting()}
-        className="fixed right-4 bottom-[calc(80px+env(safe-area-inset-bottom))] z-30 flex h-12 items-center gap-2 rounded-2xl bg-inverse px-5 text-[0.9rem] font-semibold text-on-inverse shadow-[0_10px_30px_rgba(0,0,0,0.45)] lg:hidden"
-      >
-        <Plus className="h-5 w-5" aria-hidden />
-        {a.toolbar.newMeeting}
-      </button>
+      {showKeys && <ShortcutsDialog onClose={() => setShowKeys(false)} />}
 
       {open && (
         <MeetingDetails

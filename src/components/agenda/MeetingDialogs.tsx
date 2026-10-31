@@ -594,10 +594,11 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
             </div>
           ))}
           {errors.participants && <Helper tone="error">{a.errors[errors.participants]}</Helper>}
-          <button type="button" onClick={() => change({ participants: [...draft.participants, { email: "", name: "" }] })} className="inline-flex h-9 items-center gap-2 rounded-lg px-2 text-[0.84rem] font-medium text-white/85 hover:bg-white/[0.06] hover:text-white">
+          {draft.participants.length === 0 && <p className="mb-3 text-[0.84rem] text-white/50">{a.form.noParticipants}</p>}
+          <Button onClick={() => change({ participants: [...draft.participants, { email: "", name: "" }] })} className="w-full border-white/25! hover:bg-white/[0.06]">
             <UserPlus className="h-4 w-4" aria-hidden />
             {a.form.addParticipant}
-          </button>
+          </Button>
           {draft.participants.length > 0 && <Helper>{links.google ? a.form.invitesByGoogle : a.form.invitesNeedCalendar}</Helper>}
         </FormSection>
 
