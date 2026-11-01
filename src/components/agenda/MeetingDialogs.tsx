@@ -73,13 +73,8 @@ const saveError = (a: ReturnType<typeof useA>, err: unknown) => (err instanceof 
 
 /** What the closed Additional options row says is filled in. */
 function optionalSummary(d: MeetingDraft, a: ReturnType<typeof useA>) {
-  const people = d.participants.filter((row) => row.email.trim() || row.name.trim()).length;
   return [
-    d.description.trim() && a.form.description,
-    d.repeat !== "none" && a.form.repeatChoice[d.repeat],
     d.locationType !== "none" && a.form.location[d.locationType],
-    d.conferenceProvider !== "none" && a.form.provider[d.conferenceProvider],
-    people > 0 && a.details.participants(people),
     d.tips.trim() && a.form.tips,
     d.customAlerts && a.form.ownReminders,
     d.alertIntensity !== "default" && `${a.form.intensity}: ${a.intensity[d.alertIntensity]}`,
@@ -88,7 +83,7 @@ function optionalSummary(d: MeetingDraft, a: ReturnType<typeof useA>) {
 }
 
 /** The fields that stay visible when Additional options is closed. */
-const ALWAYS_SHOWN = ["title", "date", "time", "duration", "timezone"];
+const ALWAYS_SHOWN = ["title", "date", "time", "duration", "timezone", "description", "repeatInterval", "repeatUntil", "repeatCount", "conferenceUrl", "conferencePassword", "participants"];
 
 /** How the chosen intensity looks on the phone, as in the app. */
 function AlertPreview({ level }: { level: AlertIntensity }) {
@@ -551,6 +546,7 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
 
         <FormSection>
           <FloatField label={a.form.title} value={draft.title} onChange={(v) => change({ title: v })} error={errors.title} maxLength={TITLE_MAX} autoFocus />
+          <FloatField className="mt-3" label={a.form.description} value={draft.description} onChange={(v) => change({ description: v })} error={errors.description} multiline />
         </FormSection>
 
         <FormSection title={a.form.when}>
@@ -569,19 +565,6 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
               <ChoiceChips label={a.form.duration} value={draft.durationMinutes} onChange={(v) => change({ durationMinutes: v })} options={durationChoices.map((min) => ({ value: min, label: fmtDuration(min) }))} />
             </>
           )}
-        </FormSection>
-
-        <button type="button" aria-expanded={moreOpen} aria-controls={moreId} onClick={() => setMoreOpen((open) => !open)} className="flex w-full items-start justify-between gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-colors hover:border-white/20">
-          <span className="min-w-0">
-            <span className="block text-[0.95rem] font-semibold">{a.form.additional}</span>
-            {!moreOpen && <span className="mt-0.5 block text-[0.8rem] leading-snug text-white/55">{summary.length ? summary.join(", ") : a.form.additionalHint}</span>}
-          </span>
-          <ChevronDown className={`mt-0.5 h-5 w-5 shrink-0 text-white/60 transition-transform ${moreOpen ? "rotate-180" : ""}`} aria-hidden />
-        </button>
-
-        <div id={moreId} hidden={!moreOpen} className="space-y-3">
-        <FormSection>
-          <FloatField label={a.form.description} value={draft.description} onChange={(v) => change({ description: v })} error={errors.description} multiline />
         </FormSection>
 
         <FormSection title={a.form.repeatTitle}>
@@ -637,11 +620,6 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
           )}
         </FormSection>
 
-        <FormSection title={a.form.place}>
-          <ChoiceChips label={a.form.place} value={draft.locationType} onChange={(v) => change({ locationType: v })} options={(["none", "physical", "virtual", "hybrid"] as const).map((c) => ({ value: c, label: a.form.location[c] }))} />
-          {(draft.locationType === "physical" || draft.locationType === "hybrid") && <FloatField className="mt-3" label={a.form.address} value={draft.address} onChange={(v) => change({ address: v })} maxLength={500} error={errors.address} />}
-        </FormSection>
-
         <FormSection title={a.form.videoCall}>
           <ChoiceChips
             label={a.form.videoCall}
@@ -680,6 +658,20 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
             {a.form.addParticipant}
           </Button>
           {draft.participants.length > 0 && <Helper>{links.google ? a.form.invitesByGoogle : a.form.invitesNeedCalendar}</Helper>}
+        </FormSection>
+
+        <button type="button" aria-expanded={moreOpen} aria-controls={moreId} onClick={() => setMoreOpen((open) => !open)} className="flex w-full items-start justify-between gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-colors hover:border-white/20">
+          <span className="min-w-0">
+            <span className="block text-[0.95rem] font-semibold">{a.form.additional}</span>
+            {!moreOpen && <span className="mt-0.5 block text-[0.8rem] leading-snug text-white/55">{summary.length ? summary.join(", ") : a.form.additionalHint}</span>}
+          </span>
+          <ChevronDown className={`mt-0.5 h-5 w-5 shrink-0 text-white/60 transition-transform ${moreOpen ? "rotate-180" : ""}`} aria-hidden />
+        </button>
+
+        <div id={moreId} hidden={!moreOpen} className="space-y-3">
+        <FormSection title={a.form.place}>
+          <ChoiceChips label={a.form.place} value={draft.locationType} onChange={(v) => change({ locationType: v })} options={(["none", "physical", "virtual", "hybrid"] as const).map((c) => ({ value: c, label: a.form.location[c] }))} />
+          {(draft.locationType === "physical" || draft.locationType === "hybrid") && <FloatField className="mt-3" label={a.form.address} value={draft.address} onChange={(v) => change({ address: v })} maxLength={500} error={errors.address} />}
         </FormSection>
 
         <FormSection title={a.form.tips}>
