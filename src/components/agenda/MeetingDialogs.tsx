@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
-import { Bell, Bot, CalendarDays, CalendarX, Clock, ExternalLink, FileText, Globe, Lightbulb, MapPin, Repeat, StickyNote, Timer, UserPlus, Users, Video, X } from "lucide-react";
+import { AlarmClock, Bell, Bot, CalendarDays, CalendarX, ChevronDown, ChevronUp, Clock, ExternalLink, FileText, Globe, Lightbulb, MapPin, Paperclip, Repeat, StickyNote, Timer, UserPlus, Users, Video, X } from "lucide-react";
 import { useA } from "@/lib/agenda/i18n";
 import { cardInfo, formHint, linkLabel, showPasscode, zoomNotConfigured } from "@/lib/agenda/conference";
 import { findOccurrence, WEEKDAYS } from "@/lib/agenda/recurrence";
@@ -25,12 +25,12 @@ import {
   useAgenda,
 } from "@/lib/agenda/store";
 import { addDays, dayKey, dayStart, daysBetween, fmtDay, fmtDuration, fmtRange, fmtTime, fromZoned, isDayKey, isTimeKey, timeKey, zoneLabel, MINUTE } from "@/lib/agenda/time";
-import type { Meeting, MeetingPatch, RecurrenceRule, Task } from "@/lib/agenda/types";
+import type { AlertIntensity, Meeting, MeetingPatch, RecurrenceRule, Task } from "@/lib/agenda/types";
 import { ALERT_TIME_OPTIONS, defaultWeekdays, draftFromMeeting, draftToInput, draftToPatch, DURATION_OPTIONS, hasErrors, newDraft, ruleOf, startAtOf, TITLE_MAX, validateDraft, type ErrorCode, type MeetingDraft, type ParticipantDraft } from "@/lib/agenda/validation";
 import { useLang } from "@/lib/language";
 import { hostOf, type Selection } from "./Calendar";
 import { SOURCE_COLOR } from "./look";
-import { ChoiceChips, FloatField, FormSection, Helper, ListGroup, PickerRow, Subheading, Switch, ToggleChip } from "./form";
+import { ChoiceChips, FloatField, FormSection, Helper, ListGroup, PickerRow, RadioRow, Subheading, Switch, ToggleChip } from "./form";
 import { Button, Dialog, Field, IconButton, inputClass, useToast } from "./ui";
 
 /** Which meetings of a series a change applies to. */
@@ -70,6 +70,66 @@ function Gone({ title, onClose }: { title: string; onClose: () => void }) {
 }
 
 const saveError = (a: ReturnType<typeof useA>, err: unknown) => (err instanceof SeriesEndError ? a.errors.seriesEnd : a.errors.save);
+
+/** What the closed Additional options row says is filled in. */
+function optionalSummary(d: MeetingDraft, a: ReturnType<typeof useA>) {
+  const people = d.participants.filter((row) => row.email.trim() || row.name.trim()).length;
+  return [
+    d.description.trim() && a.form.description,
+    d.repeat !== "none" && a.form.repeatChoice[d.repeat],
+    d.locationType !== "none" && a.form.location[d.locationType],
+    d.conferenceProvider !== "none" && a.form.provider[d.conferenceProvider],
+    people > 0 && a.details.participants(people),
+    d.tips.trim() && a.form.tips,
+    d.customAlerts && a.form.ownReminders,
+    d.alertIntensity !== "default" && `${a.form.intensity}: ${a.intensity[d.alertIntensity]}`,
+    d.notes.trim() && a.form.notes,
+  ].filter((x): x is string => !!x);
+}
+
+/** The fields that stay visible when Additional options is closed. */
+const ALWAYS_SHOWN = ["title", "date", "time", "duration", "timezone"];
+
+/** How the chosen intensity looks on the phone, as in the app. */
+function AlertPreview({ level }: { level: AlertIntensity }) {
+  const p = useA().form.preview;
+  return (
+    <>
+      <Subheading>{p.label}</Subheading>
+      <div className="theme-dark overflow-hidden rounded-xl border border-white/10 bg-ink-950 p-3" aria-live="polite">
+        {level === "max" && (
+          <div className="flex flex-col items-center gap-1 rounded-xl bg-[#3f0a14] px-4 py-5 text-center text-white">
+            <AlarmClock className="h-7 w-7" aria-hidden />
+            <p className="mt-1 text-[0.95rem] font-semibold">{p.meetingTitle}</p>
+            <p className="text-[0.82rem] text-[#f5d58a]">{p.startsIn}</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2 text-[0.82rem] font-medium" aria-hidden>
+              <span className="rounded-lg bg-[#fafafa] px-3 py-1.5 text-[#3f0a14]">{p.acknowledge}</span>
+              <span className="rounded-lg border border-[#f3a0a8] px-3 py-1.5 text-[#fbd5d8]">{p.snooze}</span>
+            </div>
+          </div>
+        )}
+        {level === "medium" && (
+          <div className="flex items-center gap-3 rounded-lg border-l-4 border-[#c9974a] bg-[#1b2433] px-3 py-3 text-white">
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#c9974a]" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[0.88rem] font-semibold">{p.meetingTitle}</span>
+              <span className="block text-[0.78rem] text-white/70">{p.startsIn}</span>
+            </span>
+            <ChevronUp className="h-4 w-4 shrink-0 text-white/70" aria-hidden />
+          </div>
+        )}
+        {level === "light" && (
+          <div className="flex justify-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#1b2433] px-4 py-2 text-[0.82rem] text-white">
+              <Bell className="h-4 w-4 shrink-0" aria-hidden />
+              {p.lightText}
+            </span>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
 
 /* ---------- Details ---------- */
 
@@ -251,6 +311,9 @@ export function MeetingDetails({
             {m.alertIntensity === null && <span className="text-white/50"> {a.details.yourDefault}</span>}
           </p>
         </Row>
+        <Row icon={<Paperclip className="h-[18px] w-[18px]" />} label={a.details.attachments}>
+          <p className="text-white/65">{a.details.attachmentsNote}</p>
+        </Row>
       </div>
 
       {linked.length > 0 && (
@@ -408,6 +471,8 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [moveLinked, setMoveLinked] = useState<boolean | null>(null);
+  // closed for a new meeting; open when editing one that already has optional details
+  const [moreOpen, setMoreOpen] = useState(() => !!existing && optionalSummary(original, a).length > 0);
   const change = (patch: Partial<MeetingDraft>) => setDraft((d) => ({ ...d, ...patch }));
 
   if (mode.kind === "edit" && !existing) return <Gone title={a.editor.editTitle} onClose={onClose} />;
@@ -432,12 +497,18 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
     // switching to weekly selects the meeting's own weekday
     change({ repeat, repeatWeekdays: repeat === "weekly" && !draft.repeatWeekdays.length ? defaultWeekdays(draft) : draft.repeatWeekdays });
   const setParticipant = (index: number, patch: Partial<ParticipantDraft>) => change({ participants: draft.participants.map((row, i) => (i === index ? { ...row, ...patch } : row)) });
+  const formId = "meeting-form";
+  const moreId = "meeting-form-more";
+  const summary = optionalSummary(draft, a);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     if (hasErrors(found)) {
       toast(a.form.fixErrors, { tone: "error" });
+      if (Object.keys(found).some((key) => !ALWAYS_SHOWN.includes(key))) setMoreOpen(true);
+      // after the errors have rendered, and the section has opened
+      requestAnimationFrame(() => requestAnimationFrame(() => document.querySelector(`#${formId} [aria-invalid="true"], #${formId} [role="alert"]`)?.scrollIntoView({ block: "center" })));
       return;
     }
     if (linked.length > 0 && moveLinked === null) return;
@@ -461,7 +532,6 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
     }
   };
 
-  const formId = "meeting-form";
   const dateLabel = isDayKey(draft.date) ? capitalize(fmtDay(draft.date, lang, { weekday: "long", month: "long", day: "numeric", year: "numeric" })) : "—";
   const timeLabel = newStart && !draft.allDay ? fmtTime(new Date(newStart), lang, draft.timezone) : "—";
 
@@ -480,10 +550,7 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
         {existing?.source === "google" && <Helper>{a.details.synced(a.sources.google)}</Helper>}
 
         <FormSection>
-          <div className="space-y-3">
-            <FloatField label={a.form.title} value={draft.title} onChange={(v) => change({ title: v })} error={errors.title} maxLength={TITLE_MAX} autoFocus />
-            <FloatField label={a.form.description} value={draft.description} onChange={(v) => change({ description: v })} error={errors.description} multiline />
-          </div>
+          <FloatField label={a.form.title} value={draft.title} onChange={(v) => change({ title: v })} error={errors.title} maxLength={TITLE_MAX} autoFocus />
         </FormSection>
 
         <FormSection title={a.form.when}>
@@ -502,6 +569,19 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
               <ChoiceChips label={a.form.duration} value={draft.durationMinutes} onChange={(v) => change({ durationMinutes: v })} options={durationChoices.map((min) => ({ value: min, label: fmtDuration(min) }))} />
             </>
           )}
+        </FormSection>
+
+        <button type="button" aria-expanded={moreOpen} aria-controls={moreId} onClick={() => setMoreOpen((open) => !open)} className="flex w-full items-start justify-between gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-colors hover:border-white/20">
+          <span className="min-w-0">
+            <span className="block text-[0.95rem] font-semibold">{a.form.additional}</span>
+            {!moreOpen && <span className="mt-0.5 block text-[0.8rem] leading-snug text-white/55">{summary.length ? summary.join(", ") : a.form.additionalHint}</span>}
+          </span>
+          <ChevronDown className={`mt-0.5 h-5 w-5 shrink-0 text-white/60 transition-transform ${moreOpen ? "rotate-180" : ""}`} aria-hidden />
+        </button>
+
+        <div id={moreId} hidden={!moreOpen} className="space-y-3">
+        <FormSection>
+          <FloatField label={a.form.description} value={draft.description} onChange={(v) => change({ description: v })} error={errors.description} multiline />
         </FormSection>
 
         <FormSection title={a.form.repeatTitle}>
@@ -607,6 +687,9 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
         </FormSection>
 
         <FormSection title={a.form.alerts}>
+          <p className="text-[0.8rem] text-white/60">{a.form.alertsOnPhone}</p>
+          {!s.prefs.alertEnabled && <p className="mt-2 rounded-lg border border-warm/30 bg-warm/[0.05] px-3 py-2 text-[0.8rem] leading-relaxed">{a.form.alertsOff}</p>}
+          <Subheading>{a.form.whenToRemind}</Subheading>
           <Switch
             label={a.form.useDefaultAlerts}
             checked={!draft.customAlerts}
@@ -629,13 +712,15 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
             <Helper tone="muted">{a.editor.remindersDefault(s.prefs.defaultAlertTimes.map(a.reminder).join(", "))}</Helper>
           )}
           {errors.alertTimes && <Helper tone="error">{a.errors.alertTimesRequired}</Helper>}
-          <Subheading>{a.form.intensity}</Subheading>
-          <ChoiceChips
-            label={a.form.intensity}
-            value={draft.alertIntensity}
-            onChange={(v) => change({ alertIntensity: v })}
-            options={(["default", "max", "medium", "light"] as const).map((level) => ({ value: level, label: level === "default" ? a.form.intensityDefault(a.intensity[s.prefs.alertIntensity]) : a.intensity[level] }))}
-          />
+          <Subheading>{a.form.howToAlert}</Subheading>
+          <p className="mb-2 text-[0.8rem] text-white/60">{a.form.intensityApplies}</p>
+          <div role="radiogroup" aria-label={a.form.intensity} className="space-y-1.5">
+            <RadioRow on={draft.alertIntensity === "default"} onClick={() => change({ alertIntensity: "default" })} title={a.form.intensityDefault(a.intensity[s.prefs.alertIntensity])} description={a.form.intensityDefaultNote} />
+            {(["max", "medium", "light"] as const).map((level) => (
+              <RadioRow key={level} on={draft.alertIntensity === level} onClick={() => change({ alertIntensity: level })} title={a.alertForm.level[level].title} description={a.alertForm.level[level].description} />
+            ))}
+          </div>
+          <AlertPreview level={draft.alertIntensity === "default" ? s.prefs.alertIntensity : draft.alertIntensity} />
         </FormSection>
 
         <FormSection title={a.form.notes}>
@@ -643,8 +728,10 @@ export function MeetingEditor({ mode, onClose }: { mode: EditorMode; onClose: ()
         </FormSection>
 
         <FormSection title={a.form.attachments}>
-          <p className="text-[0.8rem] text-white/55">{a.form.attachmentsWeb}</p>
+          <p className="text-[0.88rem] font-medium">{a.form.attachmentsLead}</p>
+          <p className="mt-1 text-[0.8rem] leading-relaxed text-white/55">{a.form.attachmentsBody}</p>
         </FormSection>
+        </div>
 
         {linked.length > 0 && <LinkedQuestion tasks={linked} value={moveLinked} onChange={setMoveLinked} />}
       </form>

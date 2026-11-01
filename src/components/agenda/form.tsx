@@ -55,6 +55,19 @@ export function ChoiceChips<T extends string | number>({ label, value, options, 
   );
 }
 
+/** One choice of a role="radiogroup", with a line that explains it. */
+export function RadioRow({ on, onClick, title, description }: { on: boolean; onClick: () => void; title: string; description: string }) {
+  return (
+    <button type="button" role="radio" aria-checked={on} onClick={onClick} className={`flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${on ? "bg-white/[0.08]" : "hover:bg-white/[0.04]"}`}>
+      <span className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 ${on ? "border-white" : "border-white/40"}`}>{on && <span className="h-1.5 w-1.5 rounded-full bg-white" />}</span>
+      <span>
+        <span className="block text-[0.9rem] font-medium">{title}</span>
+        <span className="block text-[0.8rem] leading-snug text-white/55">{description}</span>
+      </span>
+    </button>
+  );
+}
+
 /** Several choices, as chips that toggle. */
 export function ToggleChip({ on, onClick, label, children }: { on: boolean; onClick: () => void; label?: string; children: ReactNode }) {
   return (
