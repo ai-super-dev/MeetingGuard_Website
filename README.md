@@ -115,8 +115,6 @@ the guest links; the guest page reads the token from either.
 
 ## Before launch (open items)
 
-- App Store link: `appStoreUrl` in `src/lib/site.ts` (until it is set, the
-  App Store badge does nothing when clicked). The Google Play link is set.
 - Privacy policy and terms: confirm the URLs (`/privacy-policy`,
   `/terms-of-service`; `/privacy` and `/terms` redirect there) match Play
   Console, App Store Connect and the Meta app.

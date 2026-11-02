@@ -14,8 +14,7 @@ export const siteConfig = {
   contactPhoneLabel: "+44 7400 752170",
   // The MeetingGuard WhatsApp business number (shown in the app's WhatsApp linking screen).
   whatsappNumberRaw: "+447403693109",
-  // TODO: the App Store listing. Until a link is set, its badge does nothing when clicked.
-  appStoreUrl: "",
+  appStoreUrl: "https://apps.apple.com/app/id6819847236",
   playStoreUrl: "https://play.google.com/store/apps/details?id=com.meetingguard.ai",
   // The header's Sign in button opens the web agenda (/app) only when this is true; until
   // then it shows "coming soon". The agenda itself can still be opened by typing /app.
