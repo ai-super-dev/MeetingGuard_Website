@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { AlertCircle, ArrowRight, BarChart3, CalendarDays, CalendarPlus, CheckCircle2, ChevronRight, CircleUser, Clock, Hourglass, Info, Lightbulb, ListPlus, MapPin, SquareCheck, Video } from "lucide-react";
+import { AlertCircle, ArrowRight, BarChart3, CalendarDays, CalendarPlus, CheckCircle2, ChevronRight, Clock, Hourglass, Info, Lightbulb, ListPlus, MapPin, SquareCheck, Video } from "lucide-react";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { CancelDialog, EditScopeDialog, MeetingDetails, MeetingEditor, MoveDialog, OccurrenceEditor, type EditorMode } from "@/components/agenda/MeetingDialogs";
 import { TaskEditor, type TaskDraft } from "@/components/agenda/TaskDialogs";
@@ -67,21 +67,19 @@ function Dashboard() {
   const details = (o: Occurrence) => setOpen({ id: o.meeting.id, key: o.key });
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] space-y-5">
+    // as on Tasks and Profile: the full width up to 1180px, then centred at about 84%
+    <div className="mx-auto w-full max-w-[max(1180px,84%)] space-y-5">
       <Greeting now={now} zone={zone} today={today} />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      {/* from a tablet up the upcoming meeting and the buttons share one row; everything else is full width */}
+      <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_260px]">
         <NowAndNext occs={occs} zone={zone} onDetails={details} />
-        <div className="space-y-5">
-          <QuickActions onNewMeeting={newMeeting} onNewTask={() => setTask({})} />
-          <TasksCard today={today} now={now} zone={zone} onOpen={(t) => setTask({ id: t.id })} onNew={() => setTask({})} />
-        </div>
+        <QuickActions onNewMeeting={newMeeting} onNewTask={() => setTask({})} />
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Today items={timeline} zone={zone} onOpen={details} onNew={newMeeting} />
-        <YourWeek week={week} />
-      </div>
+      <TasksCard today={today} now={now} zone={zone} onOpen={(t) => setTask({ id: t.id })} onNew={() => setTask({})} />
+      <Today items={timeline} zone={zone} onOpen={details} onNew={newMeeting} />
+      <YourWeek week={week} />
 
       {task && <TaskEditor draft={task} onClose={() => setTask(null)} />}
       {open && (
@@ -149,12 +147,35 @@ function Greeting({ now, zone, today }: { now: number; zone: string; today: stri
   const period = a.dashboard.greeting[dayPeriodOf(zoned(new Date(now), zone).h)];
   const name = firstNameOf(s.user?.name);
   return (
-    <section className="surface relative overflow-hidden rounded-2xl px-5 py-6 sm:px-7 sm:py-7">
-      {name && <p className="text-[0.75rem] font-semibold tracking-[0.14em] text-white/55 uppercase">{period}</p>}
-      <p className={`text-[1.9rem] leading-tight font-semibold tracking-[-0.02em] break-words sm:text-[2.3rem] ${name ? "mt-1" : ""}`}>{name ?? period}</p>
-      <p className="mt-1.5 text-[0.92rem] text-white/60 first-letter:uppercase">{fmtDay(today, lang, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
-      <CalendarDays aria-hidden strokeWidth={1} className="pointer-events-none absolute top-1/2 right-5 hidden h-28 w-28 -translate-y-1/2 text-white/[0.07] sm:block" />
+    <section className="surface relative overflow-hidden rounded-2xl">
+      <HeaderArt theme="dark" base="linear-gradient(90deg, #030e46, #07105a)" />
+      <HeaderArt theme="light" base="linear-gradient(90deg, #edf3fc, #e9f1fe)" />
+      <div className="relative flex min-h-[168px] flex-col justify-end px-5 py-5 sm:min-h-[190px] sm:px-7">
+        {name && <p className="text-[0.72rem] font-medium tracking-[0.16em] text-white/80 uppercase">{period}</p>}
+        <p className={`max-w-[75%] text-[1.9rem] leading-tight font-bold tracking-[-0.02em] break-words sm:text-[2.3rem] ${name ? "mt-1" : ""}`}>{name ?? period}</p>
+        <p className="mt-1 text-[0.9rem] text-white/75 first-letter:uppercase">{fmtDay(today, lang, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
+        <span aria-hidden className="mt-2.5 block h-[3px] w-10 rounded-full bg-[#3b82f6]" />
+      </div>
     </section>
+  );
+}
+
+/**
+ * The header's picture, the same as the app's, for one theme. It sits on the right, tall enough to
+ * show the whole calendar, and fades on its left into a colour taken from the picture.
+ */
+function HeaderArt({ theme, base }: { theme: "dark" | "light"; base: string }) {
+  return (
+    <div aria-hidden className={`pointer-events-none absolute inset-0 ${theme === "dark" ? "[html[data-theme=light]_&]:hidden" : "hidden [html[data-theme=light]_&]:block"}`} style={{ backgroundImage: base }}>
+      <div
+        className="absolute top-0 right-0 aspect-[232/100] h-full bg-cover bg-no-repeat [background-position:50%_100%] sm:aspect-[339/100] sm:[background-position:50%_64%]"
+        style={{
+          backgroundImage: `url(/images/dashboard_header_${theme}.jpg)`,
+          maskImage: "linear-gradient(to right, transparent, #000 40%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, #000 40%)",
+        }}
+      />
+    </div>
   );
 }
 
@@ -171,11 +192,11 @@ function NowAndNext({ occs, zone, onDetails }: { occs: Occurrence[]; zone: strin
   const { current, next } = useMemo(() => findNowAndNext(occs, now), [occs, now]);
 
   return (
-    <section aria-label={a.dashboard.next} className="surface flex flex-col divide-y divide-white/[0.06] overflow-hidden rounded-2xl">
+    <section aria-label={a.dashboard.next} className="surface flex flex-col overflow-hidden rounded-2xl">
       {current && <MeetingBlock occurrence={current} kind="current" now={now} zone={zone} onDetails={onDetails} />}
       {next && <MeetingBlock occurrence={next} kind="next" now={now} zone={zone} onDetails={onDetails} />}
       {!current && !next && (
-        <div className="flex flex-1 items-center gap-3.5 px-5 py-6">
+        <div className="flex flex-1 items-center gap-3.5 px-5 py-6 md:py-3">
           <span aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-white/60">
             <CalendarDays className="h-5 w-5" />
           </span>
@@ -206,21 +227,61 @@ function MeetingBlock({ occurrence: o, kind, now, zone, onDetails }: { occurrenc
   const label = kind === "current" ? d.endsIn : left.kind === "now" ? d.startingNow : left.kind === "relative" ? d.starts : d.startsIn;
   const value =
     left.kind === "clock" ? left.text : left.kind === "duration" ? fmtDuration(left.minutes) : left.kind === "relative" ? relativeDay(o.start, now, zone, lang) : "";
+  const eyebrow = `text-[0.72rem] font-semibold tracking-[0.12em] uppercase ${kind === "current" ? "text-accent-soft" : "text-white/55"}`;
+  const when = `${fmtDay(dayKey(o.start, zone), lang, { weekday: "short", month: "short", day: "numeric" })} · ${fmtRange(o.start, o.end, lang, zone)}`;
+  const place = link ? d.online : (address ?? d.noPlace);
 
   return (
-    <div className="grid gap-4 px-4 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-5">
+    <div className="flex flex-1 flex-col justify-center border-t border-white/[0.06] first:border-t-0">
+    {/* tablet and computer: one compact band of about two lines */}
+    <div className="hidden items-center gap-4 px-5 py-3 md:flex">
+      <div className="min-w-0 flex-1">
+        <p className="truncate" title={o.title}>
+          <span className={`${eyebrow} block xl:mr-2.5 xl:inline`}>{kind === "current" ? d.current : d.next}</span>
+          <span className="text-[1rem] font-semibold">{o.title}</span>
+        </p>
+        <p className="mt-0.5 truncate text-[0.82rem] text-white/60" title={`${when} · ${place}`}>
+          {when}
+          <span className="max-xl:hidden"> · {place}</span>
+        </p>
+      </div>
+      <div className="flex shrink-0 flex-col items-end gap-1.5 xl:flex-row xl:items-center xl:gap-4">
+        <p className="flex items-baseline gap-1.5 whitespace-nowrap">
+          <span className="text-[0.75rem] text-white/55">{label}</span>
+          {value && <span className="text-[1rem] font-semibold tabular-nums first-letter:uppercase">{value}</span>}
+        </p>
+        <div className="flex gap-2">
+          {link && (
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={d.joinA11y(o.title)}
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-inverse px-3 text-[0.82rem] font-medium text-on-inverse transition-colors hover:bg-inverse-hover"
+            >
+              <Video className="h-4 w-4" aria-hidden />
+              {d.join}
+            </a>
+          )}
+          <Button onClick={() => onDetails(o)} aria-label={d.detailsA11y(o.title)} className="h-9! px-3! text-[0.82rem]!">
+            {d.details}
+          </Button>
+        </div>
+      </div>
+    </div>
+
+    {/* phone */}
+    <div className="grid gap-4 px-4 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-5 md:hidden">
       <div className="min-w-0">
-        <p className={`text-[0.72rem] font-semibold tracking-[0.12em] uppercase ${kind === "current" ? "text-accent-soft" : "text-white/55"}`}>{kind === "current" ? d.current : d.next}</p>
+        <p className={eyebrow}>{kind === "current" ? d.current : d.next}</p>
         <p className="mt-1.5 text-[1.3rem] leading-snug font-semibold break-words">{o.title}</p>
         <p className="mt-2 flex items-center gap-2 text-[0.85rem] text-white/65">
           <CalendarDays className="h-4 w-4 shrink-0" aria-hidden />
-          <span className="min-w-0">
-            {fmtDay(dayKey(o.start, zone), lang, { weekday: "short", month: "short", day: "numeric" })} · {fmtRange(o.start, o.end, lang, zone)}
-          </span>
+          <span className="min-w-0">{when}</span>
         </p>
         <p className="mt-1 flex items-center gap-2 text-[0.85rem] text-white/65">
           {link ? <Video className="h-4 w-4 shrink-0" aria-hidden /> : <MapPin className="h-4 w-4 shrink-0" aria-hidden />}
-          <span className="min-w-0 truncate">{link ? d.online : (address ?? d.noPlace)}</span>
+          <span className="min-w-0 truncate">{place}</span>
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:w-[170px]">
@@ -247,6 +308,7 @@ function MeetingBlock({ occurrence: o, kind, now, zone, onDetails }: { occurrenc
         </div>
       </div>
     </div>
+    </div>
   );
 }
 
@@ -254,11 +316,10 @@ function MeetingBlock({ occurrence: o, kind, now, zone, onDetails }: { occurrenc
 
 function QuickActions({ onNewMeeting, onNewTask }: { onNewMeeting: () => void; onNewTask: () => void }) {
   const a = useA();
-  const href = useHref();
   const tile = "flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-xl border p-2 text-center text-[0.78rem] font-medium transition-colors";
   const plain = `${tile} surface text-white/85 hover:border-white/25 hover:text-white`;
   return (
-    <section aria-label={a.dashboard.actions} className="grid grid-cols-4 gap-2.5">
+    <section aria-label={a.dashboard.actions} className="grid grid-cols-2 gap-2.5">
       <button type="button" onClick={onNewMeeting} className={`${tile} border-transparent bg-inverse text-on-inverse hover:bg-inverse-hover`}>
         <CalendarPlus className="h-5 w-5" aria-hidden />
         {a.dashboard.newMeeting}
@@ -267,14 +328,6 @@ function QuickActions({ onNewMeeting, onNewTask }: { onNewMeeting: () => void; o
         <ListPlus className="h-5 w-5" aria-hidden />
         {a.dashboard.newTask}
       </button>
-      <Link href={href("/app/meetings")} className={plain}>
-        <CalendarDays className="h-5 w-5" aria-hidden />
-        {a.nav.agenda}
-      </Link>
-      <Link href={href("/app/account")} className={plain}>
-        <CircleUser className="h-5 w-5" aria-hidden />
-        {a.nav.account}
-      </Link>
     </section>
   );
 }
@@ -292,7 +345,7 @@ function TasksCard({ today, now, zone, onOpen, onNew }: { today: string; now: nu
     <section aria-labelledby="dash-tasks" className="surface overflow-hidden rounded-2xl">
       <Heading id="dash-tasks" icon={<SquareCheck />} title={d.tasksTitle} trailing={d.openCount(openCount)} />
       {rows.length ? (
-        <ul className="divide-y divide-white/[0.06]">
+        <ul>
           {rows.map((t) => (
             <TaskRow key={t.id} task={t} overdue={isOverdue(t, today, now)} zone={zone} onOpen={() => onOpen(t)} />
           ))}
@@ -356,7 +409,7 @@ function Today({ items, zone, onOpen, onNew }: { items: TimelineItem[]; zone: st
     <section aria-labelledby="dash-today" className="surface self-start overflow-hidden rounded-2xl">
       <Heading id="dash-today" title={d.today} trailing={d.meetingCount(count)} />
       {items.length ? (
-        <ul className="divide-y divide-white/[0.06]">
+        <ul>
           {items.map((item) => (
             <TodayRow key={`${item.occurrence.meeting.id}-${item.occurrence.key}`} item={item} zone={zone} onOpen={() => onOpen(item.occurrence)} />
           ))}
@@ -430,7 +483,10 @@ function YourWeek({ week }: { week: WeekSummary }) {
       <Heading id="dash-week" icon={<BarChart3 />} title={d.yourWeek} />
       <div className="px-4 py-4 sm:px-5">
         <p className="text-[0.85rem] font-medium text-white/70">{d.weekTotals(d.meetingCount(week.count), fmtDuration(week.minutes))}</p>
-        <p className="mt-4 text-[0.78rem] font-medium text-white/55">{d.weeklySummary}</p>
+        {/* full width on a computer: the bars on the left, the numbers on the right */}
+        <div className="lg:mt-4 lg:grid lg:grid-cols-2 lg:gap-10">
+        <div>
+        <p className="mt-4 text-[0.78rem] font-medium text-white/55 lg:mt-0">{d.weeklySummary}</p>
         {/* one bar a day, Sunday first */}
         <ul className="mt-2 grid grid-cols-7 gap-1.5">
           {week.days.map((day) => {
@@ -448,7 +504,9 @@ function YourWeek({ week }: { week: WeekSummary }) {
             );
           })}
         </ul>
-        <dl className="mt-4 grid grid-cols-2 gap-3">
+        </div>
+        <div>
+        <dl className="mt-4 grid grid-cols-2 gap-3 lg:mt-0">
           <Total icon={<CalendarDays />} value={d.meetingCount(week.count)} versus={d.versusMeetings(week.lastCount)} />
           <Total icon={<Clock />} value={d.totalTime(fmtDuration(week.minutes))} versus={d.versusTime(fmtDuration(week.lastMinutes))} />
         </dl>
@@ -469,6 +527,8 @@ function YourWeek({ week }: { week: WeekSummary }) {
             </li>
           )}
         </ul>
+        </div>
+        </div>
       </div>
     </section>
   );
