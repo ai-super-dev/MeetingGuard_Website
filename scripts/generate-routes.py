@@ -24,7 +24,8 @@ DYNAMIC = []
 # The web agenda: its own layout (src/app/(app-en)/app, src/app/(app-es)/es/app).
 # (route folder under /app, view component, metadata key)
 AGENDA = [
-    ("", "AgendaPage", "agenda"),
+    ("", "DashboardPage", "dashboard"),
+    ("meetings", "AgendaPage", "agenda"),
     ("tasks", "TasksPage", "tasks"),
     ("account", "AccountPage", "account"),
     ("sign-in", "SignInPage", "signIn"),

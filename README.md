@@ -70,17 +70,16 @@ to `PhoneShot` with its `image` prop (`src/components/phone/PhoneShot.tsx`).
 
 The web agenda (milestones S3 to S6) lives in the same project with its own
 layout: `/app` (Spanish `/es/app`). It is kept out of search engines. The
-header's Sign in button leads to it, but until the agenda is connected to the
-backend the button is shown disabled and says "coming soon"; set `agendaOpen`
-in `src/lib/site.ts` to `true` to turn it on. Until then, open the agenda by
-typing `/app`.
+header's Sign in button leads to it; set `agendaOpen` in `src/lib/site.ts` to
+`false` to show the button disabled with a "coming soon" note instead.
 
 | Page | URL |
 | --- | --- |
 | Sign in (Google, or email and password, as in the app) | `/app/sign-in` |
-| Agenda: day, week and month; meeting details; create, edit, move, cancel | `/app` |
+| Dashboard: greeting, happening now and next meeting, tasks, quick actions, today, your week | `/app` |
+| Meetings: day, week and month; meeting details; create, edit, move, cancel | `/app/meetings` |
 | Tasks: by due date, overdue and done; quick capture; edit, complete, delete | `/app/tasks` |
-| Account: plan, manage subscription in the store, sign out, delete account | `/app/account` |
+| Profile: plan, manage subscription in the store, sign out, delete account | `/app/account` |
 | Guest invitation (no account needed): accept, decline, propose a time | `/app/invite?t=<token>` |
 
 It reads and writes the app's own records in the app's Firebase project, live
@@ -106,6 +105,8 @@ Every read and write goes through `src/lib/agenda/store.ts`. Other files:
   assistant requests, so nothing on the web agenda is locked.
 - Words, English and Spanish: `src/lib/agenda/i18n.ts`.
 - Typed tasks ("Send the deck to Ana tomorrow at 5 pm"): `src/lib/agenda/capture.ts`.
+- The dashboard's rules: `src/lib/agenda/dashboard.ts`, following the app's
+  `src/screens/home/homeModel.ts` and `src/screens/insights/meetingInsights.ts`.
 
 Keep the first four in step with the app when its records change.
 

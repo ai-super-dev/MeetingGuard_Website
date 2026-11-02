@@ -3,14 +3,14 @@ import { agendaEn, agendaEs } from "@/lib/agenda/i18n";
 import type { Lang } from "@/lib/routes";
 import { siteConfig } from "@/lib/site";
 
-export type AgendaPageKey = "agenda" | "tasks" | "account" | "signIn" | "invite";
+export type AgendaPageKey = "dashboard" | "agenda" | "tasks" | "account" | "signIn" | "invite";
 
 /** Defaults for every agenda page: private, so never indexed. */
 export function agendaBaseMetadata(lang: Lang): Metadata {
   const a = lang === "es" ? agendaEs : agendaEn;
   return {
     metadataBase: new URL(siteConfig.url),
-    title: { default: a.meta.agenda, template: "%s | MeetingGuard" },
+    title: { default: a.meta.dashboard, template: "%s | MeetingGuard" },
     description: a.meta.description,
     applicationName: siteConfig.name,
     robots: { index: false, follow: false },

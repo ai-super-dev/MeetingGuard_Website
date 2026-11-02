@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CircleAlert, CircleUser, House, Info, ListChecks, WifiOff, X } from "lucide-react";
+import { CalendarDays, CircleAlert, CircleUser, House, Info, LayoutDashboard, ListChecks, WifiOff, X } from "lucide-react";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { AppMark, Logo } from "@/components/ui/Logo";
@@ -17,7 +17,8 @@ import { splitPath } from "@/lib/routes";
 import { Spinner } from "./ui";
 
 const NAV = [
-  { key: "agenda", path: "/app", Icon: CalendarDays },
+  { key: "dashboard", path: "/app", Icon: LayoutDashboard },
+  { key: "agenda", path: "/app/meetings", Icon: CalendarDays },
   { key: "tasks", path: "/app/tasks", Icon: ListChecks },
   { key: "account", path: "/app/account", Icon: CircleUser },
 ] as const;
@@ -115,7 +116,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
     <div className="min-h-dvh lg:pl-[244px]">
       {/* side menu (computer) */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[244px] flex-col border-r border-white/[0.07] bg-bar px-3 py-5 lg:flex">
-        <Link href={href("/app")} className="px-3" aria-label={a.nav.agenda}>
+        <Link href={href("/app")} className="px-3" aria-label={a.nav.dashboard}>
           <Logo />
         </Link>
         <nav aria-label={a.nav.main} className="mt-8">
@@ -157,7 +158,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
       {/* top bar */}
       <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-ink-950/85 backdrop-blur-xl">
         <div className="flex h-14 items-center gap-3 px-4 lg:h-16 lg:px-8">
-          <Link href={href("/app")} className="lg:hidden" aria-label={a.nav.agenda}>
+          <Link href={href("/app")} className="lg:hidden" aria-label={a.nav.dashboard}>
             <AppMark className="h-7 w-7" sizes="56px" />
           </Link>
           <h1 className="min-w-0 flex-1 truncate text-[1.05rem] font-semibold tracking-[-0.01em] lg:text-[1.2rem]">{title}</h1>
@@ -193,7 +194,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
         aria-label={a.nav.main}
         className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-bar/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
-        <ul className="grid grid-cols-3">
+        <ul className="grid grid-cols-4">
           {NAV.map(({ key, path: to, Icon }) => {
             const active = path === to;
             return (

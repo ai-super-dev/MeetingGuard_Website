@@ -18,7 +18,7 @@ export const siteConfig = {
   playStoreUrl: "https://play.google.com/store/apps/details?id=com.meetingguard.ai",
   // The header's Sign in button opens the web agenda (/app) only when this is true; until
   // then it shows "coming soon". The agenda itself can still be opened by typing /app.
-  agendaOpen: false,
+  agendaOpen: true,
   // TODO: URL of the Cloud Function that receives the waitlist and update forms.
   formsEndpoint: "",
   // TODO: GA4 measurement ID (G-XXXXXXX). Analytics loads only after consent and only when this is set.
