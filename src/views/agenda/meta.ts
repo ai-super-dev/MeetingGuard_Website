@@ -3,7 +3,7 @@ import { agendaEn, agendaEs } from "@/lib/agenda/i18n";
 import type { Lang } from "@/lib/routes";
 import { siteConfig } from "@/lib/site";
 
-export type AgendaPageKey = "dashboard" | "agenda" | "tasks" | "account" | "signIn" | "invite";
+export type AgendaPageKey = "dashboard" | "agenda" | "calendar" | "tasks" | "account" | "signIn" | "invite";
 
 /** Defaults for every agenda page: private, so never indexed. */
 export function agendaBaseMetadata(lang: Lang): Metadata {

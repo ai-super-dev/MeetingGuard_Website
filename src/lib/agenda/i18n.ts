@@ -14,13 +14,14 @@ export const agendaEn = {
   meta: {
     dashboard: "Dashboard",
     agenda: "Meetings",
+    calendar: "Calendar",
     tasks: "Tasks",
     account: "Profile",
     signIn: "Sign in",
     invite: "Invitation",
     description: "Your MeetingGuard agenda on the web: the same account, meetings and tasks as the app.",
   },
-  nav: { main: "Agenda menu", dashboard: "Dashboard", agenda: "Meetings", tasks: "Tasks", account: "Profile", site: "Back to website" },
+  nav: { main: "Agenda menu", dashboard: "Dashboard", agenda: "Meetings", calendar: "Calendar", tasks: "Tasks", account: "Profile", site: "Back to website" },
 
   dashboard: {
     greeting: { morning: "Good morning", afternoon: "Good afternoon", evening: "Good evening" },
@@ -72,6 +73,38 @@ export const agendaEn = {
     withTips: (n: number) => (n === 1 ? "1 meeting has preparation tips" : `${n} meetings have preparation tips`),
     allClear: "No overlaps, back-to-back meetings or missing links for the rest of the week.",
   },
+  meetingsPage: {
+    search: "Search meetings",
+    searchLabel: "Search meetings by title, place, people or notes",
+    clearSearch: "Clear search",
+    timeLabel: "Show meetings",
+    time: { upcoming: "Upcoming", past: "Past", all: "All" },
+    sourceLabel: "Filter by source",
+    online: "Online",
+    moreActions: (title: string) => `More actions for ${title}`,
+    openDetails: "Open details",
+    clearFilters: "Clear search and filters",
+    showPast: "Show past meetings",
+    empty: {
+      none: { title: "No meetings yet", body: "Create one, or connect your calendars in the app to see your meetings here." },
+      noMatches: { title: "No meetings match", body: "Try other words or change the filters." },
+      upcoming: { title: "Nothing coming up", body: "You have no upcoming meetings." },
+      past: { title: "No past meetings", body: "Meetings that have ended show up here." },
+      all: { title: "No meetings", body: "There are no meetings to show." },
+    },
+  },
+
+  calendarPage: {
+    previousMonth: "Previous month",
+    nextMonth: "Next month",
+    goToToday: "Go to today",
+    todayMarker: "today",
+    hasTasks: "with tasks",
+    noMeetings: "No meetings",
+    taskCount: (n: number) => (n === 1 ? "1 task" : `${n} tasks`),
+    emptyDay: "No meetings on this day.",
+  },
+
   demo: {
     badge: "Preview",
     banner: "Preview with sample data. Changes stay in this browser, and nothing reaches an account.",
@@ -106,6 +139,7 @@ export const agendaEn = {
   },
 
   calendar: {
+    relation: { today: "Today", tomorrow: "Tomorrow", yesterday: "Yesterday" },
     allDay: "All day",
     more: (n: number) => `${n} more`,
     count: (n: number) => (n === 1 ? "1 meeting" : `${n} meetings`),
@@ -577,13 +611,14 @@ export const agendaEs: AgendaDict = {
   meta: {
     dashboard: "Panel",
     agenda: "Reuniones",
+    calendar: "Calendario",
     tasks: "Tareas",
     account: "Perfil",
     signIn: "Iniciar sesión",
     invite: "Invitación",
     description: "Tu agenda de MeetingGuard en la web: la misma cuenta, reuniones y tareas que en la app.",
   },
-  nav: { main: "Menú de la agenda", dashboard: "Panel", agenda: "Reuniones", tasks: "Tareas", account: "Perfil", site: "Volver al sitio web" },
+  nav: { main: "Menú de la agenda", dashboard: "Panel", agenda: "Reuniones", calendar: "Calendario", tasks: "Tareas", account: "Perfil", site: "Volver al sitio web" },
 
   dashboard: {
     greeting: { morning: "Buenos días", afternoon: "Buenas tardes", evening: "Buenas noches" },
@@ -635,6 +670,38 @@ export const agendaEs: AgendaDict = {
     withTips: (n: number) => (n === 1 ? "1 reunión tiene consejos de preparación" : `${n} reuniones tienen consejos de preparación`),
     allClear: "No hay solapamientos, reuniones seguidas ni enlaces pendientes en lo que queda de semana.",
   },
+  meetingsPage: {
+    search: "Buscar reuniones",
+    searchLabel: "Busca reuniones por título, lugar, personas o notas",
+    clearSearch: "Borrar búsqueda",
+    timeLabel: "Mostrar reuniones",
+    time: { upcoming: "Próximas", past: "Pasadas", all: "Todas" },
+    sourceLabel: "Filtrar por origen",
+    online: "En línea",
+    moreActions: (title: string) => `Más acciones para ${title}`,
+    openDetails: "Abrir detalles",
+    clearFilters: "Borrar búsqueda y filtros",
+    showPast: "Ver reuniones pasadas",
+    empty: {
+      none: { title: "Aún no tienes reuniones", body: "Crea una o conecta tus calendarios en la app para verlas aquí." },
+      noMatches: { title: "Ninguna reunión coincide", body: "Prueba con otras palabras o cambia los filtros." },
+      upcoming: { title: "No tienes nada próximamente", body: "No tienes reuniones próximas." },
+      past: { title: "No hay reuniones pasadas", body: "Aquí aparecen las reuniones que ya terminaron." },
+      all: { title: "No hay reuniones", body: "No hay reuniones que mostrar." },
+    },
+  },
+
+  calendarPage: {
+    previousMonth: "Mes anterior",
+    nextMonth: "Mes siguiente",
+    goToToday: "Ir a hoy",
+    todayMarker: "hoy",
+    hasTasks: "con tareas",
+    noMeetings: "Sin reuniones",
+    taskCount: (n: number) => (n === 1 ? "1 tarea" : `${n} tareas`),
+    emptyDay: "No hay reuniones este día.",
+  },
+
   demo: {
     badge: "Vista previa",
     banner: "Vista previa con datos de ejemplo. Los cambios se quedan en este navegador y no llegan a ninguna cuenta.",
@@ -669,6 +736,7 @@ export const agendaEs: AgendaDict = {
   },
 
   calendar: {
+    relation: { today: "Hoy", tomorrow: "Mañana", yesterday: "Ayer" },
     allDay: "Todo el día",
     more: (n: number) => `${n} más`,
     count: (n: number) => (n === 1 ? "1 reunión" : `${n} reuniones`),

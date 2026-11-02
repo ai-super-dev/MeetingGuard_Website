@@ -4,16 +4,15 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { AlertCircle, ArrowRight, BarChart3, CalendarDays, CalendarPlus, CheckCircle2, ChevronRight, Clock, Hourglass, Info, Lightbulb, ListPlus, MapPin, SquareCheck, Video } from "lucide-react";
 import { AgendaFrame } from "@/components/agenda/Frame";
-import { CancelDialog, EditScopeDialog, MeetingDetails, MeetingEditor, MoveDialog, OccurrenceEditor, type EditorMode } from "@/components/agenda/MeetingDialogs";
+import { suggestedTime, useMeetingFlows } from "@/components/agenda/MeetingFlows";
 import { TaskEditor, type TaskDraft } from "@/components/agenda/TaskDialogs";
-import type { Selection } from "@/components/agenda/Calendar";
-import { Button, useToast } from "@/components/agenda/ui";
+import { Button, TONES, useToast } from "@/components/agenda/ui";
 import { barFraction, countdownTo, dayPeriodOf, dueNow, findNowAndNext, firstNameOf, isOverdue, todayTimeline, weekSummary, type TimelineItem, type WeekSummary } from "@/lib/agenda/dashboard";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { expandAll } from "@/lib/agenda/recurrence";
 import { displayZone, joinUrl, setTaskDone, useAgenda } from "@/lib/agenda/store";
-import { addDays, dayKey, dayStart, daysBetween, fmtDay, fmtDuration, fmtRange, fmtTime, fromZoned, LOCALE, minuteOfDay, zoned } from "@/lib/agenda/time";
+import { addDays, dayKey, dayStart, daysBetween, fmtDay, fmtDuration, fmtRange, fmtTime, fromZoned, LOCALE, zoned } from "@/lib/agenda/time";
 import type { Occurrence, Task } from "@/lib/agenda/types";
 import { useHref, useLang } from "@/lib/language";
 
@@ -37,18 +36,13 @@ function Dashboard() {
   const zone = displayZone(s);
   const today = dayKey(new Date(now), zone);
 
-  const [editor, setEditor] = useState<EditorMode | null>(null);
   const [task, setTask] = useState<TaskDraft | null>(null);
-  const [open, setOpen] = useState<Selection | null>(null);
-  const [askScope, setAskScope] = useState<Selection | null>(null);
-  const [occurrenceEdit, setOccurrenceEdit] = useState<{ sel: Selection; scope: "one" | "following" } | null>(null);
-  const [moving, setMoving] = useState<Selection | null>(null);
-  const [cancelling, setCancelling] = useState<Selection | null>(null);
+  const flows = useMeetingFlows();
 
   // the calendar used to live at this address: send its old links on to where it is now
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
-    if (q.has("view") || q.has("date") || q.has("open")) window.location.replace(`${window.location.pathname.replace(/\/$/, "")}/meetings/?${q}`);
+    if (q.has("view") || q.has("date") || q.has("open")) window.location.replace(`${window.location.pathname.replace(/\/$/, "")}/calendar/?${q}`);
   }, []);
 
   const occs = useMemo(
@@ -58,13 +52,8 @@ function Dashboard() {
   const timeline = useMemo(() => todayTimeline(occs, today, zone, now), [occs, today, zone, now]);
   const week = useMemo(() => weekSummary(occs, today, zone, now), [occs, today, zone, now]);
 
-  const newMeeting = () => {
-    // the next half hour today, as on the Meetings page
-    const next = Math.ceil((minuteOfDay(new Date(now), zone) + 1) / 30) * 30;
-    const time = next < 24 * 60 ? `${String(Math.floor(next / 60)).padStart(2, "0")}:${String(next % 60).padStart(2, "0")}` : "09:00";
-    setEditor({ kind: "new", day: next < 24 * 60 ? today : addDays(today, 1), time });
-  };
-  const details = (o: Occurrence) => setOpen({ id: o.meeting.id, key: o.key });
+  const newMeeting = () => flows.newMeeting(today, suggestedTime(today, today, now, zone));
+  const details = (o: Occurrence) => flows.details({ id: o.meeting.id, key: o.key });
 
   return (
     // as on Tasks and Profile: the full width up to 1180px, then centred at about 84%
@@ -82,42 +71,7 @@ function Dashboard() {
       <YourWeek week={week} />
 
       {task && <TaskEditor draft={task} onClose={() => setTask(null)} />}
-      {open && (
-        <MeetingDetails
-          sel={open}
-          onClose={() => setOpen(null)}
-          onEdit={() => {
-            // one date of a series: ask which meetings the edit is for, as on the Meetings page
-            const isSeries = !!open.key && !!s.meetings.find((m) => m.id === open.id)?.recurrence;
-            if (isSeries) setAskScope(open);
-            else setEditor({ kind: "edit", id: open.id });
-            setOpen(null);
-          }}
-          onMove={() => {
-            setMoving(open);
-            setOpen(null);
-          }}
-          onCancel={() => {
-            setCancelling(open);
-            setOpen(null);
-          }}
-        />
-      )}
-      {askScope && (
-        <EditScopeDialog
-          sel={askScope}
-          onClose={() => setAskScope(null)}
-          onChoose={(scope) => {
-            if (scope === "all") setEditor({ kind: "edit", id: askScope.id });
-            else setOccurrenceEdit({ sel: askScope, scope });
-            setAskScope(null);
-          }}
-        />
-      )}
-      {occurrenceEdit && <OccurrenceEditor sel={occurrenceEdit.sel} scope={occurrenceEdit.scope} onClose={() => setOccurrenceEdit(null)} />}
-      {editor && <MeetingEditor mode={editor} onClose={() => setEditor(null)} />}
-      {moving && <MoveDialog sel={moving} onClose={() => setMoving(null)} />}
-      {cancelling && <CancelDialog sel={cancelling} onClose={() => setCancelling(null)} />}
+      {flows.dialogs}
     </div>
   );
 }
@@ -257,13 +211,13 @@ function MeetingBlock({ occurrence: o, kind, now, zone, onDetails }: { occurrenc
               target="_blank"
               rel="noopener noreferrer"
               aria-label={d.joinA11y(o.title)}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-inverse px-3 text-[0.82rem] font-medium text-on-inverse transition-colors hover:bg-inverse-hover"
+              className={`inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-[0.82rem] font-medium transition ${TONES.meeting}`}
             >
               <Video className="h-4 w-4" aria-hidden />
               {d.join}
             </a>
           )}
-          <Button onClick={() => onDetails(o)} aria-label={d.detailsA11y(o.title)} className="h-9! px-3! text-[0.82rem]!">
+          <Button variant="detail" onClick={() => onDetails(o)} aria-label={d.detailsA11y(o.title)} className="h-9! px-3! text-[0.82rem]!">
             {d.details}
           </Button>
         </div>
@@ -296,13 +250,13 @@ function MeetingBlock({ occurrence: o, kind, now, zone, onDetails }: { occurrenc
               target="_blank"
               rel="noopener noreferrer"
               aria-label={d.joinA11y(o.title)}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-inverse px-4 text-[0.88rem] font-medium text-on-inverse transition-colors hover:bg-inverse-hover"
+              className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-[0.88rem] font-medium transition ${TONES.meeting}`}
             >
               <Video className="h-4 w-4" aria-hidden />
               {d.join}
             </a>
           )}
-          <Button onClick={() => onDetails(o)} aria-label={d.detailsA11y(o.title)} className={link ? "" : "col-span-2 sm:col-span-1"}>
+          <Button variant="detail" onClick={() => onDetails(o)} aria-label={d.detailsA11y(o.title)} className={link ? "" : "col-span-2 sm:col-span-1"}>
             {d.details}
           </Button>
         </div>
@@ -316,15 +270,14 @@ function MeetingBlock({ occurrence: o, kind, now, zone, onDetails }: { occurrenc
 
 function QuickActions({ onNewMeeting, onNewTask }: { onNewMeeting: () => void; onNewTask: () => void }) {
   const a = useA();
-  const tile = "flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-xl border p-2 text-center text-[0.78rem] font-medium transition-colors";
-  const plain = `${tile} surface text-white/85 hover:border-white/25 hover:text-white`;
+  const tile = "flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-xl p-2 text-center text-[0.78rem] font-semibold transition";
   return (
     <section aria-label={a.dashboard.actions} className="grid grid-cols-2 gap-2.5">
-      <button type="button" onClick={onNewMeeting} className={`${tile} border-transparent bg-inverse text-on-inverse hover:bg-inverse-hover`}>
+      <button type="button" onClick={onNewMeeting} className={`${tile} ${TONES.meeting}`}>
         <CalendarPlus className="h-5 w-5" aria-hidden />
         {a.dashboard.newMeeting}
       </button>
-      <button type="button" onClick={onNewTask} className={plain}>
+      <button type="button" onClick={onNewTask} className={`${tile} ${TONES.task}`}>
         <ListPlus className="h-5 w-5" aria-hidden />
         {a.dashboard.newTask}
       </button>
@@ -354,7 +307,7 @@ function TasksCard({ today, now, zone, onOpen, onNew }: { today: string; now: nu
         <div className="px-4 py-4 sm:px-5">
           <p className="text-[0.86rem] text-white/60">{openCount > 0 ? d.nothingDueToday : d.noTasks}</p>
           {openCount === 0 && (
-            <Button onClick={onNew} className="mt-3">
+            <Button variant="task" onClick={onNew} className="mt-3">
               {d.newTask}
             </Button>
           )}
@@ -421,7 +374,7 @@ function Today({ items, zone, onOpen, onNew }: { items: TimelineItem[]; zone: st
           </span>
           <p className="mt-3 text-[0.98rem] font-semibold">{d.noMeetingsToday}</p>
           <p className="mt-1 text-[0.85rem] text-white/55">{d.noMeetingsHint}</p>
-          <Button onClick={onNew} className="mt-4">
+          <Button variant="meeting" onClick={onNew} className="mt-4">
             {d.newMeeting}
           </Button>
         </div>

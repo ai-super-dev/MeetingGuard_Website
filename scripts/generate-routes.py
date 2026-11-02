@@ -25,7 +25,8 @@ DYNAMIC = []
 # (route folder under /app, view component, metadata key)
 AGENDA = [
     ("", "DashboardPage", "dashboard"),
-    ("meetings", "AgendaPage", "agenda"),
+    ("meetings", "MeetingsPage", "agenda"),
+    ("calendar", "CalendarPage", "calendar"),
     ("tasks", "TasksPage", "tasks"),
     ("account", "AccountPage", "account"),
     ("sign-in", "SignInPage", "signIn"),

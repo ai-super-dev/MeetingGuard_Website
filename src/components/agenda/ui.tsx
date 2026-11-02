@@ -7,13 +7,25 @@ import type { ErrorCode } from "@/lib/agenda/validation";
 
 /* ---------- Buttons ---------- */
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | keyof typeof TONES;
+
+/*
+ * The three everyday actions, one colour each: blue to add a meeting, green to
+ * add a task, violet to open details. Mixing the ink with the theme's "white"
+ * makes it lighter in dark mode and darker in light mode, so it reads in both.
+ */
+export const TONES = {
+  meeting: "border border-transparent bg-[linear-gradient(135deg,#4f8df9,#2563eb)] text-[#fff] shadow-[0_6px_18px_rgba(37,99,235,0.28)] hover:brightness-110",
+  task: "border border-[#1fa37a]/40 bg-[#1fa37a]/[0.13] text-[color:color-mix(in_srgb,#1fa37a_62%,var(--color-white))] hover:border-[#1fa37a]/70 hover:bg-[#1fa37a]/[0.22]",
+  detail: "border border-[#7c6cf0]/40 bg-[#7c6cf0]/[0.13] text-[color:color-mix(in_srgb,#7c6cf0_62%,var(--color-white))] hover:border-[#7c6cf0]/70 hover:bg-[#7c6cf0]/[0.22]",
+};
 
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-inverse text-on-inverse hover:bg-inverse-hover",
   secondary: "border border-white/12 text-white/85 hover:border-white/25 hover:text-white",
   ghost: "text-white/70 hover:bg-white/[0.06] hover:text-white",
   danger: "bg-accent text-[#fff] hover:bg-accent-deep",
+  ...TONES,
 };
 
 export function Button({

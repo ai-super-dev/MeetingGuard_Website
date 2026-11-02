@@ -77,7 +77,8 @@ header's Sign in button leads to it; set `agendaOpen` in `src/lib/site.ts` to
 | --- | --- |
 | Sign in (Google, or email and password, as in the app) | `/app/sign-in` |
 | Dashboard: greeting, happening now and next meeting, tasks, quick actions, today, your week | `/app` |
-| Meetings: day, week and month; meeting details; create, edit, move, cancel | `/app/meetings` |
+| Meetings: search, upcoming, past and all, by source; details, create, edit, move, delete | `/app/meetings` |
+| Calendar: the month with dots per source; the selected day's tasks and meetings | `/app/calendar` |
 | Tasks: by due date, overdue and done; quick capture; edit, complete, delete | `/app/tasks` |
 | Profile: plan, manage subscription in the store, sign out, delete account | `/app/account` |
 | Guest invitation (no account needed): accept, decline, propose a time | `/app/invite?t=<token>` |
@@ -107,6 +108,8 @@ Every read and write goes through `src/lib/agenda/store.ts`. Other files:
 - Typed tasks ("Send the deck to Ana tomorrow at 5 pm"): `src/lib/agenda/capture.ts`.
 - The dashboard's rules: `src/lib/agenda/dashboard.ts`, following the app's
   `src/screens/home/homeModel.ts` and `src/screens/insights/meetingInsights.ts`.
+- The Meetings page's rules: `src/lib/agenda/meetingsList.ts`, following the
+  app's `src/screens/meetings/list/meetingListModel.ts`.
 
 Keep the first four in step with the app when its records change.
 

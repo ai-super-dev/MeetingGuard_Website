@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CircleAlert, CircleUser, House, Info, LayoutDashboard, ListChecks, WifiOff, X } from "lucide-react";
+import { CalendarClock, CalendarDays, CircleAlert, CircleUser, House, Info, LayoutDashboard, ListChecks, WifiOff, X } from "lucide-react";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { AppMark, Logo } from "@/components/ui/Logo";
@@ -18,7 +18,8 @@ import { Spinner } from "./ui";
 
 const NAV = [
   { key: "dashboard", path: "/app", Icon: LayoutDashboard },
-  { key: "agenda", path: "/app/meetings", Icon: CalendarDays },
+  { key: "agenda", path: "/app/meetings", Icon: CalendarClock },
+  { key: "calendar", path: "/app/calendar", Icon: CalendarDays },
   { key: "tasks", path: "/app/tasks", Icon: ListChecks },
   { key: "account", path: "/app/account", Icon: CircleUser },
 ] as const;
@@ -194,7 +195,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
         aria-label={a.nav.main}
         className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-bar/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       >
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-5">
           {NAV.map(({ key, path: to, Icon }) => {
             const active = path === to;
             return (
