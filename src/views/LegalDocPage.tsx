@@ -8,7 +8,8 @@ import { pageMetadata } from "@/lib/seo";
 
 /*
  * Legal pages at the URLs the store listings and the Meta app point to:
- * /privacy-policy and /terms-of-service. The text lives in src/content/legal.ts.
+ * /privacy-policy, /terms-of-service and /delete-account. The text lives in
+ * src/content/legal.ts.
  */
 
 const BACK = { en: "Back to home", es: "Volver al inicio" };
@@ -33,7 +34,7 @@ export function LegalDocPage({ lang, doc }: { lang: Lang; doc: LegalDocKey }) {
         <Reveal>
           <p className="eyebrow mt-10">MeetingGuard AI</p>
           <Headline as="h1" id="legal-title" line1={d.title} className="mt-3" />
-          <p className="mt-3 text-sm text-white/55">{d.updated}</p>
+          {d.updated && <p className="mt-3 text-sm text-white/55">{d.updated}</p>}
           {d.intro.map((p) => (
             <p key={p} className="mt-6 leading-relaxed text-white/70">
               {p}

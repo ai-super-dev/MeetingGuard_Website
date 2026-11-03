@@ -32,4 +32,4 @@ export const FEATURE_SLUGS = ["voice-assistant", "alarms", "tasks", "agenda", "w
 export type FeatureSlug = (typeof FEATURE_SLUGS)[number];
 
 /** Every page, language-neutral. */
-export const PAGES = ["/", "/privacy-policy", "/terms-of-service"] as const;
+export const PAGES = ["/", "/privacy-policy", "/terms-of-service", "/delete-account"] as const;

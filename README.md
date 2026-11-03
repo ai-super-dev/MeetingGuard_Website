@@ -5,8 +5,8 @@ built as plain static files and hosted on Firebase Hosting.
 
 Built with Next.js (static export), TypeScript, Tailwind CSS and Motion.
 
-This is the first, limited release: three pages only, the landing page, the
-privacy policy and the terms of service (each in English and Spanish). The
+This is the first, limited release: the landing page, the privacy policy,
+the terms of service and the delete account page (each in English and Spanish). The
 full site, with the feature, pricing, assistant, FAQ, blog and other pages,
 is kept in `Meeting_Guard_Web-Copy` for a later release.
 
@@ -30,7 +30,7 @@ English and the Spanish text side by side; change both.
 | --- | --- |
 | Header, footer, buttons, forms, home page sections, phone screens | `src/lib/i18n.ts` |
 | The FAQ on the home page (5 questions) | `src/content/faq.ts` |
-| Privacy policy and terms of service (English as approved, Spanish translation) | `src/content/legal.ts` |
+| Privacy policy, terms of service and delete account page (English as approved, Spanish translation) | `src/content/legal.ts` |
 | Facts used everywhere: store links, email, phone, company number, release months, ratings, form and analytics settings | `src/lib/site.ts` |
 
 Writing rules from the brief: short, direct and friendly; plain punctuation (no
@@ -121,7 +121,8 @@ the guest links; the guest page reads the token from either.
 
 - Privacy policy and terms: confirm the URLs (`/privacy-policy`,
   `/terms-of-service`; `/privacy` and `/terms` redirect there) match Play
-  Console, App Store Connect and the Meta app.
+  Console, App Store Connect and the Meta app. The Meta app (WhatsApp) also
+  needs the data deletion URL, `/delete-account`.
 - Company number.
 - Forms: deploy `functions/` and set `formsEndpoint` in `src/lib/site.ts`.
 - Analytics: set `gaMeasurementId` in `src/lib/site.ts`; the consent banner

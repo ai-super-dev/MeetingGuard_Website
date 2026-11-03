@@ -16,6 +16,7 @@ STATIC = [
     ("", "HomePage", "HomePage", "homeMetadata", ""),
     ("privacy-policy", "LegalDocPage", "LegalDocPage", "legalMetadata", 'doc="privacy"'),
     ("terms-of-service", "LegalDocPage", "LegalDocPage", "legalMetadata", 'doc="terms"'),
+    ("delete-account", "LegalDocPage", "LegalDocPage", "legalMetadata", 'doc="deleteAccount"'),
 ]
 
 # (route folder, view module, component, metadata fn, params function source, slug type)

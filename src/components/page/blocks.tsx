@@ -84,16 +84,17 @@ function WithEmailLinks({ text }: { text: string }) {
   );
 }
 
-/** Long-form text sections (legal). Each body item is a paragraph, or a bulleted list when it is an array. */
+/** Long-form text sections (legal). Each body item is a paragraph, or a bulleted list when it is an array. An empty heading shows no title. */
 export function Prose({ sections }: { sections: readonly { heading: string; body: readonly (string | readonly string[])[] }[] }) {
   return (
     <div className="surface mx-auto max-w-3xl space-y-9 rounded-2xl p-6 sm:p-10">
       {sections.map((s) => (
         <div key={s.heading}>
-          <h2 className="text-[1.15rem] font-semibold text-white">{s.heading}</h2>
+          {s.heading && <h2 className="text-[1.15rem] font-semibold text-white">{s.heading}</h2>}
           {s.body.map((block, i) =>
             typeof block === "string" ? (
-              <p key={i} className="mt-3 leading-relaxed text-white/65">
+              // without a heading, the first paragraph starts at the top of the box
+              <p key={i} className="mt-3 leading-relaxed text-white/65 first:mt-0">
                 <WithEmailLinks text={block} />
               </p>
             ) : (
