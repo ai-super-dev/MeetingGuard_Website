@@ -88,6 +88,15 @@ both ways, under the same server rules. Set the values in `.env.example` (copy
 it to `.env.local`) and build. Without them, it runs as a preview with sample
 data kept in the browser, and a "Preview" label says so.
 
+The website can't reach Google Calendar or Outlook itself: their access tokens
+stay on the phone. So every meeting it saves (create, edit, delete) carries
+`pushPending: true`, and the app on the user's phone sends it to the calendars,
+creates the Google Meet link, emails the invitations or cancellations, and then
+writes `pushPending: false`. Meet links and invitations therefore need the app
+installed with calendar sync on. A Zoom link comes from the server after the
+meeting is saved, so the website saves the meeting once more when the link
+arrives, and the invitations carry it.
+
 To turn it on: register a Web app in the Firebase console and copy its config;
 add the site's domain under Authentication > Settings > Authorized domains; and
 for Apple, add a Services ID to the Apple provider and set

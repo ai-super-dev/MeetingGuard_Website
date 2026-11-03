@@ -11,6 +11,12 @@
  * Writes follow the app's data layer (src/services/data/engine.ts): whole
  * documents, the newest version wins, and deleted meetings stay as an empty
  * record so every device can sync the deletion.
+ *
+ * The website can't reach Google Calendar or Outlook (their tokens stay on the
+ * phone), so every meeting it saves carries `pushPending: true`. The app treats
+ * such a meeting like a change made in the app: it sends it to the calendars,
+ * creates the Meet link, emails the invitations or cancellations, and then
+ * writes `pushPending: false`. The website never clears the field itself.
  */
 
 import { useSyncExternalStore } from "react";
@@ -349,14 +355,22 @@ const requireUid = () => {
   return state.user.uid;
 };
 
-/** Saves records together, then shows them right away (the live listener confirms them). */
+/**
+ * Saves records together, then shows them right away (the live listener confirms them).
+ * Every meeting written here, deletions included, asks the app to push it (see the top of the file).
+ */
 async function save(change: Change) {
   const uid = requireUid();
   const creates = new Set(change.creates ?? []);
   if (LIVE) {
     const r = await loadRemote();
     await r.commit([
-      ...(change.meetings ?? []).map((m) => ({ path: `users/${uid}/meetings/${m.id}`, mode: creates.has(m.id) ? ("create" as const) : ("set" as const), data: meetingToDoc(m), updatedAt: m.updatedAt })),
+      ...(change.meetings ?? []).map((m) => ({
+        path: `users/${uid}/meetings/${m.id}`,
+        mode: creates.has(m.id) ? ("create" as const) : ("set" as const),
+        data: { ...meetingToDoc(m), pushPending: true },
+        updatedAt: m.updatedAt,
+      })),
       ...(change.tasks ?? []).map((t) => ({ path: `users/${uid}/tasks/${t.id}`, mode: creates.has(t.id) ? ("create" as const) : ("set" as const), data: taskToDoc(t), updatedAt: t.updatedAt })),
       ...(change.removeTasks ?? []).map((t) => ({ path: `users/${uid}/tasks/${t.id}`, mode: "delete" as const, data: null, updatedAt: stamp(t.updatedAt) })),
     ]);
@@ -408,6 +422,41 @@ function setZoomFailed(id: string, failed: boolean) {
   setState({ zoomFailed: failed ? [...others, id] : others });
 }
 
+/** The meeting as the live records show it once it passes `test`, or null when that doesn't happen in time. */
+function waitForMeeting(id: string, test: (m: Meeting) => boolean, ms: number): Promise<Meeting | null> {
+  const find = () => allMeetings.find((m) => m.id === id && test(m)) ?? null;
+  const now = find();
+  if (now) return Promise.resolve(now);
+  return new Promise((resolve) => {
+    const finish = (m: Meeting | null) => {
+      listeners.delete(check);
+      clearTimeout(timer);
+      resolve(m);
+    };
+    const check = () => {
+      const m = find();
+      if (m) finish(m);
+    };
+    const timer = setTimeout(() => finish(null), ms);
+    listeners.add(check);
+  });
+}
+
+const ZOOM_LINK_WAIT_MS = 30_000;
+
+/**
+ * The server writes the Zoom link after the meeting was already saved for the
+ * app to push, so the app may send the invitations before the link exists. As
+ * the app does after its own Zoom links, the meeting is saved once more with
+ * the link, which asks the app to push it again.
+ */
+async function pushAgainWithZoomLink(id: string) {
+  const settled = (m: Meeting) => m.deletedAt !== null || m.conference?.provider !== "zoom" || !!m.conference.url;
+  const m = await waitForMeeting(id, settled, ZOOM_LINK_WAIT_MS);
+  if (!m || m.deletedAt !== null || m.conference?.provider !== "zoom" || !m.conference.url) return;
+  await save({ meetings: [{ ...m, updatedAt: stamp(m.updatedAt) }] });
+}
+
 /**
  * Asks the app's server to create the Zoom meeting of a saved meeting. The
  * server writes the link into the meeting, so it arrives like any other change.
@@ -418,7 +467,10 @@ export function createZoomLink(id: string) {
   const call = loadRemote()
     .then((r) => r.zoomCreate(id))
     .then(
-      () => setZoomFailed(id, false),
+      () => {
+        setZoomFailed(id, false);
+        void pushAgainWithZoomLink(id).catch(() => {});
+      },
       (err: unknown) => {
         setZoomFailed(id, true);
         throw err;

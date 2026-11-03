@@ -266,7 +266,7 @@ export const agendaEn = {
     videoCall: "Video call",
     noVideoCall: "None",
     provider: { google_meet: "Google Meet", zoom: "Zoom", teams: "Microsoft Teams", other: "Online meeting" },
-    meetWillBeCreated: "A real Google Meet link will be created in Google Calendar when the meeting syncs.",
+    meetWillBeCreated: "A real Google Meet link will be created in Google Calendar when the MeetingGuard app on your phone syncs the meeting.",
     meetNeedsCalendar: "Connect Google Calendar in the app (Settings > Calendar sync) to get a Google Meet link. You can also paste an existing link.",
     teamsWillBeCreated: "A real Microsoft Teams link will be created in Outlook when the meeting syncs.",
     zoomWillBeCreated: "A Zoom link will be created when you save",
@@ -281,7 +281,7 @@ export const agendaEn = {
     removeParticipant: "Remove participant",
     noParticipants: "No participants yet.",
     addParticipant: "Add participant",
-    invitesByGoogle: "Google Calendar emails the invitations when the meeting syncs.",
+    invitesByGoogle: "Google Calendar emails the invitations when the MeetingGuard app on your phone syncs the meeting.",
     invitesNeedCalendar: "Connect Google Calendar to send invitations. Otherwise participants are only saved here.",
     tips: "Preparation tips",
     tipsLabel: "One tip per line",
@@ -309,7 +309,7 @@ export const agendaEn = {
 
   // what the details say about a video call without a link yet (the app's "details")
   link: {
-    meetPending: "A Google Meet link is created when the meeting syncs to Google Calendar.",
+    meetPending: "A Google Meet link is created when the MeetingGuard app on your phone syncs the meeting to Google Calendar.",
     meetNeedsCalendar: "There is no Google Meet link yet. MeetingGuard creates one only through Google Calendar: connect it in the app, or edit the meeting and paste a link.",
     teamsPending: "A Microsoft Teams link is created when the meeting syncs to Outlook.",
     teamsLinkTooLate: "This meeting is already in Outlook, so a Teams link can no longer be created automatically. Edit the meeting and paste the link from your Teams invitation.",
@@ -862,7 +862,7 @@ export const agendaEs: AgendaDict = {
     videoCall: "Videollamada",
     noVideoCall: "Ninguna",
     provider: { google_meet: "Google Meet", zoom: "Zoom", teams: "Microsoft Teams", other: "Reunión en línea" },
-    meetWillBeCreated: "Google Calendar creará un enlace real de Google Meet cuando la reunión se sincronice.",
+    meetWillBeCreated: "Google Calendar creará un enlace real de Google Meet cuando la app MeetingGuard de tu teléfono sincronice la reunión.",
     meetNeedsCalendar: "Conecta Google Calendar en la app (Ajustes > Sincronización de calendarios) para obtener un enlace de Google Meet. También puedes pegar un enlace que ya tengas.",
     teamsWillBeCreated: "Outlook creará un enlace real de Microsoft Teams cuando la reunión se sincronice.",
     zoomWillBeCreated: "Se creará un enlace de Zoom al guardar",
@@ -877,7 +877,7 @@ export const agendaEs: AgendaDict = {
     removeParticipant: "Quitar participante",
     noParticipants: "Aún no hay participantes.",
     addParticipant: "Añadir participante",
-    invitesByGoogle: "Google Calendar enviará las invitaciones por correo cuando se sincronice la reunión.",
+    invitesByGoogle: "Google Calendar enviará las invitaciones por correo cuando la app MeetingGuard de tu teléfono sincronice la reunión.",
     invitesNeedCalendar: "Conecta Google Calendar para enviar invitaciones. Si no, los participantes solo se guardan aquí.",
     tips: "Consejos de preparación",
     tipsLabel: "Un consejo por línea",
@@ -903,7 +903,7 @@ export const agendaEs: AgendaDict = {
   },
 
   link: {
-    meetPending: "El enlace de Google Meet se crea cuando la reunión se sincroniza con Google Calendar.",
+    meetPending: "El enlace de Google Meet se crea cuando la app MeetingGuard de tu teléfono sincroniza la reunión con Google Calendar.",
     meetNeedsCalendar: "Todavía no hay enlace de Google Meet. MeetingGuard solo lo crea a través de Google Calendar: conéctalo en la app, o edita la reunión y pega un enlace.",
     teamsPending: "El enlace de Microsoft Teams se crea cuando la reunión se sincroniza con Outlook.",
     teamsLinkTooLate: "Esta reunión ya está en Outlook, así que el enlace de Teams ya no se puede crear automáticamente. Edita la reunión y pega el enlace de tu invitación de Teams.",
