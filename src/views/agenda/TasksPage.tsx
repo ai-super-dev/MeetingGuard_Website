@@ -2,10 +2,10 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { AlertCircle, Bell, CalendarClock, CalendarDays, Check, CheckCircle2, Clock, Inbox, Link2, ListChecks, ListTodo, Pencil, Plus, Search, SearchX, Sun, Trash2, X } from "lucide-react";
+import { AlertCircle, Bell, CalendarClock, CalendarDays, CheckCircle2, Clock, Inbox, Link2, ListChecks, ListTodo, Pencil, Plus, Search, SearchX, Sun, Trash2, X } from "lucide-react";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { DeleteTaskDialog, TaskEditor, useDueLabel, type TaskDraft } from "@/components/agenda/TaskDialogs";
-import { Button, IconButton, useToast } from "@/components/agenda/ui";
+import { Button, IconButton, TaskCheck, useToast } from "@/components/agenda/ui";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { displayZone, setTaskDone, useAgenda } from "@/lib/agenda/store";
@@ -273,17 +273,14 @@ function TaskRow({ task: t, overdue, onEdit, onDelete }: { task: Task; overdue: 
 
   return (
     <li className="flex items-start gap-3.5 py-3.5 pr-2 pl-4 transition-colors hover:bg-white/[0.025] sm:pr-3 sm:pl-5">
-      {/* a round box over the real checkbox */}
-      <span className="relative mt-0.5 grid h-5 w-5 shrink-0 place-items-center">
-        <input
-          type="checkbox"
-          checked={isDone}
-          onChange={(e) => toggle(e.target.checked)}
-          aria-label={isDone ? a.tasks.markUndone(t.title) : a.tasks.markDone(t.title)}
-          className={`peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 transition-colors checked:border-[#1fa37a] checked:bg-[#1fa37a] hover:border-white/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60 ${overdue ? "border-accent-soft/70" : "border-white/30"}`}
-        />
-        <Check className="pointer-events-none absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100" strokeWidth={3} aria-hidden />
-      </span>
+      <TaskCheck
+        checked={isDone}
+        busy={s.savingTasks.includes(t.id)}
+        overdue={overdue}
+        onChange={(next) => void toggle(next)}
+        label={isDone ? a.tasks.markUndone(t.title) : a.tasks.markDone(t.title)}
+        className="mt-0.5"
+      />
       <div className="min-w-0 flex-1 md:flex md:items-start md:gap-6">
         <div className="min-w-0 flex-1">
           <button type="button" onClick={onEdit} className={`block max-w-full text-left text-[0.95rem] font-medium break-words hover:underline ${isDone ? "text-white/45 line-through" : "text-white"}`}>

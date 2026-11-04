@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, ListPlus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, ListPlus, Plus } from "lucide-react";
 import { byDay, type Selection } from "@/components/agenda/Calendar";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { SOURCE_COLOR } from "@/components/agenda/look";
 import { suggestedTime, useMeetingFlows } from "@/components/agenda/MeetingFlows";
 import { MeetingRow, useDayTitle } from "@/components/agenda/MeetingRow";
 import { TaskEditor, type TaskDraft } from "@/components/agenda/TaskDialogs";
-import { Button, IconButton, useToast } from "@/components/agenda/ui";
+import { Button, IconButton, TaskCheck, useToast } from "@/components/agenda/ui";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { compareWithinDay } from "@/lib/agenda/meetingsList";
@@ -220,6 +220,7 @@ function DayTask({ task: t, zone, onOpen }: { task: Task; zone: string; onOpen: 
   const a = useA();
   const lang = useLang();
   const toast = useToast();
+  const s = useAgenda();
   const done = t.status === "done";
   const toggle = async (next: boolean) => {
     try {
@@ -231,17 +232,12 @@ function DayTask({ task: t, zone, onOpen }: { task: Task; zone: string; onOpen: 
   };
   return (
     <li className="flex items-center gap-3 px-4 py-2">
-      {/* a round box over the real checkbox, as on the Tasks page */}
-      <span className="relative grid h-5 w-5 shrink-0 place-items-center">
-        <input
-          type="checkbox"
-          checked={done}
-          onChange={(e) => void toggle(e.target.checked)}
-          aria-label={done ? a.tasks.markUndone(t.title) : a.tasks.markDone(t.title)}
-          className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-white/30 transition-colors checked:border-[#1fa37a] checked:bg-[#1fa37a] hover:border-white/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
-        />
-        <Check className="pointer-events-none absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100" strokeWidth={3} aria-hidden />
-      </span>
+      <TaskCheck
+        checked={done}
+        busy={s.savingTasks.includes(t.id)}
+        onChange={(next) => void toggle(next)}
+        label={done ? a.tasks.markUndone(t.title) : a.tasks.markDone(t.title)}
+      />
       <button type="button" onClick={onOpen} className={`min-w-0 flex-1 truncate text-left text-[0.9rem] hover:underline ${done ? "text-white/45 line-through" : ""}`}>
         {t.title}
       </button>

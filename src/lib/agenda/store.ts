@@ -46,13 +46,15 @@ export type AgendaState = {
   zoom: boolean | null;
   /** Meetings whose Zoom link couldn't be created in this session. */
   zoomFailed: string[];
+  /** Tasks being marked done or not done right now (their round box spins until the save ends). */
+  savingTasks: string[];
 };
 
 const ZONE_KEY = "mg-agenda-zone";
 const DEMO_KEY = "mg-agenda-preview";
 const DELETED_KEY = "mg-agenda-deleted";
 
-const BLANK: Omit<AgendaState, "zone"> = { ready: false, loadFailed: false, user: null, entitlement: FREE, meetings: [], tasks: [], prefs: DEFAULT_PREFERENCES, zoom: null, zoomFailed: [] };
+const BLANK: Omit<AgendaState, "zone"> = { ready: false, loadFailed: false, user: null, entitlement: FREE, meetings: [], tasks: [], prefs: DEFAULT_PREFERENCES, zoom: null, zoomFailed: [], savingTasks: [] };
 const SERVER: AgendaState = { ...BLANK, zone: "" };
 
 let state: AgendaState = SERVER;
@@ -618,7 +620,20 @@ export async function updateTask(id: string, patch: TaskPatch) {
   await save({ tasks: [applyTaskPatch(current, patch, stamp(current.updatedAt))] });
 }
 
-export const setTaskDone = (id: string, done: boolean) => updateTask(id, { status: done ? "done" : "open" });
+/**
+ * Marks a task done or not done. The save takes a moment (it goes to the
+ * server and back), so the task is listed in `savingTasks` until it ends:
+ * every screen that shows the task shows it saving, Undo included.
+ */
+export async function setTaskDone(id: string, done: boolean) {
+  setState({ savingTasks: [...state.savingTasks, id] });
+  try {
+    await updateTask(id, { status: done ? "done" : "open" });
+  } finally {
+    const i = state.savingTasks.indexOf(id);
+    if (i >= 0) setState({ savingTasks: state.savingTasks.filter((_, j) => j !== i) });
+  }
+}
 
 /** A linked task moved by the same amount as its meeting (not saved yet). */
 export function shiftedTask(t: Task, ms: number, days: number): Task {

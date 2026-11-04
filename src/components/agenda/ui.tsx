@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
-import { Loader2, X } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { useA } from "@/lib/agenda/i18n";
 import type { ErrorCode } from "@/lib/agenda/validation";
 
@@ -62,6 +62,60 @@ export function IconButton({ label, children, className = "", ...rest }: ButtonH
       {children}
     </button>
   );
+}
+
+/* ---------- Task box ---------- */
+
+const SAVING_RING = "pointer-events-none absolute inset-0 animate-spin rounded-full border-2 border-[#1fa37a]/25 border-t-[#1fa37a]";
+
+/**
+ * The round box that marks a task done. While the change is saving, a
+ * spinning green ring takes its place and further clicks are ignored. It
+ * stays focusable (aria-disabled, not disabled), so the keyboard focus isn't lost.
+ */
+export function TaskCheck({
+  checked,
+  busy,
+  label,
+  overdue = false,
+  onChange,
+  className = "",
+}: {
+  checked: boolean;
+  busy: boolean;
+  label: string;
+  overdue?: boolean;
+  onChange: (checked: boolean) => void;
+  className?: string;
+}) {
+  const a = useA();
+  return (
+    <span className={`relative grid h-5 w-5 shrink-0 place-items-center ${className}`}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => !busy && onChange(e.target.checked)}
+        aria-label={busy ? `${label} (${a.common.saving})` : label}
+        aria-disabled={busy || undefined}
+        aria-busy={busy || undefined}
+        className={`peer h-5 w-5 appearance-none rounded-full border-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60 ${
+          busy
+            ? "cursor-wait border-transparent"
+            : `cursor-pointer checked:border-[#1fa37a] checked:bg-[#1fa37a] hover:border-white/60 ${overdue ? "border-accent-soft/70" : "border-white/30"}`
+        }`}
+      />
+      {busy ? (
+        <span data-saving className={SAVING_RING} aria-hidden />
+      ) : (
+        <Check className="pointer-events-none absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100" strokeWidth={3} aria-hidden />
+      )}
+    </span>
+  );
+}
+
+/** The same spinning ring, sized to a small square checkbox (the linked tasks in a meeting's details). */
+export function SavingRing({ className = "" }: { className?: string }) {
+  return <span data-saving className={`${SAVING_RING} ${className}`} aria-hidden />;
 }
 
 /* ---------- Form fields ---------- */

@@ -31,7 +31,7 @@ import { useLang } from "@/lib/language";
 import { hostOf, type Selection } from "./Calendar";
 import { SOURCE_COLOR } from "./look";
 import { ChoiceChips, FloatField, FormSection, Helper, ListGroup, PickerRow, RadioRow, Subheading, Switch, ToggleChip } from "./form";
-import { Button, Dialog, Field, IconButton, inputClass, useToast } from "./ui";
+import { Button, Dialog, Field, IconButton, inputClass, SavingRing, useToast } from "./ui";
 
 /** Which meetings of a series a change applies to. */
 export type Scope = "one" | "following" | "all";
@@ -315,27 +315,41 @@ export function MeetingDetails({
         <section className="mt-4">
           <h3 className="mb-2 text-[0.8rem] text-white/55">{a.details.linkedTasks}</h3>
           <ul className="space-y-1.5">
-            {linked.map((t) => (
+            {linked.map((t) => {
+              const saving = s.savingTasks.includes(t.id);
+              return (
               <li key={t.id}>
-                <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-white/[0.08] px-3 py-2.5 hover:border-white/15">
-                  <input
-                    type="checkbox"
-                    checked={t.status === "done"}
-                    onChange={async (e) => {
-                      try {
-                        await setTaskDone(t.id, e.target.checked);
-                        toast(e.target.checked ? a.toast.taskDone : a.toast.taskUndone);
-                      } catch {
-                        toast(a.errors.save, { tone: "error" });
-                      }
-                    }}
-                    className="h-4 w-4 accent-[var(--color-accent)]"
-                  />
-                  <span className={`flex-1 text-[0.9rem] ${t.status === "done" ? "text-white/45 line-through" : ""}`}>{t.title}</span>
+                <label className={`flex items-center gap-3 rounded-lg border border-white/[0.08] px-3 py-2.5 hover:border-white/15 ${saving ? "cursor-wait" : "cursor-pointer"}`}>
+                  {/* while it saves, a spinning ring covers the box and clicks are ignored */}
+                  <span className="relative grid h-4 w-4 shrink-0 place-items-center">
+                    <input
+                      type="checkbox"
+                      checked={t.status === "done"}
+                      aria-disabled={saving || undefined}
+                      aria-busy={saving || undefined}
+                      onChange={async (e) => {
+                        if (saving) return;
+                        const next = e.target.checked;
+                        try {
+                          await setTaskDone(t.id, next);
+                          toast(next ? a.toast.taskDone : a.toast.taskUndone);
+                        } catch {
+                          toast(a.errors.save, { tone: "error" });
+                        }
+                      }}
+                      className={`h-4 w-4 accent-[var(--color-accent)] ${saving ? "opacity-0" : ""}`}
+                    />
+                    {saving && <SavingRing />}
+                  </span>
+                  <span className={`flex-1 text-[0.9rem] ${t.status === "done" ? "text-white/45 line-through" : ""}`}>
+                    {t.title}
+                    {saving && <span className="sr-only"> ({a.common.saving})</span>}
+                  </span>
                   {t.dueDate && <span className="text-[0.76rem] text-white/50">{fmtDay(t.dueDate, lang, { day: "numeric", month: "short" })}</span>}
                 </label>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </section>
       )}

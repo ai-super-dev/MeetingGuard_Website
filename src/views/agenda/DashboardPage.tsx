@@ -6,7 +6,7 @@ import { AlertCircle, ArrowRight, BarChart3, CalendarDays, CalendarPlus, CheckCi
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { suggestedTime, useMeetingFlows } from "@/components/agenda/MeetingFlows";
 import { TaskEditor, type TaskDraft } from "@/components/agenda/TaskDialogs";
-import { Button, TONES, useToast } from "@/components/agenda/ui";
+import { Button, TaskCheck, TONES, useToast } from "@/components/agenda/ui";
 import { barFraction, countdownTo, dayPeriodOf, dueNow, findNowAndNext, firstNameOf, isOverdue, todayTimeline, weekSummary, type TimelineItem, type WeekSummary } from "@/lib/agenda/dashboard";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
@@ -325,6 +325,7 @@ function TaskRow({ task: t, overdue, zone, onOpen }: { task: Task; overdue: bool
   const a = useA();
   const lang = useLang();
   const toast = useToast();
+  const s = useAgenda();
   const done = async () => {
     try {
       await setTaskDone(t.id, true);
@@ -336,13 +337,7 @@ function TaskRow({ task: t, overdue, zone, onOpen }: { task: Task; overdue: bool
   const due = overdue ? a.dashboard.overdue : t.dueTime && t.dueDate ? fmtTime(fromZoned(t.dueDate, t.dueTime, t.timezone), lang, zone) : a.dashboard.dueToday;
   return (
     <li className="flex items-center gap-3 px-4 py-2.5 sm:px-5">
-      <input
-        type="checkbox"
-        checked={false}
-        onChange={() => void done()}
-        aria-label={a.tasks.markDone(t.title)}
-        className={`h-5 w-5 shrink-0 cursor-pointer appearance-none rounded-full border-2 transition-colors hover:border-white/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60 ${overdue ? "border-accent-soft/70" : "border-white/30"}`}
-      />
+      <TaskCheck checked={false} busy={s.savingTasks.includes(t.id)} overdue={overdue} onChange={() => void done()} label={a.tasks.markDone(t.title)} />
       <button type="button" onClick={onOpen} className="min-w-0 flex-1 truncate text-left text-[0.9rem] hover:underline">
         {t.title}
       </button>
