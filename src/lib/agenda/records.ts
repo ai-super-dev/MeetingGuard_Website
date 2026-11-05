@@ -129,6 +129,8 @@ export function tombstoneMeeting(m: Meeting, now: string): Meeting {
 export function meetingToDoc(m: Meeting): Raw {
   const out: Raw = { ...m, external: { ...m.external } };
   delete out.id;
+  // the store writes pushPending itself on every save
+  delete out.pushPending;
   for (const key of SPARSE_MEETING) if (out[key] === null) delete out[key];
   const external = out.external as ExternalRefs;
   for (const key of SPARSE_EXTERNAL) if (external[key] === null) delete external[key];
@@ -185,6 +187,7 @@ export function parseMeeting(id: string, raw: Raw): Meeting | null {
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
     deletedAt: nullable(raw.deletedAt),
+    pushPending: raw.pushPending === true,
   };
 }
 
@@ -233,9 +236,12 @@ export function applyTaskPatch(t: Task, patch: TaskPatch, now: string): Task {
   };
 }
 
+/** The stored document: no id; the app's own fields (source, external) go back exactly as they were read. */
 export function taskToDoc(t: Task): Raw {
   const out: Raw = { ...t };
   delete out.id;
+  if (out.source === undefined) delete out.source;
+  if (out.external === undefined) delete out.external;
   return out;
 }
 
@@ -257,6 +263,9 @@ export function parseTask(id: string, raw: Raw): Task | null {
     completedAt: status === "done" ? (isIso(raw.completedAt) ? raw.completedAt : raw.updatedAt) : null,
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
+    // kept untouched, so a save on the website doesn't cut the To Do or Google Tasks link
+    ...(typeof raw.source === "string" ? { source: raw.source } : {}),
+    ...(raw.external && typeof raw.external === "object" && !Array.isArray(raw.external) ? { external: raw.external as Record<string, unknown> } : {}),
   };
 }
 
@@ -287,6 +296,10 @@ export const DEFAULT_PREFERENCES: Preferences = {
   googleCalendarSyncEnabled: false,
   deviceCalendarImportIds: [],
   deviceCalendarExportId: null,
+  todoListId: null,
+  todoListName: null,
+  gtasksListId: null,
+  gtasksListName: null,
   updatedAt: null,
 };
 
@@ -313,6 +326,23 @@ export function parsePreferences(raw: Raw | null): Preferences {
     googleCalendarSyncEnabled: raw.googleCalendarSyncEnabled === true,
     deviceCalendarImportIds: Array.isArray(raw.deviceCalendarImportIds) ? (raw.deviceCalendarImportIds as string[]) : [],
     deviceCalendarExportId: nullable(raw.deviceCalendarExportId),
+    todoListId: nullable(raw.todoListId),
+    todoListName: nullable(raw.todoListName),
+    gtasksListId: nullable(raw.gtasksListId),
+    gtasksListName: nullable(raw.gtasksListName),
     updatedAt: nullable(raw.updatedAt),
   };
+}
+
+/**
+ * Whether the app has run on a phone with this account. The app writes the
+ * whole settings record the first time it starts with an account; the
+ * website only ever changes a few settings in it. So a record holding the
+ * fields only the app writes means the app was used; no record, or one with
+ * only the website's few settings (older website versions created it), means
+ * it wasn't.
+ */
+export function isAppPreferences(raw: Raw | null): boolean {
+  if (!raw) return false;
+  return ["language", "googleCalendarSyncEnabled", "deviceCalendarImportIds"].some((key) => key in raw);
 }

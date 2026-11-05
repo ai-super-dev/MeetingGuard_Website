@@ -68,6 +68,8 @@ function SignIn() {
     setBusy(provider);
     try {
       await (provider === "google" ? signInWithGoogle : signInWithApple)(lang);
+      // signed in: the agenda opens; refused: the buttons are free again under the message
+      setBusy("");
     } catch (err) {
       fail(err);
     }
@@ -94,6 +96,7 @@ function SignIn() {
     setBusy("password");
     try {
       await signInWithPassword(email.trim(), password, lang);
+      setBusy("");
     } catch (err) {
       fail(err);
     }

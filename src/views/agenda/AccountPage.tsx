@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheck, Bell, CalendarDays, Check, ChevronRight, CirclePlus, ExternalLink, Globe, LogOut, Mail, MailCheck, MailWarning, MessageCircle, Smartphone } from "lucide-react";
+import { BadgeCheck, Bell, CalendarDays, Check, ChevronRight, CirclePlus, ExternalLink, Globe, ListChecks, LogOut, Mail, MailCheck, MailWarning, MessageCircle, Smartphone } from "lucide-react";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { ChoiceChips, Helper, Subheading, Switch, ToggleChip } from "@/components/agenda/form";
 import { Button, Dialog, Field, inputClass, useToast } from "@/components/agenda/ui";
@@ -406,14 +406,28 @@ function TimeFormat({ value, onChange }: { value: boolean | null; onChange: (use
   );
 }
 
+/**
+ * What the app saved about its calendar and task sync. Turned on in the app
+ * is all the website can know: not whether the phone is syncing right now.
+ * Outlook's connection stays on the phone, so it is never shown as on or off.
+ */
 function Connections() {
   const a = useA();
   const s = useAgenda();
-  // connected in the app; Outlook's connection stays on the phone, so its meetings are the sign
-  const connections = [
-    { name: a.sources.google, icon: <CalendarDays />, on: s.prefs.googleCalendarSyncEnabled, off: a.account.notConnected },
-    { name: a.sources.outlook, icon: <Mail />, on: s.meetings.some((m) => m.source === "outlook" || !!m.external.outlookEventId), off: a.account.outlookUnknown },
-    { name: a.sources.device, icon: <Smartphone />, on: s.prefs.deviceCalendarImportIds.length > 0 || s.prefs.deviceCalendarExportId !== null, off: a.account.notConnected },
+  const p = s.prefs;
+  const list = (id: string | null, name: string | null) => (id ? (name ? a.account.listInApp(name) : a.account.onInApp) : null);
+  const outlookSeen = s.meetings.some((m) => m.source === "outlook" || !!m.external.outlookEventId);
+  const connections: { name: string; icon: ReactNode; on: boolean; text: string }[] = [
+    { name: a.sources.google, icon: <CalendarDays />, on: p.googleCalendarSyncEnabled, text: p.googleCalendarSyncEnabled ? a.account.onInApp : a.account.offInApp },
+    { name: a.sources.outlook, icon: <Mail />, on: outlookSeen, text: outlookSeen ? a.account.outlookSeen : a.account.outlookInApp },
+    { name: a.account.todo, icon: <ListChecks />, on: !!p.todoListId, text: list(p.todoListId, p.todoListName) ?? a.account.offInApp },
+    { name: a.account.gtasks, icon: <ListChecks />, on: !!p.gtasksListId, text: list(p.gtasksListId, p.gtasksListName) ?? a.account.offInApp },
+    {
+      name: a.sources.device,
+      icon: <Smartphone />,
+      on: p.deviceCalendarImportIds.length > 0 || p.deviceCalendarExportId !== null,
+      text: p.deviceCalendarImportIds.length > 0 || p.deviceCalendarExportId !== null ? a.account.onInApp : a.account.offInApp,
+    },
   ];
   return (
     <Panel className="p-0! sm:p-0!">
@@ -425,7 +439,7 @@ function Connections() {
             <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <span className="text-[0.92rem] font-medium">{c.name}</span>
               <Status tone={c.on ? "ok" : "muted"} dot>
-                {c.on ? a.account.connected : c.off}
+                {c.text}
               </Status>
             </div>
           </li>

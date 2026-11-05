@@ -16,6 +16,7 @@ import {
   isLinkedElsewhere,
   joinUrl,
   linkState,
+  phoneStatus,
   removeMeeting,
   SeriesEndError,
   setTaskDone,
@@ -24,6 +25,7 @@ import {
   updateOccurrence,
   useAgenda,
 } from "@/lib/agenda/store";
+import { useNow } from "@/lib/agenda/hooks";
 import { addDays, dayKey, dayStart, daysBetween, fmtDay, fmtDuration, fmtRange, fmtTime, fromZoned, isDayKey, isTimeKey, timeKey, zoneLabel, MINUTE } from "@/lib/agenda/time";
 import type { AlertIntensity, Meeting, MeetingPatch, RecurrenceRule, Task } from "@/lib/agenda/types";
 import { ALERT_TIME_OPTIONS, defaultWeekdays, draftFromMeeting, draftToInput, draftToPatch, DURATION_OPTIONS, hasErrors, newDraft, ruleOf, startAtOf, TITLE_MAX, validateDraft, type ErrorCode, type MeetingDraft, type ParticipantDraft } from "@/lib/agenda/validation";
@@ -57,6 +59,29 @@ function Row({ icon, label, children }: { icon: ReactNode; label: string; childr
         <div className="mt-0.5 text-[0.92rem]">{children}</div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Where the meeting stands with the phone, from its record: waiting for the
+ * app to send a change made here, or placed on Google Calendar or Outlook.
+ */
+function PhoneLine({ meeting: m, now, zone }: { meeting: Meeting; now: number; zone: string }) {
+  const a = useA();
+  const lang = useLang();
+  const status = phoneStatus(m, now);
+  const calendar = calendarOf(m);
+  let text: string | null = null;
+  if (status === "waiting") text = a.details.phone.waiting;
+  else if (status === "late") text = a.details.phone.late(fmtDay(dayKey(new Date(m.updatedAt), zone), lang, { weekday: "long", month: "long", day: "numeric" }));
+  else if (status === "google" || status === "outlook") text = a.details.phone[status];
+  else if (isLinkedElsewhere(m)) text = a.details.synced(a.sources[calendar === "meetingguard" ? "google" : calendar]);
+  if (!text) return null;
+  const waiting = status === "waiting" || status === "late";
+  return (
+    <p role="status" className={`mt-4 text-[0.78rem] ${waiting ? "text-warm" : "text-white/45"}`}>
+      {text}
+    </p>
   );
 }
 
@@ -146,6 +171,7 @@ export function MeetingDetails({
   const s = useAgenda();
   const toast = useToast();
   const ruleLabel = useRuleLabel();
+  const now = useNow();
   const zone = displayZone(s);
   const m = s.meetings.find((x) => x.id === sel.id);
   const o = m ? findOccurrence(m, sel.key) : null;
@@ -354,7 +380,7 @@ export function MeetingDetails({
         </section>
       )}
 
-      {isLinkedElsewhere(m) && <p className="mt-4 text-[0.78rem] text-white/45">{a.details.synced(a.sources[calendar === "meetingguard" ? (m.external.outlookEventId ? "outlook" : "google") : calendar])}</p>}
+      <PhoneLine meeting={m} now={now} zone={zone} />
     </Dialog>
   );
 }

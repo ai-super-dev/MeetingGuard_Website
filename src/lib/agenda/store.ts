@@ -23,7 +23,7 @@ import { useSyncExternalStore } from "react";
 import type { Lang } from "@/lib/routes";
 import { LIVE } from "./config";
 import type * as Remote from "./firebase";
-import { applyMeetingPatch, applyTaskPatch, buildMeeting, buildTask, DEFAULT_PREFERENCES, FREE, meetingToDoc, nextTimestamp, parseEntitlement, parseMeeting, parsePreferences, parseTask, taskToDoc, tombstoneMeeting } from "./records";
+import { applyMeetingPatch, applyTaskPatch, buildMeeting, buildTask, DEFAULT_PREFERENCES, FREE, isAppPreferences, meetingToDoc, nextTimestamp, parseEntitlement, parseMeeting, parsePreferences, parseTask, taskToDoc, tombstoneMeeting } from "./records";
 import { reconcileAnchor, splitRecurrenceAt, withOverride } from "./recurrence";
 import { addDays, dayKey, deviceZone, fromZoned, setClock, timeKey, weekStart } from "./time";
 import type { LinkState } from "./conference";
@@ -48,13 +48,23 @@ export type AgendaState = {
   zoomFailed: string[];
   /** Tasks being marked done or not done right now (their round box spins until the save ends). */
   savingTasks: string[];
+  /**
+   * The last sign-in was to an account the app was never used with, so it was
+   * refused and signed out. Meanwhile `user` is an empty stand-in with this
+   * name: the agenda shows as a new, blurred account under a window that asks
+   * to set up the app first (Frame.tsx). Nothing of the account is loaded.
+   */
+  blocked: RefusedAccount | null;
 };
+
+/** Who tried to sign in, for the "set up the app first" window. Kept in memory only. */
+export type RefusedAccount = { name: string; email: string };
 
 const ZONE_KEY = "mg-agenda-zone";
 const DEMO_KEY = "mg-agenda-preview";
 const DELETED_KEY = "mg-agenda-deleted";
 
-const BLANK: Omit<AgendaState, "zone"> = { ready: false, loadFailed: false, user: null, entitlement: FREE, meetings: [], tasks: [], prefs: DEFAULT_PREFERENCES, zoom: null, zoomFailed: [], savingTasks: [] };
+const BLANK: Omit<AgendaState, "zone"> = { ready: false, loadFailed: false, user: null, entitlement: FREE, meetings: [], tasks: [], prefs: DEFAULT_PREFERENCES, zoom: null, zoomFailed: [], savingTasks: [], blocked: null };
 const SERVER: AgendaState = { ...BLANK, zone: "" };
 
 let state: AgendaState = SERVER;
@@ -93,7 +103,17 @@ let remote: typeof Remote | null = null;
 const loadRemote = async () => (remote ??= await import("./firebase"));
 
 let stopListening: (() => void) | null = null;
-let loaded = { meetings: false, tasks: false };
+let loaded = { meetings: false, tasks: false, preferences: false };
+/** Kept across the sign-out that follows a refused sign-in, for the window. */
+let blockedNotice: RefusedAccount | null = null;
+
+/** The empty stand-in account behind the blur: no uid, so nothing can be read or saved with it. */
+const standIn = (who: RefusedAccount): Partial<AgendaState> => ({
+  user: { uid: "", name: who.name, email: who.email, providers: [], verified: false },
+  blocked: who,
+});
+/** How long the account check may wait for the server before the "couldn't load" screen shows. */
+const ACCOUNT_CHECK_MS = 15_000;
 
 /** A version on this browser that is newer than the server's stays until the server catches up. */
 function merged<T extends { id: string; updatedAt: string }>(local: T[], incoming: T[]) {
@@ -106,7 +126,20 @@ function merged<T extends { id: string; updatedAt: string }>(local: T[], incomin
 
 function markLoaded(kind: keyof typeof loaded) {
   loaded[kind] = true;
-  if (loaded.meetings && loaded.tasks && !state.ready) setState({ ready: true });
+  if (loaded.meetings && loaded.tasks && loaded.preferences && !state.ready) setState({ ready: true });
+}
+
+/**
+ * Signs out an account the app was never used with. The website only serves
+ * accounts made in the app; it never creates one (Google and Apple would
+ * otherwise create one on a first sign-in).
+ */
+function refuse(r: typeof Remote) {
+  blockedNotice = { name: state.user?.name ?? "", email: state.user?.email ?? "" };
+  stopListening?.();
+  stopListening = null;
+  // an account this sign-in just created is being deleted already
+  if (!r.isRemovingNewAccount()) void r.signOut().catch(() => {});
 }
 
 function startLive() {
@@ -114,21 +147,31 @@ function startLive() {
     r.onUser((user) => {
       stopListening?.();
       stopListening = null;
-      loaded = { meetings: false, tasks: false };
+      loaded = { meetings: false, tasks: false, preferences: false };
       allMeetings = [];
       if (!user) {
-        setState({ ...BLANK, ready: true });
+        setState({ ...BLANK, ready: true, ...(blockedNotice ? standIn(blockedNotice) : {}) });
         return;
       }
+      // nothing shows until the account check below has passed
       setState({ ...BLANK, user });
-      void r.ensureProfile(user, new Date().toISOString()).catch(() => {});
-      // as in the app, an account that isn't verified only pastes Zoom links
-      if (user.verified) {
-        void r.zoomStatus().then(
-          (zoom) => state.user?.uid === user.uid && setState({ zoom }),
-          () => {},
-        );
-      }
+      let admitted = false;
+      const admit = () => {
+        admitted = true;
+        blockedNotice = null;
+        void r.ensureProfile(user, new Date().toISOString()).catch(() => {});
+        // as in the app, an account that isn't verified only pastes Zoom links
+        if (user.verified) {
+          void r.zoomStatus().then(
+            (zoom) => state.user?.uid === user.uid && setState({ zoom }),
+            () => {},
+          );
+        }
+      };
+      // offline at the start: the "couldn't load" screen, never a refusal
+      const waited = setTimeout(() => {
+        if (!admitted && state.user?.uid === user.uid) setState({ ready: true, loadFailed: true });
+      }, ACCOUNT_CHECK_MS);
       stopListening = r.listen(user.uid, {
         meetings: (docs) => {
           const parsed = docs.flatMap((d) => parseMeeting(d.id, d.data) ?? []);
@@ -141,8 +184,27 @@ function startLive() {
           markLoaded("tasks");
         },
         entitlement: (data) => setState({ entitlement: parseEntitlement(data) }),
-        preferences: (data) => setState({ prefs: parsePreferences(data) }),
-        error: () => setState({ ready: true, loadFailed: true }),
+        // the account check: the app writes this record the first time it runs with the account
+        preferences: (data, fromCache) => {
+          if (!isAppPreferences(data)) {
+            // not loaded from the server yet is not "missing"
+            if (!fromCache) {
+              clearTimeout(waited);
+              refuse(r);
+            }
+            return;
+          }
+          setState({ prefs: parsePreferences(data) });
+          if (!admitted) {
+            clearTimeout(waited);
+            admit();
+            markLoaded("preferences");
+          }
+        },
+        error: () => {
+          clearTimeout(waited);
+          setState({ ready: true, loadFailed: true });
+        },
       });
     });
   });
@@ -206,6 +268,21 @@ export function isLinkedElsewhere(m: Pick<Meeting, "source" | "external">) {
   return calendarOf(m) !== "meetingguard" || !!m.external.googleEventId || !!m.external.outlookEventId;
 }
 
+/** A change made here that the phone hasn't picked up after this long gets a nudge to open the app. */
+const PHONE_LATE_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Where the meeting stands with the phone, as last reported in its record:
+ * waiting for the app to send a change made here (late after a day), or
+ * placed on Google Calendar or Outlook. Never more than the record says.
+ */
+export function phoneStatus(m: Pick<Meeting, "pushPending" | "external" | "updatedAt">, now: number): "waiting" | "late" | "google" | "outlook" | null {
+  if (m.pushPending) return now - Date.parse(m.updatedAt) > PHONE_LATE_MS ? "late" : "waiting";
+  if (m.external.googleEventId) return "google";
+  if (m.external.outlookEventId) return "outlook";
+  return null;
+}
+
 /* ---------- Sign in ---------- */
 
 export type AuthCode = "wrongPassword" | "network" | "tooMany" | "popupBlocked" | "otherMethod" | "disabled" | "unavailable" | "generic";
@@ -230,13 +307,42 @@ function toAuthError(err: unknown): AuthError {
   return new AuthError("generic");
 }
 
-const signedIn = async (run: () => Promise<void>) => {
+const signedIn = async (run: () => Promise<unknown>) => {
   try {
     await run();
   } catch (err) {
     throw toAuthError(err);
   }
 };
+
+/** A new sign-in attempt clears the last refusal. */
+function clearBlocked() {
+  blockedNotice = null;
+  if (state.blocked) setState({ ...BLANK, ready: true });
+}
+
+/** Shows the blurred stand-in agenda with the "set up the app first" window. */
+function showRefused(who: RefusedAccount) {
+  blockedNotice = who;
+  setState({ ...BLANK, ready: true, ...standIn(who) });
+}
+
+/** The window's "Back to sign in": the stand-in goes, and the agenda sends the visitor to the sign-in page. */
+export function leaveRefused() {
+  clearBlocked();
+}
+
+/** Google and Apple: an account the sign-in just created was deleted again, so the window says why. */
+async function providerSignIn(run: () => Promise<RefusedAccount | null>) {
+  clearBlocked();
+  let refused: RefusedAccount | null;
+  try {
+    refused = await run();
+  } catch (err) {
+    throw toAuthError(err);
+  }
+  if (refused) showRefused(refused);
+}
 
 /**
  * Called when the sign-in page opens: downloads the sign-in code and its helper
@@ -253,19 +359,22 @@ export function prepareSignIn() {
 export async function signInWithGoogle(lang: Lang) {
   if (!LIVE) return demoSignIn({ uid: "preview-google", name: "Alex Morgan", email: "alex.morgan@gmail.com", providers: ["google.com"] }, lang);
   const r = await loadRemote();
-  await signedIn(r.signInGoogle);
+  await providerSignIn(r.signInGoogle);
 }
 
 export async function signInWithApple(lang: Lang) {
   if (!LIVE) return demoSignIn({ uid: "preview-apple", name: "Alex Morgan", email: "alex.morgan@icloud.com", providers: ["apple.com"] }, lang);
   const r = await loadRemote();
-  await signedIn(r.signInApple);
+  await providerSignIn(r.signInApple);
 }
 
 export async function signInWithPassword(email: string, password: string, lang: Lang) {
+  clearBlocked();
   if (!LIVE) {
     if (password.length < 6) throw new AuthError("wrongPassword");
     const name = email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    // preview only: an address starting with "noapp" acts as an account the app was never used with
+    if (/^noapp/i.test(email)) return showRefused({ name, email });
     return demoSignIn({ uid: "preview-password", name, email, providers: ["password"] }, lang);
   }
   const r = await loadRemote();
@@ -392,7 +501,8 @@ async function save(change: Change) {
     await new Promise((done) => setTimeout(done, 150));
   }
   const meetings = new Map(allMeetings.map((m) => [m.id, m]));
-  for (const m of change.meetings ?? []) meetings.set(m.id, m);
+  // shown at once as waiting for the phone, like the record just written (the preview has no phone)
+  for (const m of change.meetings ?? []) meetings.set(m.id, LIVE ? { ...m, pushPending: true } : m);
   const tasks = new Map(state.tasks.map((t) => [t.id, t]));
   for (const t of change.tasks ?? []) tasks.set(t.id, t);
   for (const t of change.removeTasks ?? []) tasks.delete(t.id);
@@ -757,6 +867,7 @@ function startDemo() {
 }
 
 function demoSignIn(user: User, lang: Lang) {
+  clearBlocked();
   // the preview account keeps its records between visits; a new one gets the sample agenda
   const data = loadDemo();
   if (data && data.meetings.length && data.meetings[0].userId === user.uid) setDemo({ ...data, user });

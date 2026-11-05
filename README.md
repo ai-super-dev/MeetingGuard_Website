@@ -96,6 +96,17 @@ installed with calendar sync on. A Zoom link comes from the server after the
 meeting is saved, so the website saves the meeting once more when the link
 arrives, and the invitations carry it.
 
+It only signs in; accounts are made in the app. The app writes the account's
+settings record (`users/{uid}/settings/preferences`) the first time it runs
+with an account, so the website lets an account in only when that record exists
+with the app's fields, and otherwise signs out and asks to set up the app
+first. An account that Google or Apple creates on a first sign-in here is
+deleted again at once. The website never creates the profile or the settings
+record, and it keeps the app's own task fields (`source`, `external`: the To Do
+and Google Tasks links) when it saves a task. The Profile page shows what the
+app saved about calendar and task sync, and each meeting says when it is
+waiting for the phone (`pushPending`).
+
 To turn it on: register a Web app in the Firebase console and copy its config;
 add the site's domain under Authentication > Settings > Authorized domains; and
 for Apple, add a Services ID to the Apple provider and set

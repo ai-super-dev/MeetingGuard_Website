@@ -72,6 +72,12 @@ export type Meeting = {
   updatedAt: string;
   /** Deleted meetings stay as an empty record so every device can sync the deletion. */
   deletedAt: string | null;
+  /**
+   * Read only: true while a change made on the website waits for the app on the
+   * phone to send it to the calendars (the app clears it). Every website save
+   * writes true itself (store.ts), whatever this says.
+   */
+  pushPending?: boolean;
 };
 
 /** What the forms may set on a meeting. */
@@ -112,6 +118,13 @@ export type Task = {
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  /**
+   * The app's own fields, kept as they are when the website saves the task:
+   * where it came from ("manual", "ai_chat", "whatsapp", "todo", "gtasks") and
+   * its links to Microsoft To Do and Google Tasks. The website never sets them.
+   */
+  source?: string;
+  external?: Record<string, unknown>;
 };
 
 export type TaskInput = Pick<Task, "title"> & Partial<Pick<Task, "description" | "dueDate" | "dueTime" | "timezone" | "reminderMinutesBefore" | "meetingId" | "people">>;
@@ -159,6 +172,11 @@ export type Preferences = {
   googleCalendarSyncEnabled: boolean;
   deviceCalendarImportIds: string[];
   deviceCalendarExportId: string | null;
+  /** The Microsoft To Do and Google Tasks lists new tasks go to; null while that sync is off in the app. */
+  todoListId: string | null;
+  todoListName: string | null;
+  gtasksListId: string | null;
+  gtasksListName: string | null;
   updatedAt: string | null;
 };
 

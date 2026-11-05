@@ -8,6 +8,7 @@ import { getApp, getApps, initializeApp } from "firebase/app";
 import {
   connectAuthEmulator,
   EmailAuthProvider,
+  getAdditionalUserInfo,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -18,9 +19,10 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut,
+  type AuthProvider,
   type User as FirebaseUser,
 } from "firebase/auth";
-import { collection, connectFirestoreEmulator, doc, getFirestore, initializeFirestore, memoryLocalCache, onSnapshot, runTransaction, setDoc, type DocumentData, type Firestore } from "firebase/firestore";
+import { collection, connectFirestoreEmulator, doc, getFirestore, initializeFirestore, memoryLocalCache, onSnapshot, runTransaction, updateDoc, type DocumentData, type Firestore } from "firebase/firestore";
 import { connectFunctionsEmulator, getFunctions, httpsCallable } from "firebase/functions";
 import { EMULATOR_HOST, FIREBASE_CONFIG, FUNCTIONS_REGION } from "./config";
 import type { User } from "./types";
@@ -92,8 +94,35 @@ export async function prepareSignIn() {
   await Promise.allSettled([resolver?._initialize?.(auth), resolver?._originValidation?.(auth)]);
 }
 
-export const signInGoogle = () => signInWithPopup(auth, googleProvider()).then(() => undefined);
-export const signInApple = () => signInWithPopup(auth, appleProvider()).then(() => undefined);
+/** Set while an account this sign-in just created is being removed (the session check then leaves it alone). */
+let removingNewAccount = false;
+export const isRemovingNewAccount = () => removingNewAccount;
+
+/**
+ * Google and Apple create an account the first time someone signs in with
+ * them. The website only signs in to accounts made in the app, so an account
+ * this sign-in just created is deleted at once: nothing else exists for it
+ * yet (the app's server runs nothing on new accounts), and the person can
+ * still create it in the app later. Answers with the person's name and email
+ * in that case (for the "set up the app first" window), null otherwise.
+ */
+async function popupSignIn(provider: AuthProvider): Promise<{ name: string; email: string } | null> {
+  const result = await signInWithPopup(auth, provider);
+  if (!getAdditionalUserInfo(result)?.isNewUser) return null;
+  const { name, email } = toUser(result.user);
+  removingNewAccount = true;
+  try {
+    await result.user.delete();
+  } catch {
+    await firebaseSignOut(auth).catch(() => {});
+  } finally {
+    removingNewAccount = false;
+  }
+  return { name, email };
+}
+
+export const signInGoogle = () => popupSignIn(googleProvider());
+export const signInApple = () => popupSignIn(appleProvider());
 export const signInPassword = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => undefined);
 export const sendReset = (email: string) => sendPasswordResetEmail(auth, email);
 export const signOut = () => firebaseSignOut(auth);
@@ -144,7 +173,8 @@ export type Handlers = {
   meetings: (docs: { id: string; data: Raw }[], fromCache: boolean) => void;
   tasks: (docs: { id: string; data: Raw }[], fromCache: boolean) => void;
   entitlement: (data: Raw | null) => void;
-  preferences: (data: Raw | null) => void;
+  /** `fromCache`: not confirmed by the server yet (a missing record may only be not loaded yet). */
+  preferences: (data: Raw | null, fromCache: boolean) => void;
   error: (error: unknown) => void;
 };
 
@@ -154,7 +184,7 @@ export function listen(uid: string, on: Handlers) {
     onSnapshot(collection(db, `users/${uid}/meetings`), (s) => on.meetings(s.docs.map((d) => ({ id: d.id, data: plainDoc(d.data()) })), s.metadata.fromCache), on.error),
     onSnapshot(collection(db, `users/${uid}/tasks`), (s) => on.tasks(s.docs.map((d) => ({ id: d.id, data: plainDoc(d.data()) })), s.metadata.fromCache), on.error),
     onSnapshot(doc(db, `entitlements/${uid}`), (s) => on.entitlement(s.exists() ? plainDoc(s.data()) : null), on.error),
-    onSnapshot(doc(db, `users/${uid}/settings/preferences`), (s) => on.preferences(s.exists() ? plainDoc(s.data()) : null), on.error),
+    onSnapshot(doc(db, `users/${uid}/settings/preferences`), (s) => on.preferences(s.exists() ? plainDoc(s.data()) : null, s.metadata.fromCache), on.error),
   ];
   return () => stops.forEach((stop) => stop());
 }
@@ -211,20 +241,24 @@ export async function commit(writes: Write[]) {
   }
 }
 
-/** Saves changed settings as the app does: only those fields, merged into the record, with a new time. */
+/**
+ * Saves changed settings as the app does: only those fields, with a new time.
+ * It only updates the record the app created, never creates one: the record
+ * is how the website knows the app was used (see isAppPreferences).
+ */
 export async function savePreferences(uid: string, patch: Raw, updatedAt: string) {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const limit = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error("Save timed out")), SAVE_LIMIT_MS);
   });
   try {
-    await Promise.race([setDoc(doc(db, `users/${uid}/settings/preferences`), { ...patch, updatedAt }, { merge: true }), limit]);
+    await Promise.race([updateDoc(doc(db, `users/${uid}/settings/preferences`), { ...patch, updatedAt }), limit]);
   } finally {
     clearTimeout(timer);
   }
 }
 
-/** Keeps the profile's identity up to date, as the app does on each sign-in. */
+/** Keeps the profile's identity up to date, as the app does on each sign-in. The app creates the profile; the website never does. */
 export async function ensureProfile(user: User, now: string) {
   const ref = doc(db, `users/${user.uid}`);
   const allowed = ["uid", "email", "displayName", "photoURL", "createdAt", "updatedAt", "lastLoginAt", "legacyMigratedAt"];
@@ -232,10 +266,7 @@ export async function ensureProfile(user: User, now: string) {
   const identity = { uid: user.uid, email: current?.email?.slice(0, 254) ?? null, displayName: current?.displayName?.slice(0, 200) ?? null, photoURL: current?.photoURL?.slice(0, 2048) ?? null, updatedAt: now, lastLoginAt: now };
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
-    if (!snap.exists()) {
-      tx.set(ref, { ...identity, createdAt: now, legacyMigratedAt: null });
-      return;
-    }
+    if (!snap.exists()) return;
     const data = plainDoc(snap.data());
     // an old profile is converted by the app, which knows the old format
     if (Object.keys(data).some((k) => !allowed.includes(k))) return;

@@ -190,6 +190,9 @@ export function Dialog({
   footer,
   size = "md",
   headerExtra,
+  backdrop = "backdrop:bg-black/55 backdrop:backdrop-blur-[2px]",
+  plain = false,
+  labelId,
 }: {
   title: ReactNode;
   onClose: () => void;
@@ -197,6 +200,14 @@ export function Dialog({
   footer?: ReactNode;
   size?: "sm" | "md" | "lg";
   headerExtra?: ReactNode;
+  /** The classes of the dimmed page behind the dialog. */
+  backdrop?: string;
+  /**
+   * No title bar or footer bar: the children lay out the whole dialog, with a
+   * close button in the corner. They show the title themselves, under `labelId`.
+   */
+  plain?: boolean;
+  labelId?: string;
 }) {
   const a = useA();
   const ref = useRef<HTMLDialogElement>(null);
@@ -223,7 +234,7 @@ export function Dialog({
     <dialog
       ref={ref}
       tabIndex={-1}
-      aria-labelledby={titleId}
+      aria-labelledby={plain && labelId ? labelId : titleId}
       onCancel={(e) => {
         e.preventDefault();
         close.current();
@@ -232,8 +243,16 @@ export function Dialog({
         // a click on the backdrop (the dialog element itself, outside its box) closes it
         if (e.target === ref.current) close.current();
       }}
-      className={`m-auto w-full max-w-none overflow-hidden border border-white/10 bg-panel p-0 text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop:bg-black/55 backdrop:backdrop-blur-[2px] max-sm:mb-0 max-sm:max-h-[92dvh] max-sm:rounded-t-2xl sm:max-h-[calc(100dvh-48px)] sm:rounded-2xl ${width}`}
+      className={`m-auto w-full max-w-none overflow-hidden border border-white/10 bg-panel p-0 text-white shadow-[0_24px_80px_rgba(0,0,0,0.55)] ${backdrop} max-sm:mb-0 max-sm:max-h-[92dvh] max-sm:rounded-t-2xl sm:max-h-[calc(100dvh-48px)] sm:rounded-2xl ${width}`}
     >
+      {plain ? (
+        <div className="relative max-h-[inherit] overflow-y-auto">
+          <IconButton label={a.common.close} onClick={() => close.current()} className="absolute top-3 right-3 z-10">
+            <X className="h-4 w-4" />
+          </IconButton>
+          {children}
+        </div>
+      ) : (
       <div className="flex max-h-[inherit] flex-col">
         <div className="flex items-start gap-3 border-b border-white/[0.07] px-5 py-4">
           <h2 id={titleId} className="min-w-0 flex-1 pt-1 text-[1.05rem] leading-snug font-semibold">
@@ -247,6 +266,7 @@ export function Dialog({
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
         {footer && <div className="flex flex-wrap items-center justify-end gap-2 border-t border-white/[0.07] px-5 py-3">{footer}</div>}
       </div>
+      )}
     </dialog>
   );
 }

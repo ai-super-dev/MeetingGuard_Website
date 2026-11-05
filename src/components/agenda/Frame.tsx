@@ -1,20 +1,21 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarClock, CalendarDays, CircleAlert, CircleUser, House, Info, LayoutDashboard, ListChecks, WifiOff, X } from "lucide-react";
+import { ArrowLeft, CalendarClock, CalendarDays, CircleAlert, CircleUser, House, Info, LayoutDashboard, ListChecks, Smartphone, WifiOff, X } from "lucide-react";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { AppMark, Logo } from "@/components/ui/Logo";
+import { StoreBadges } from "@/components/ui/StoreBadges";
 import { useNow, useOnline } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { LIVE } from "@/lib/agenda/config";
 import { effectivePlan } from "@/lib/agenda/plans";
-import { useAgenda } from "@/lib/agenda/store";
+import { leaveRefused, useAgenda, type RefusedAccount } from "@/lib/agenda/store";
 import { useHref } from "@/lib/language";
 import { splitPath } from "@/lib/routes";
-import { Spinner } from "./ui";
+import { Button, Dialog, Spinner } from "./ui";
 
 const NAV = [
   { key: "dashboard", path: "/app", Icon: LayoutDashboard },
@@ -83,6 +84,84 @@ function LoadFailedBanner() {
   );
 }
 
+/**
+ * Shown over the blurred, empty agenda after a sign-in to an account the app
+ * was never used with: the website only signs in, accounts are made in the app.
+ * Any way of closing it goes back to the sign-in page.
+ */
+function RefusedDialog({ who }: { who: RefusedAccount }) {
+  const a = useA();
+  const r = a.signIn.refused;
+  const labelId = useId();
+  const initial = (who.name || who.email).trim().charAt(0).toUpperCase();
+  return (
+    <Dialog
+      plain
+      labelId={labelId}
+      title={r.title}
+      onClose={leaveRefused}
+      size="sm"
+      // strong enough that the agenda behind is only a hint
+      backdrop="backdrop:bg-ink-950/45 backdrop:backdrop-blur-[10px]"
+    >
+      {/* the app, with a soft glow of its blue */}
+      <div className="relative px-6 pt-9 text-center sm:px-8">
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(79,141,249,0.24),transparent)]" />
+        <span className="relative mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.06] shadow-[0_12px_32px_rgba(37,99,235,0.28)] ring-1 ring-white/10">
+          <AppMark className="h-10 w-10" sizes="80px" />
+        </span>
+        <span className="relative mt-5 inline-flex items-center gap-1.5 rounded-full border border-[#4f8df9]/30 bg-[#4f8df9]/10 px-2.5 py-1 text-[0.72rem] font-semibold text-[color:color-mix(in_srgb,#4f8df9_70%,var(--color-white))]">
+          <Smartphone className="h-3.5 w-3.5" aria-hidden />
+          {r.eyebrow}
+        </span>
+        <h2 id={labelId} className="relative mt-3 text-[1.35rem] leading-snug font-semibold tracking-[-0.015em] text-balance">
+          {r.title}
+        </h2>
+        <p className="relative mx-auto mt-2 max-w-[340px] text-[0.88rem] leading-relaxed text-white/60">{r.lead}</p>
+      </div>
+
+      {/* what to do, in order */}
+      <ol className="mx-6 mt-6 space-y-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 sm:mx-8">
+        <RefusedStep n={1} text={r.step1}>
+          <StoreBadges className="mt-2.5 gap-2!" height={34} />
+        </RefusedStep>
+        <RefusedStep n={2} text={r.step2}>
+          {who.email && (
+            <span className="mt-2 inline-flex max-w-full items-center gap-2 rounded-full bg-white/[0.06] py-1 pr-3 pl-1 text-[0.8rem] text-white/80 ring-1 ring-white/[0.08]">
+              <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#4f8df9,#2563eb)] text-[0.7rem] font-semibold text-[#fff]">
+                {initial}
+              </span>
+              <span className="truncate">{who.email}</span>
+            </span>
+          )}
+        </RefusedStep>
+        <RefusedStep n={3} text={r.step3} />
+      </ol>
+
+      <div className="px-6 pt-5 pb-6 sm:px-8">
+        <Button variant="primary" onClick={leaveRefused} className="h-11 w-full" data-autofocus>
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          {r.back}
+        </Button>
+      </div>
+    </Dialog>
+  );
+}
+
+function RefusedStep({ n, text, children }: { n: number; text: string; children?: ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <span aria-hidden className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#4f8df9]/15 text-[0.75rem] font-semibold text-[color:color-mix(in_srgb,#4f8df9_75%,var(--color-white))]">
+        {n}
+      </span>
+      <div className="min-w-0 flex-1 pt-0.5">
+        <p className="text-[0.88rem] leading-snug font-medium text-white/90">{text}</p>
+        {children}
+      </div>
+    </li>
+  );
+}
+
 /** Language and theme buttons, shared by every agenda page. */
 function Controls() {
   return (
@@ -108,6 +187,11 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
   useEffect(() => {
     if (s.ready && !s.user) router.replace(href("/app/sign-in"));
   }, [s.ready, s.user, router, href]);
+
+  // a refused sign-in always shows the (empty, blurred) dashboard
+  useEffect(() => {
+    if (s.blocked && path !== "/app") router.replace(href("/app"));
+  }, [s.blocked, path, router, href]);
 
   if (!s.ready || !s.user) return <Spinner label={a.loading} />;
 
@@ -213,6 +297,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
           })}
         </ul>
       </nav>
+      {s.blocked && <RefusedDialog who={s.blocked} />}
     </div>
   );
 }
