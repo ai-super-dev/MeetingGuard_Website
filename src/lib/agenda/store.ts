@@ -17,6 +17,12 @@
  * such a meeting like a change made in the app: it sends it to the calendars,
  * creates the Meet link, emails the invitations or cancellations, and then
  * writes `pushPending: false`. The website never clears the field itself.
+ *
+ * Tasks work the same way (the app's ARCHITECTURE section 32): every task the
+ * website creates or changes carries `pushPending: true` with a new
+ * `updatedAt`, and the app sends it to Microsoft To Do and Google Tasks. A task
+ * deleted here is a plain delete; the app removes its copies from the links it
+ * keeps. The app's own task fields (source, external) are written back as read.
  */
 
 import { useSyncExternalStore } from "react";
@@ -494,7 +500,12 @@ async function save(change: Change) {
         data: { ...meetingToDoc(m), pushPending: true },
         updatedAt: m.updatedAt,
       })),
-      ...(change.tasks ?? []).map((t) => ({ path: `users/${uid}/tasks/${t.id}`, mode: creates.has(t.id) ? ("create" as const) : ("set" as const), data: taskToDoc(t), updatedAt: t.updatedAt })),
+      ...(change.tasks ?? []).map((t) => ({
+        path: `users/${uid}/tasks/${t.id}`,
+        mode: creates.has(t.id) ? ("create" as const) : ("set" as const),
+        data: { ...taskToDoc(t), pushPending: true },
+        updatedAt: t.updatedAt,
+      })),
       ...(change.removeTasks ?? []).map((t) => ({ path: `users/${uid}/tasks/${t.id}`, mode: "delete" as const, data: null, updatedAt: stamp(t.updatedAt) })),
     ]);
   } else {
@@ -504,7 +515,7 @@ async function save(change: Change) {
   // shown at once as waiting for the phone, like the record just written (the preview has no phone)
   for (const m of change.meetings ?? []) meetings.set(m.id, LIVE ? { ...m, pushPending: true } : m);
   const tasks = new Map(state.tasks.map((t) => [t.id, t]));
-  for (const t of change.tasks ?? []) tasks.set(t.id, t);
+  for (const t of change.tasks ?? []) tasks.set(t.id, LIVE ? { ...t, pushPending: true } : t);
   for (const t of change.removeTasks ?? []) tasks.delete(t.id);
   allMeetings = [...meetings.values()];
   setState({ meetings: allMeetings.filter((m) => m.deletedAt === null), tasks: [...tasks.values()] });

@@ -308,6 +308,8 @@ function TaskRow({ task: t, overdue, onEdit, onDelete }: { task: Task; overdue: 
             </Link>
           )}
           {t.meetingId && !meeting && <span className={chip}>{a.tasks.meetingGone}</span>}
+          {/* a change made here, not yet sent by the phone to To Do or Google Tasks (only when that sync is on in the app) */}
+          {t.pushPending && (s.prefs.todoListId || s.prefs.gtasksListId) && <span className={`${chip} bg-warm/10! font-medium text-warm!`}>{a.details.waitingChip}</span>}
         </div>
       </div>
       <div className="-my-1.5 flex shrink-0">

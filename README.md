@@ -103,7 +103,10 @@ with the app's fields, and otherwise signs out and asks to set up the app
 first. An account that Google or Apple creates on a first sign-in here is
 deleted again at once. The website never creates the profile or the settings
 record, and it keeps the app's own task fields (`source`, `external`: the To Do
-and Google Tasks links) when it saves a task. The Profile page shows what the
+and Google Tasks links) when it saves a task. Tasks follow the same rule as
+meetings: every task the website creates or changes carries `pushPending: true`,
+and the app on the phone sends it to Microsoft To Do and Google Tasks (a task
+deleted here is a plain delete; the app removes its copies). The Profile page shows what the
 app saved about calendar and task sync, and each meeting says when it is
 waiting for the phone (`pushPending`).
 

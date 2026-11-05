@@ -242,6 +242,8 @@ export function taskToDoc(t: Task): Raw {
   delete out.id;
   if (out.source === undefined) delete out.source;
   if (out.external === undefined) delete out.external;
+  // the store writes pushPending itself on every save
+  delete out.pushPending;
   return out;
 }
 
@@ -266,6 +268,7 @@ export function parseTask(id: string, raw: Raw): Task | null {
     // kept untouched, so a save on the website doesn't cut the To Do or Google Tasks link
     ...(typeof raw.source === "string" ? { source: raw.source } : {}),
     ...(raw.external && typeof raw.external === "object" && !Array.isArray(raw.external) ? { external: raw.external as Record<string, unknown> } : {}),
+    pushPending: raw.pushPending === true,
   };
 }
 

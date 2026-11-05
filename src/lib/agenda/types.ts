@@ -125,6 +125,12 @@ export type Task = {
    */
   source?: string;
   external?: Record<string, unknown>;
+  /**
+   * Read only: true while a change made on the website waits for the app on the
+   * phone to send it to Microsoft To Do and Google Tasks (the app clears it).
+   * Every website save writes true itself (store.ts), whatever this says.
+   */
+  pushPending?: boolean;
 };
 
 export type TaskInput = Pick<Task, "title"> & Partial<Pick<Task, "description" | "dueDate" | "dueTime" | "timezone" | "reminderMinutesBefore" | "meetingId" | "people">>;
