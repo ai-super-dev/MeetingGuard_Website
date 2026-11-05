@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "MeetingGuard: nunca te pierdas lo importante";
+export const alt = "Meeting Guard AI: nunca te pierdas lo importante";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const dynamic = "force-static";
@@ -23,7 +23,7 @@ export default async function Image() {
         }}
       >
         <div style={{ fontSize: 22, letterSpacing: 4, color: "rgba(255,255,255,0.45)", textTransform: "uppercase" }}>
-          MeetingGuard
+          Meeting Guard AI
         </div>
         <div style={{ display: "flex", flexDirection: "column", fontSize: 96, fontWeight: 700, lineHeight: 1.05, marginTop: 24 }}>
           <span>Nunca te pierdas</span>

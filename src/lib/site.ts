@@ -3,7 +3,7 @@
  * page shows them as "TBC" or hides the element until they are filled in.
  */
 export const siteConfig = {
-  name: "MeetingGuard",
+  name: "Meeting Guard AI",
   url: "https://meetingguard.ai",
   company: "Aeternum Tech Ltd",
   // TODO: UK company number (Companies House).
@@ -12,7 +12,7 @@ export const siteConfig = {
   // Support phone from the original site's footer.
   contactPhone: "+447400752170",
   contactPhoneLabel: "+44 7400 752170",
-  // The MeetingGuard WhatsApp business number (shown in the app's WhatsApp linking screen).
+  // The Meeting Guard AI WhatsApp business number (shown in the app's WhatsApp linking screen).
   whatsappNumberRaw: "+447403693109",
   appStoreUrl: "https://apps.apple.com/app/id6819847236",
   playStoreUrl: "https://play.google.com/store/apps/details?id=com.meetingguard.ai",
@@ -34,12 +34,3 @@ export const socialLinks: { label: string; href: string; icon: "facebook" | "ins
   { label: "LinkedIn", href: "", icon: "linkedin" },
   { label: "YouTube", href: "", icon: "youtube" },
 ];
-
-/** Release months for features that are not shipped yet (the "available <month>" labels). */
-export const availability = {
-  // TODO: confirm each month at release time.
-  outlook: "november",
-  microsoftToDo: "december",
-  googleTasks: "december",
-  debrief: "december",
-} as const;

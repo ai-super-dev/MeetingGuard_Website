@@ -45,7 +45,7 @@ export function VoiceScreen({ height = SHOT_H, time = "16:12" }: { height?: numb
   const s = useT().screens;
   return (
     <Screen className="bg-[#0e1524]" time={time} height={height}>
-      <Bar title="MeetingGuard" back={false} />
+      <Bar title="Meeting Guard AI" back={false} />
       <div className="flex flex-col items-center px-[22px] pt-[70px] text-center">
         <span className="relative grid h-[120px] w-[120px] place-items-center">
           <span className="absolute inset-0 rounded-full bg-[#b3b7ff]/15 [animation:glow-pulse_1.6s_ease-in-out_infinite]" />
@@ -242,7 +242,7 @@ export function TasksScreen({ height = SHOT_H, time = "9:10", doneFirst = false 
   );
 }
 
-/** Android settings page for one permission, with MeetingGuard switched on. */
+/** Android settings page for one permission, with Meeting Guard AI switched on. */
 export function PermissionScreen({ title, label, note, height = SHOT_H }: { title: string; label: string; note: string; height?: number }) {
   return (
     <Screen className="bg-[#111318]" time="9:41" height={height}>

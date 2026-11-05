@@ -32,16 +32,16 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
     "privacy": {
       "path": "/privacy-policy",
       "title": "Privacy Policy",
-      "description": "How MeetingGuard AI collects, uses and protects your data.",
+      "description": "How Meeting Guard AI collects, uses and protects your data.",
       "updated": "Last updated: November 3, 2026",
       "intro": [
-        "This policy explains what information the MeetingGuard AI app collects, how we use it, who we share it with and the choices you have. MeetingGuard AI is provided by AETERNUM TECH LTD (\"we\", \"us\")."
+        "This policy explains what information the Meeting Guard AI app collects, how we use it, who we share it with and the choices you have. Meeting Guard AI is provided by AETERNUM TECH LTD (\"we\", \"us\")."
       ],
       "sections": [
         {
           "heading": "Who is responsible for your data",
           "body": [
-            "AETERNUM TECH LTD (Company No. 14085985), registered at 128 City Road, London, United Kingdom, EC1V 2NX, is responsible for the personal data processed through MeetingGuard AI. You can contact us at support@meetingguard.ai."
+            "AETERNUM TECH LTD (Company No. 14085985), registered at 128 City Road, London, United Kingdom, EC1V 2NX, is responsible for the personal data processed through Meeting Guard AI. You can contact us at support@meetingguard.ai."
           ]
         },
         {
@@ -87,11 +87,11 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Google Calendar and Google Tasks",
           "body": [
-            "If you connect Google Calendar, you allow MeetingGuard AI to view and edit the events of your Google calendars (Google scope \"calendar.events\"). The app reads the events of the calendars you choose and writes the meetings you create or change in the app. It also creates Google Meet links and sends invitations to participants through Google Calendar when you ask for it.",
-            "If you turn on Google Tasks sync, you allow MeetingGuard AI to create, edit, organize and delete your tasks (Google scope \"tasks\"). The app reads the tasks of the list you choose and writes the tasks you create, complete, change or delete in the app, so both sides show the same tasks. The app never touches lists you did not choose.",
-            "Events and tasks from Google are saved in your MeetingGuard AI account (Google Firebase) so that they are available on your devices and can trigger your alerts.",
+            "If you connect Google Calendar, you allow Meeting Guard AI to view and edit the events of your Google calendars (Google scope \"calendar.events\"). The app reads the events of the calendars you choose and writes the meetings you create or change in the app. It also creates Google Meet links and sends invitations to participants through Google Calendar when you ask for it.",
+            "If you turn on Google Tasks sync, you allow Meeting Guard AI to create, edit, organize and delete your tasks (Google scope \"tasks\"). The app reads the tasks of the list you choose and writes the tasks you create, complete, change or delete in the app, so both sides show the same tasks. The app never touches lists you did not choose.",
+            "Events and tasks from Google are saved in your Meeting Guard AI account (Google Firebase) so that they are available on your devices and can trigger your alerts.",
             "The access token that lets the app talk to Google stays on your device, is managed by Google Sign-In and is never sent to our servers. You can disconnect Google Calendar or Google Tasks at any time in Settings > Calendar sync, or revoke the access in your Google Account settings (myaccount.google.com/permissions).",
-            "MeetingGuard AI's use and transfer to any other app of information received from Google APIs will adhere to the Google API Services User Data Policy, including the Limited Use requirements. This means:",
+            "Meeting Guard AI's use and transfer to any other app of information received from Google APIs will adhere to the Google API Services User Data Policy, including the Limited Use requirements. This means:",
             [
               "We use Google user data only to provide and improve the features described in this policy.",
               "We only transfer it to others when it is needed for those features (for example, to OpenAI when you ask the AI assistant about your meetings or tasks), to comply with the law, or as part of a merger or acquisition with notice to you.",
@@ -103,22 +103,22 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Microsoft: sign-in, Outlook and To Do",
           "body": [
-            "Sign in with Microsoft: when you sign in with Microsoft, Microsoft sends our server a signed proof of your identity (name, email address and account identifier). Our server checks it and creates or links your MeetingGuard AI account. We keep the Microsoft account identifier, the email address and the date of your last sign-in so you can sign in again.",
-            "Outlook calendar: if you connect Outlook, you allow MeetingGuard AI to read and write the events of your Outlook calendars through Microsoft Graph. When you ask for a Microsoft Teams link, the meeting is created in Outlook as an online meeting and Microsoft generates the link.",
-            "Microsoft To Do: if you turn on To Do sync, you allow MeetingGuard AI to read and write the tasks of the To Do lists you choose through Microsoft Graph, so the app and To Do show the same tasks.",
-            "Events and tasks from Microsoft are saved in your MeetingGuard AI account (Google Firebase) so that they are available on your devices and can trigger your alerts. The Microsoft tokens that let the app talk to Outlook and To Do stay on your device, in the operating system's secure storage, and are never sent to our servers. You can disconnect Outlook or To Do at any time in Settings > Calendar sync, or revoke the access at https://account.live.com/consent/Manage (personal accounts) or https://myapps.microsoft.com (work or school accounts)."
+            "Sign in with Microsoft: when you sign in with Microsoft, Microsoft sends our server a signed proof of your identity (name, email address and account identifier). Our server checks it and creates or links your Meeting Guard AI account. We keep the Microsoft account identifier, the email address and the date of your last sign-in so you can sign in again.",
+            "Outlook calendar: if you connect Outlook, you allow Meeting Guard AI to read and write the events of your Outlook calendars through Microsoft Graph. When you ask for a Microsoft Teams link, the meeting is created in Outlook as an online meeting and Microsoft generates the link.",
+            "Microsoft To Do: if you turn on To Do sync, you allow Meeting Guard AI to read and write the tasks of the To Do lists you choose through Microsoft Graph, so the app and To Do show the same tasks.",
+            "Events and tasks from Microsoft are saved in your Meeting Guard AI account (Google Firebase) so that they are available on your devices and can trigger your alerts. The Microsoft tokens that let the app talk to Outlook and To Do stay on your device, in the operating system's secure storage, and are never sent to our servers. You can disconnect Outlook or To Do at any time in Settings > Calendar sync, or revoke the access at https://account.live.com/consent/Manage (personal accounts) or https://myapps.microsoft.com (work or school accounts)."
           ]
         },
         {
           "heading": "Zoom links",
           "body": [
-            "If you choose Zoom as the video call of a meeting, our server creates the Zoom meeting through MeetingGuard AI's own Zoom account and stores the join link with your meeting. Zoom receives the meeting title, start time, duration and time zone, nothing else about you. You do not need a Zoom account, and your Zoom account is never connected."
+            "If you choose Zoom as the video call of a meeting, our server creates the Zoom meeting through Meeting Guard AI's own Zoom account and stores the join link with your meeting. Zoom receives the meeting title, start time, duration and time zone, nothing else about you. You do not need a Zoom account, and your Zoom account is never connected."
           ]
         },
         {
           "heading": "Calendars on your phone",
           "body": [
-            "If you allow calendar access, MeetingGuard AI reads the events of the phone calendars you choose and saves them in your account, so you get alerts for them. If you also choose a calendar for export, the app writes your MeetingGuard AI meetings into it. You can change these choices in the app, or turn off calendar access in your phone's settings."
+            "If you allow calendar access, Meeting Guard AI reads the events of the phone calendars you choose and saves them in your account, so you get alerts for them. If you also choose a calendar for export, the app writes your Meeting Guard AI meetings into it. You can change these choices in the app, or turn off calendar access in your phone's settings."
           ]
         },
         {
@@ -132,7 +132,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "WhatsApp assistant",
           "body": [
-            "The WhatsApp assistant is optional. To use it you link your WhatsApp number in the app with a one-time code. From then on, messages you send to the MeetingGuard AI WhatsApp number are delivered to our server by Meta (WhatsApp Business Platform) and handled like requests to the AI assistant in the app: our server sends the text of your message, together with your upcoming meetings and open tasks, to OpenAI to understand the request, and nothing is created, changed or deleted until you confirm it in the chat. Meta processes the messages between you and our number under its own terms and privacy policy. We do not store the content of your messages beyond a short conversation state, which resets after 15 minutes without messages, and our server logs never contain message text or phone numbers. Send STOP to pause the assistant, or unlink the number in Settings > WhatsApp, which deletes the link and the conversation state."
+            "The WhatsApp assistant is optional. To use it you link your WhatsApp number in the app with a one-time code. From then on, messages you send to the Meeting Guard AI WhatsApp number are delivered to our server by Meta (WhatsApp Business Platform) and handled like requests to the AI assistant in the app: our server sends the text of your message, together with your upcoming meetings and open tasks, to OpenAI to understand the request, and nothing is created, changed or deleted until you confirm it in the chat. Meta processes the messages between you and our number under its own terms and privacy policy. We do not store the content of your messages beyond a short conversation state, which resets after 15 minutes without messages, and our server logs never contain message text or phone numbers. Send STOP to pause the assistant, or unlink the number in Settings > WhatsApp, which deletes the link and the conversation state."
           ]
         },
         {
@@ -208,7 +208,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Children",
           "body": [
-            "MeetingGuard AI is not intended for children under 16, and we do not knowingly collect personal information from them. If you think a child has given us personal information, contact us at support@meetingguard.ai and we will delete it."
+            "Meeting Guard AI is not intended for children under 16, and we do not knowingly collect personal information from them. If you think a child has given us personal information, contact us at support@meetingguard.ai and we will delete it."
           ]
         },
         {
@@ -228,28 +228,28 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
     "terms": {
       "path": "/terms-of-service",
       "title": "Terms of Service",
-      "description": "The terms for using the MeetingGuard AI app.",
+      "description": "The terms for using the Meeting Guard AI app.",
       "updated": "Last updated: September 28, 2026",
       "intro": [
-        "Please read these terms carefully. They explain the rules for using MeetingGuard AI and what you can expect from us."
+        "Please read these terms carefully. They explain the rules for using Meeting Guard AI and what you can expect from us."
       ],
       "sections": [
         {
           "heading": "Agreement",
           "body": [
-            "These Terms of Service are an agreement between you and AETERNUM TECH LTD (\"we\", \"us\"), a company registered in England and Wales under Company No. 14085985 with its registered office at 128 City Road, London, United Kingdom, EC1V 2NX, for the use of the MeetingGuard AI app. By creating an account or using the app, you accept these terms and our Privacy Policy. If you do not agree, please do not use the app."
+            "These Terms of Service are an agreement between you and AETERNUM TECH LTD (\"we\", \"us\"), a company registered in England and Wales under Company No. 14085985 with its registered office at 128 City Road, London, United Kingdom, EC1V 2NX, for the use of the Meeting Guard AI app. By creating an account or using the app, you accept these terms and our Privacy Policy. If you do not agree, please do not use the app."
           ]
         },
         {
           "heading": "The service",
           "body": [
-            "MeetingGuard AI helps you manage your meetings: it stores your meetings and notes, schedules reminders on your device, syncs with Google Calendar and the calendars on your phone if you connect them, and offers an AI assistant that proposes changes for you to confirm. We may add, change or remove features over time. Features that are not available yet are marked as such in the app."
+            "Meeting Guard AI helps you manage your meetings: it stores your meetings and notes, schedules reminders on your device, syncs with Google Calendar and the calendars on your phone if you connect them, and offers an AI assistant that proposes changes for you to confirm. We may add, change or remove features over time. Features that are not available yet are marked as such in the app."
           ]
         },
         {
           "heading": "Your account",
           "body": [
-            "To use MeetingGuard AI:",
+            "To use Meeting Guard AI:",
             [
               "You must be at least 16 years old, or older if your country requires it to use online services without a parent's consent.",
               "Give accurate information and keep your Google account or password secure.",
@@ -277,7 +277,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Plans and payments",
           "body": [
-            "MeetingGuard AI is currently free to use. The paid plans (Pro and Premium) are shown for information only and cannot be purchased yet. If we offer paid plans in the future, they will be sold through the App Store or Google Play, and the price, billing period, renewal and cancellation terms will be shown before you buy."
+            "Meeting Guard AI is currently free to use. The paid plans (Pro and Premium) are shown for information only and cannot be purchased yet. If we offer paid plans in the future, they will be sold through the App Store or Google Play, and the price, billing period, renewal and cancellation terms will be shown before you buy."
           ]
         },
         {
@@ -350,8 +350,8 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
     },
     "deleteAccount": {
       "path": "/delete-account",
-      "title": "Delete your MeetingGuard AI account",
-      "description": "How to delete your MeetingGuard AI account and all its data.",
+      "title": "Delete your Meeting Guard AI account",
+      "description": "How to delete your Meeting Guard AI account and all its data.",
       "intro": [],
       "sections": [
         {
@@ -369,16 +369,16 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
     "privacy": {
       "path": "/privacy-policy",
       "title": "Política de privacidad",
-      "description": "Cómo MeetingGuard AI recopila, usa y protege tus datos.",
+      "description": "Cómo Meeting Guard AI recopila, usa y protege tus datos.",
       "updated": "Última actualización: 3 de noviembre de 2026",
       "intro": [
-        "Esta política explica qué información recopila la app MeetingGuard AI, cómo la usamos, con quién la compartimos y qué opciones tienes. MeetingGuard AI es un servicio de AETERNUM TECH LTD (\"nosotros\")."
+        "Esta política explica qué información recopila la app Meeting Guard AI, cómo la usamos, con quién la compartimos y qué opciones tienes. Meeting Guard AI es un servicio de AETERNUM TECH LTD (\"nosotros\")."
       ],
       "sections": [
         {
           "heading": "Quién es responsable de tus datos",
           "body": [
-            "AETERNUM TECH LTD (número de empresa 14085985), con domicilio social en 128 City Road, Londres, Reino Unido, EC1V 2NX, es responsable de los datos personales que se tratan a través de MeetingGuard AI. Puedes contactarnos en support@meetingguard.ai."
+            "AETERNUM TECH LTD (número de empresa 14085985), con domicilio social en 128 City Road, Londres, Reino Unido, EC1V 2NX, es responsable de los datos personales que se tratan a través de Meeting Guard AI. Puedes contactarnos en support@meetingguard.ai."
           ]
         },
         {
@@ -424,11 +424,11 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Google Calendar y Google Tasks",
           "body": [
-            "Si conectas Google Calendar, permites a MeetingGuard AI ver y editar los eventos de tus calendarios de Google (permiso de Google \"calendar.events\"). La app lee los eventos de los calendarios que eliges y escribe las reuniones que creas o cambias en la app. También crea enlaces de Google Meet y envía invitaciones a los participantes a través de Google Calendar cuando lo pides.",
-            "Si activas la sincronización con Google Tasks, permites a MeetingGuard AI crear, editar, organizar y eliminar tus tareas (permiso de Google \"tasks\"). La app lee las tareas de la lista que eliges y escribe las tareas que creas, completas, cambias o eliminas en la app, de modo que ambos lados muestran las mismas tareas. La app nunca toca listas que no hayas elegido.",
-            "Los eventos y tareas de Google se guardan en tu cuenta de MeetingGuard AI (Google Firebase) para que estén disponibles en tus dispositivos y puedan activar tus alertas.",
+            "Si conectas Google Calendar, permites a Meeting Guard AI ver y editar los eventos de tus calendarios de Google (permiso de Google \"calendar.events\"). La app lee los eventos de los calendarios que eliges y escribe las reuniones que creas o cambias en la app. También crea enlaces de Google Meet y envía invitaciones a los participantes a través de Google Calendar cuando lo pides.",
+            "Si activas la sincronización con Google Tasks, permites a Meeting Guard AI crear, editar, organizar y eliminar tus tareas (permiso de Google \"tasks\"). La app lee las tareas de la lista que eliges y escribe las tareas que creas, completas, cambias o eliminas en la app, de modo que ambos lados muestran las mismas tareas. La app nunca toca listas que no hayas elegido.",
+            "Los eventos y tareas de Google se guardan en tu cuenta de Meeting Guard AI (Google Firebase) para que estén disponibles en tus dispositivos y puedan activar tus alertas.",
             "El token de acceso que permite a la app hablar con Google se queda en tu dispositivo, lo gestiona Google Sign-In y nunca se envía a nuestros servidores. Puedes desconectar Google Calendar o Google Tasks en cualquier momento en Ajustes > Sincronización de calendarios, o revocar el acceso en la configuración de tu cuenta de Google (myaccount.google.com/permissions).",
-            "El uso y la transferencia a cualquier otra app de la información recibida de las API de Google por parte de MeetingGuard AI se ajustará a la Política de datos de usuario de los servicios de API de Google, incluidos los requisitos de Uso limitado. Esto significa:",
+            "El uso y la transferencia a cualquier otra app de la información recibida de las API de Google por parte de Meeting Guard AI se ajustará a la Política de datos de usuario de los servicios de API de Google, incluidos los requisitos de Uso limitado. Esto significa:",
             [
               "Usamos los datos de usuario de Google solo para ofrecer y mejorar las funciones descritas en esta política.",
               "Solo los transferimos a terceros cuando es necesario para esas funciones (por ejemplo, a OpenAI cuando preguntas al asistente de IA por tus reuniones o tareas), para cumplir la ley, o como parte de una fusión o adquisición con aviso previo.",
@@ -440,22 +440,22 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Microsoft: inicio de sesión, Outlook y To Do",
           "body": [
-            "Inicio de sesión con Microsoft: cuando inicias sesión con Microsoft, Microsoft envía a nuestro servidor una prueba firmada de tu identidad (nombre, dirección de correo e identificador de cuenta). Nuestro servidor la comprueba y crea o vincula tu cuenta de MeetingGuard AI. Conservamos el identificador de la cuenta de Microsoft, la dirección de correo y la fecha de tu último inicio de sesión para que puedas volver a entrar.",
-            "Calendario de Outlook: si conectas Outlook, permites a MeetingGuard AI leer y escribir los eventos de tus calendarios de Outlook a través de Microsoft Graph. Cuando pides un enlace de Microsoft Teams, la reunión se crea en Outlook como reunión en línea y Microsoft genera el enlace.",
-            "Microsoft To Do: si activas la sincronización con To Do, permites a MeetingGuard AI leer y escribir las tareas de las listas de To Do que eliges a través de Microsoft Graph, de modo que la app y To Do muestran las mismas tareas.",
-            "Los eventos y tareas de Microsoft se guardan en tu cuenta de MeetingGuard AI (Google Firebase) para que estén disponibles en tus dispositivos y puedan activar tus alertas. Los tokens de Microsoft que permiten a la app hablar con Outlook y To Do se quedan en tu dispositivo, en el almacenamiento seguro del sistema operativo, y nunca se envían a nuestros servidores. Puedes desconectar Outlook o To Do en cualquier momento en Ajustes > Sincronización de calendarios, o revocar el acceso en https://account.live.com/consent/Manage (cuentas personales) o https://myapps.microsoft.com (cuentas de trabajo o escuela)."
+            "Inicio de sesión con Microsoft: cuando inicias sesión con Microsoft, Microsoft envía a nuestro servidor una prueba firmada de tu identidad (nombre, dirección de correo e identificador de cuenta). Nuestro servidor la comprueba y crea o vincula tu cuenta de Meeting Guard AI. Conservamos el identificador de la cuenta de Microsoft, la dirección de correo y la fecha de tu último inicio de sesión para que puedas volver a entrar.",
+            "Calendario de Outlook: si conectas Outlook, permites a Meeting Guard AI leer y escribir los eventos de tus calendarios de Outlook a través de Microsoft Graph. Cuando pides un enlace de Microsoft Teams, la reunión se crea en Outlook como reunión en línea y Microsoft genera el enlace.",
+            "Microsoft To Do: si activas la sincronización con To Do, permites a Meeting Guard AI leer y escribir las tareas de las listas de To Do que eliges a través de Microsoft Graph, de modo que la app y To Do muestran las mismas tareas.",
+            "Los eventos y tareas de Microsoft se guardan en tu cuenta de Meeting Guard AI (Google Firebase) para que estén disponibles en tus dispositivos y puedan activar tus alertas. Los tokens de Microsoft que permiten a la app hablar con Outlook y To Do se quedan en tu dispositivo, en el almacenamiento seguro del sistema operativo, y nunca se envían a nuestros servidores. Puedes desconectar Outlook o To Do en cualquier momento en Ajustes > Sincronización de calendarios, o revocar el acceso en https://account.live.com/consent/Manage (cuentas personales) o https://myapps.microsoft.com (cuentas de trabajo o escuela)."
           ]
         },
         {
           "heading": "Enlaces de Zoom",
           "body": [
-            "Si eliges Zoom como videollamada de una reunión, nuestro servidor crea la reunión de Zoom a través de la propia cuenta de Zoom de MeetingGuard AI y guarda el enlace con tu reunión. Zoom recibe el título de la reunión, la hora de inicio, la duración y la zona horaria, nada más sobre ti. No necesitas una cuenta de Zoom, y tu cuenta de Zoom nunca se conecta."
+            "Si eliges Zoom como videollamada de una reunión, nuestro servidor crea la reunión de Zoom a través de la propia cuenta de Zoom de Meeting Guard AI y guarda el enlace con tu reunión. Zoom recibe el título de la reunión, la hora de inicio, la duración y la zona horaria, nada más sobre ti. No necesitas una cuenta de Zoom, y tu cuenta de Zoom nunca se conecta."
           ]
         },
         {
           "heading": "Calendarios de tu teléfono",
           "body": [
-            "Si permites el acceso al calendario, MeetingGuard AI lee los eventos de los calendarios del teléfono que elijas y los guarda en tu cuenta, para que recibas alertas de ellos. Si además eliges un calendario para exportar, la app escribe en él tus reuniones de MeetingGuard AI. Puedes cambiar estas opciones en la app o desactivar el acceso al calendario en los ajustes de tu teléfono."
+            "Si permites el acceso al calendario, Meeting Guard AI lee los eventos de los calendarios del teléfono que elijas y los guarda en tu cuenta, para que recibas alertas de ellos. Si además eliges un calendario para exportar, la app escribe en él tus reuniones de Meeting Guard AI. Puedes cambiar estas opciones en la app o desactivar el acceso al calendario en los ajustes de tu teléfono."
           ]
         },
         {
@@ -469,7 +469,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Asistente de WhatsApp",
           "body": [
-            "El asistente de WhatsApp es opcional. Para usarlo, vinculas tu número de WhatsApp en la app con un código de un solo uso. Desde entonces, los mensajes que envías al número de WhatsApp de MeetingGuard AI llegan a nuestro servidor a través de Meta (WhatsApp Business Platform) y se tratan como peticiones al asistente de IA de la app: nuestro servidor envía el texto de tu mensaje, junto con tus próximas reuniones y tareas abiertas, a OpenAI para entender la petición, y nada se crea, cambia o elimina hasta que lo confirmas en el chat. Meta procesa los mensajes entre tú y nuestro número según sus propios términos y política de privacidad. No guardamos el contenido de tus mensajes más allá de un breve estado de la conversación, que se reinicia tras 15 minutos sin mensajes, y los registros de nuestro servidor nunca contienen texto de mensajes ni números de teléfono. Envía STOP para pausar el asistente, o desvincula el número en Ajustes > WhatsApp, lo que elimina el vínculo y el estado de la conversación."
+            "El asistente de WhatsApp es opcional. Para usarlo, vinculas tu número de WhatsApp en la app con un código de un solo uso. Desde entonces, los mensajes que envías al número de WhatsApp de Meeting Guard AI llegan a nuestro servidor a través de Meta (WhatsApp Business Platform) y se tratan como peticiones al asistente de IA de la app: nuestro servidor envía el texto de tu mensaje, junto con tus próximas reuniones y tareas abiertas, a OpenAI para entender la petición, y nada se crea, cambia o elimina hasta que lo confirmas en el chat. Meta procesa los mensajes entre tú y nuestro número según sus propios términos y política de privacidad. No guardamos el contenido de tus mensajes más allá de un breve estado de la conversación, que se reinicia tras 15 minutos sin mensajes, y los registros de nuestro servidor nunca contienen texto de mensajes ni números de teléfono. Envía STOP para pausar el asistente, o desvincula el número en Ajustes > WhatsApp, lo que elimina el vínculo y el estado de la conversación."
           ]
         },
         {
@@ -545,7 +545,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Menores",
           "body": [
-            "MeetingGuard AI no está dirigida a menores de 16 años y no recopilamos a sabiendas información personal de ellos. Si crees que un menor nos ha dado información personal, escríbenos a support@meetingguard.ai y la eliminaremos."
+            "Meeting Guard AI no está dirigida a menores de 16 años y no recopilamos a sabiendas información personal de ellos. Si crees que un menor nos ha dado información personal, escríbenos a support@meetingguard.ai y la eliminaremos."
           ]
         },
         {
@@ -565,28 +565,28 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
     "terms": {
       "path": "/terms-of-service",
       "title": "Términos del servicio",
-      "description": "Los términos para usar la app MeetingGuard AI.",
+      "description": "Los términos para usar la app Meeting Guard AI.",
       "updated": "Última actualización: 28 de septiembre de 2026",
       "intro": [
-        "Lee estos términos con atención. Explican las normas para usar MeetingGuard AI y lo que puedes esperar de nosotros."
+        "Lee estos términos con atención. Explican las normas para usar Meeting Guard AI y lo que puedes esperar de nosotros."
       ],
       "sections": [
         {
           "heading": "Acuerdo",
           "body": [
-            "Estos Términos del servicio son un acuerdo entre tú y AETERNUM TECH LTD (\"nosotros\"), una empresa registrada en Inglaterra y Gales con el número de empresa 14085985 y domicilio social en 128 City Road, Londres, Reino Unido, EC1V 2NX, para el uso de la app MeetingGuard AI. Al crear una cuenta o usar la app, aceptas estos términos y nuestra Política de privacidad. Si no estás de acuerdo, no uses la app."
+            "Estos Términos del servicio son un acuerdo entre tú y AETERNUM TECH LTD (\"nosotros\"), una empresa registrada en Inglaterra y Gales con el número de empresa 14085985 y domicilio social en 128 City Road, Londres, Reino Unido, EC1V 2NX, para el uso de la app Meeting Guard AI. Al crear una cuenta o usar la app, aceptas estos términos y nuestra Política de privacidad. Si no estás de acuerdo, no uses la app."
           ]
         },
         {
           "heading": "El servicio",
           "body": [
-            "MeetingGuard AI te ayuda a gestionar tus reuniones: guarda tus reuniones y notas, programa recordatorios en tu dispositivo, se sincroniza con Google Calendar y con los calendarios de tu teléfono si los conectas, y ofrece un asistente de IA que te propone cambios para que los confirmes. Podemos añadir, cambiar o eliminar funciones con el tiempo. Las funciones que aún no están disponibles aparecen marcadas como tales en la app."
+            "Meeting Guard AI te ayuda a gestionar tus reuniones: guarda tus reuniones y notas, programa recordatorios en tu dispositivo, se sincroniza con Google Calendar y con los calendarios de tu teléfono si los conectas, y ofrece un asistente de IA que te propone cambios para que los confirmes. Podemos añadir, cambiar o eliminar funciones con el tiempo. Las funciones que aún no están disponibles aparecen marcadas como tales en la app."
           ]
         },
         {
           "heading": "Tu cuenta",
           "body": [
-            "Para usar MeetingGuard AI:",
+            "Para usar Meeting Guard AI:",
             [
               "Debes tener al menos 16 años, o más si tu país lo exige para usar servicios en línea sin el consentimiento de tus padres.",
               "Da información correcta y mantén segura tu cuenta de Google o tu contraseña.",
@@ -614,7 +614,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
         {
           "heading": "Planes y pagos",
           "body": [
-            "Actualmente MeetingGuard AI es gratuita. Los planes de pago (Pro y Premium) se muestran solo a título informativo y todavía no se pueden comprar. Si en el futuro ofrecemos planes de pago, se venderán a través del App Store o Google Play, y el precio, el periodo de facturación y las condiciones de renovación y cancelación se mostrarán antes de la compra."
+            "Actualmente Meeting Guard AI es gratuita. Los planes de pago (Pro y Premium) se muestran solo a título informativo y todavía no se pueden comprar. Si en el futuro ofrecemos planes de pago, se venderán a través del App Store o Google Play, y el precio, el periodo de facturación y las condiciones de renovación y cancelación se mostrarán antes de la compra."
           ]
         },
         {
@@ -687,8 +687,8 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
     },
     "deleteAccount": {
       "path": "/delete-account",
-      "title": "Eliminar tu cuenta de MeetingGuard AI",
-      "description": "Cómo eliminar tu cuenta de MeetingGuard AI y todos sus datos.",
+      "title": "Eliminar tu cuenta de Meeting Guard AI",
+      "description": "Cómo eliminar tu cuenta de Meeting Guard AI y todos sus datos.",
       "intro": [],
       "sections": [
         {

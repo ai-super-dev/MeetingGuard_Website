@@ -10,7 +10,7 @@ export function agendaBaseMetadata(lang: Lang): Metadata {
   const a = lang === "es" ? agendaEs : agendaEn;
   return {
     metadataBase: new URL(siteConfig.url),
-    title: { default: a.meta.dashboard, template: "%s | MeetingGuard" },
+    title: { default: a.meta.dashboard, template: "%s | Meeting Guard AI" },
     description: a.meta.description,
     applicationName: siteConfig.name,
     robots: { index: false, follow: false },

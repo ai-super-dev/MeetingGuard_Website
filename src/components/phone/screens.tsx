@@ -20,7 +20,7 @@ import {
 import { Screen } from "./Device";
 
 /*
- * Real MeetingGuard app pages (from the store screenshots), rebuilt at
+ * Real Meeting Guard AI app pages (from the store screenshots), rebuilt at
  * SCREEN_W CSS px wide in the app's dark theme.
  */
 
@@ -147,7 +147,7 @@ export function PlanScreen({ height }: ScreenProps) {
           <span className="flex items-center gap-[6px] rounded-[8px] px-[10px] py-[6px]" style={{ background: APP.chip }}>
             <Check className="h-[14px] w-[14px]" aria-hidden /> {a.allSources}
           </span>
-          {["MeetingGuard", "Google Calendar", "Outlook"].map((s) => (
+          {["Meeting Guard AI", "Google Calendar", "Outlook"].map((s) => (
             <span key={s} className="rounded-[8px] border px-[10px] py-[5px]" style={{ borderColor: APP.line }}>
               {s}
             </span>

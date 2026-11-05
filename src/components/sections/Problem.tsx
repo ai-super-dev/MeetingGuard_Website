@@ -311,7 +311,7 @@ export function Problem() {
               </div>
             </Reveal>
 
-            {/* MeetingGuard steps in front of the calendar, overlapping its far edge */}
+            {/* Meeting Guard AI steps in front of the calendar, overlapping its far edge */}
             <Reveal delay={1.1} from="right" className="relative flex justify-center lg:-ml-[74px]">
               <GuardPhone />
             </Reveal>

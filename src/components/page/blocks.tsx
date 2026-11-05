@@ -1,23 +1,11 @@
 import type { ReactNode } from "react";
-import { Check, Clock } from "lucide-react";
+import { Check } from "lucide-react";
 
 /*
  * Small building blocks shared by the home sections and the legal pages, in
  * the landing page's style: the two-tone headline (white line, dim second
  * line), quiet dark surfaces and the crimson accent.
  */
-
-/** "Available <month>" / "Coming soon" pill for features that are not shipped yet. */
-export function AvailableLabel({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border border-warm/25 bg-warm/10 px-2.5 py-1 text-[0.72rem] font-medium whitespace-nowrap text-warm ${className}`}
-    >
-      <Clock className="h-3 w-3" aria-hidden />
-      {children}
-    </span>
-  );
-}
 
 /** Small bordered tag (e.g. "Android only"). */
 export function Tag({ children }: { children: ReactNode }) {

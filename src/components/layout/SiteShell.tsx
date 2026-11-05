@@ -22,7 +22,7 @@ export function baseMetadata(lang: Lang): Metadata {
   const t = dictionaries[lang];
   return {
     metadataBase: new URL(siteConfig.url),
-    title: { default: t.meta.homeTitle, template: "%s | MeetingGuard" },
+    title: { default: t.meta.homeTitle, template: "%s | Meeting Guard AI" },
     description: t.meta.homeDescription,
     applicationName: siteConfig.name,
     authors: [{ name: siteConfig.company }],

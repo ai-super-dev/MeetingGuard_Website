@@ -21,7 +21,7 @@ export function homeMetadata(lang: Lang) {
  * Landing page, in the order of the brief: hero (one sentence, three
  * promises, badges, proof), how it works, seven features, WhatsApp, the daily
  * briefing, pricing teaser, assistant teaser, FAQ and the final call to action.
- * The "Why MeetingGuard" calendar section sits between the hero and how it works.
+ * The "Why Meeting Guard AI" calendar section sits between the hero and how it works.
  */
 export function HomePage({ lang }: { lang: Lang }) {
   const t = dictionaries[lang];

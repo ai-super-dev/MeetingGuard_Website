@@ -6,7 +6,7 @@ import { animate, useReducedMotion } from "motion/react";
 const GLIDE = { duration: 0.9, ease: [0.65, 0, 0.35, 1] as const };
 /** Space between the floating header's bottom edge and a section's eyebrow when a glide lands. */
 const GAP = 44;
-/** Space kept under the "Why MeetingGuard" cards when gliding back up to them. */
+/** Space kept under the "Why Meeting Guard AI" cards when gliding back up to them. */
 const END_GAP = 40;
 /** Wheel silence (ms) that marks the end of trackpad inertia after a glide. */
 const QUIET_MS = 180;
@@ -29,7 +29,7 @@ function landing(name: string) {
 
 /**
  * Glide zones, each a [top, bottom] scroll range the page never rests inside:
- *   hero → "Why MeetingGuard" (its eyebrow under the header), and
+ *   hero → "Why Meeting Guard AI" (its eyebrow under the header), and
  *   the end of the "Why" cards → "How it works".
  * The calendar section is taller than the screen, so between its top and the
  * bottom of its cards the page scrolls normally.

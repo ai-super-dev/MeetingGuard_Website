@@ -183,8 +183,7 @@ export function FaqHome({ items }: { items: readonly FaqItem[] }) {
     <section id="faq" aria-labelledby="faq-title" className="relative overflow-x-clip py-14 sm:py-[4.5rem]">
       <div className="container-page">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow">{t.faqHome.eyebrow}</p>
-          <Headline id="faq-title" line1={t.faqHome.title} className="mt-3" />
+          <Headline id="faq-title" line1={t.faqHome.title} />
         </Reveal>
         <Reveal delay={0.1} className="mx-auto mt-10 max-w-3xl">
           <FaqAccordion items={items} defaultOpen={0} />

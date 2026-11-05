@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { icons } from "@/lib/assets";
 
-/** The MeetingGuard shield (app_icon.png) at any size. */
+/** The Meeting Guard AI shield (app_icon.png) at any size. */
 export function AppMark({ className = "h-6 w-6", sizes = "48px" }: { className?: string; sizes?: string }) {
   return <Image src={icons.app} alt="" sizes={sizes} className={`object-contain ${className}`} />;
 }
@@ -23,7 +23,7 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <AppMark className="h-8 w-8" sizes="64px" />
-      <span className="text-[1.02rem] font-semibold tracking-[-0.01em] text-white">MeetingGuard</span>
+      <span className="text-[1.02rem] font-semibold tracking-[-0.01em] text-white">Meeting Guard AI</span>
     </span>
   );
 }

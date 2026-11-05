@@ -1,6 +1,6 @@
-# MeetingGuard website
+# Meeting Guard AI website
 
-The marketing site for MeetingGuard: English at `/`, Spanish under `/es/`,
+The marketing site for Meeting Guard AI: English at `/`, Spanish under `/es/`,
 built as plain static files and hosted on Firebase Hosting.
 
 Built with Next.js (static export), TypeScript, Tailwind CSS and Motion.
@@ -31,12 +31,11 @@ English and the Spanish text side by side; change both.
 | Header, footer, buttons, forms, home page sections, phone screens | `src/lib/i18n.ts` |
 | The FAQ on the home page (5 questions) | `src/content/faq.ts` |
 | Privacy policy, terms of service and delete account page (English as approved, Spanish translation) | `src/content/legal.ts` |
-| Facts used everywhere: store links, email, phone, company number, release months, ratings, form and analytics settings | `src/lib/site.ts` |
+| Facts used everywhere: store links, email, phone, company number, ratings, form and analytics settings | `src/lib/site.ts` |
 
 Writing rules from the brief: short, direct and friendly; plain punctuation (no
-em dashes, ellipses or curly quotes); prices exactly as in the app; features
-that are not shipped yet carry an "Available <month>" label (set the months in
-`availability` in `src/lib/site.ts`).
+em dashes, ellipses or curly quotes); prices exactly as in the app. The
+product's name is "Meeting Guard AI".
 
 Spanish files are checked against English: if a translation is missing, the
 build stops with an error that names it.

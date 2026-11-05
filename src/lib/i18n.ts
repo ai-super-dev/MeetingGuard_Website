@@ -17,26 +17,18 @@ export type Widen<T> = T extends string
       ? readonly Widen<U>[]
       : { readonly [K in keyof T]: Widen<T[K]> };
 
-const MONTHS_EN = { november: "November", december: "December", january: "January" } as const;
-const MONTHS_ES = { november: "noviembre", december: "diciembre", january: "enero" } as const;
-export type Month = keyof typeof MONTHS_EN;
-
-/** "November" / "noviembre". */
-export const monthName = (lang: "en" | "es", m: Month) => (lang === "es" ? MONTHS_ES : MONTHS_EN)[m];
-
 export const en = {
   lang: "en",
   skip: "Skip to content",
-  available: (m: Month) => `Available ${MONTHS_EN[m]}`,
 
   meta: {
-    homeTitle: "MeetingGuard: never miss a meeting",
+    homeTitle: "Meeting Guard AI: never miss a meeting",
     homeDescription:
-      "MeetingGuard is the AI meeting assistant for busy professionals. Say what you need, confirm the card, and a full-screen alarm makes sure you never miss it. English and Spanish, iPhone and Android.",
+      "Meeting Guard AI is the meeting assistant for busy professionals. Say what you need, confirm the card, and a full-screen alarm makes sure you never miss it. English and Spanish, iPhone and Android.",
   },
 
   header: {
-    home: "MeetingGuard home",
+    home: "Meeting Guard AI home",
     primary: "Main",
     openMenu: "Open menu",
     closeMenu: "Close menu",
@@ -59,7 +51,7 @@ export const en = {
     appStore: "Download on the App Store",
     googlePlay: "Get it on Google Play",
   },
-  qr: { scan: "Scan to download", aria: "QR code that opens the MeetingGuard website" },
+  qr: { scan: "Scan to download", aria: "QR code that opens the Meeting Guard AI website" },
 
   consent: {
     text: "We use analytics to improve this site, only if you agree.",
@@ -110,11 +102,11 @@ export const en = {
   },
 
   problem: {
-    eyebrow: "Why MeetingGuard",
+    eyebrow: "Why Meeting Guard AI",
     line1: "Your calendar stores time.",
-    line2a: "MeetingGuard",
+    line2a: "Meeting Guard AI",
     line2b: "protects it.",
-    body: "Calendars only store dates. When your day gets busy, passive notifications get ignored. MeetingGuard reads the same calendar and makes sure you're in the right meeting, right on time.",
+    body: "Calendars only store dates. When your day gets busy, passive notifications get ignored. Meeting Guard AI reads the same calendar and makes sure you're in the right meeting, right on time.",
     calendar: "Calendar",
     today: "Today",
     month: "October 2026",
@@ -136,7 +128,7 @@ export const en = {
         steps: ["Nothing happens.", "One small banner, swiped away with everything else.", "The call starts without you."],
       },
       {
-        title: "With MeetingGuard",
+        title: "With Meeting Guard AI",
         outcome: "On time",
         steps: [
           "Your phone rings and a full-screen alarm takes over, even with the app closed.",
@@ -157,7 +149,7 @@ export const en = {
       {
         day: "Mon",
         title: "Say it",
-        body: "Tell MeetingGuard what you need in plain words, by voice or by text, in English or Spanish.",
+        body: "Tell Meeting Guard AI what you need in plain words, by voice or by text, in English or Spanish.",
         points: [
           "Create, move or cancel a meeting by voice",
           "A meeting and its task from one sentence",
@@ -204,7 +196,7 @@ export const en = {
         label: "Wednesday · October 28th, 2026",
         meetings: [
           { time: "10:00 AM - 10:45 AM", title: "Investor call", place: "Zoom", source: "Created with the AI assistant" },
-          { time: "11:30 AM - 12:30 PM", title: "Design review with Marketing", place: "Zoom", source: "Created in MeetingGuard" },
+          { time: "11:30 AM - 12:30 PM", title: "Design review with Marketing", place: "Zoom", source: "Created in Meeting Guard AI" },
         ],
       },
     ],
@@ -264,7 +256,7 @@ export const en = {
     eyebrow: "WhatsApp",
     line1: "Schedule straight",
     line2: "from WhatsApp.",
-    body: "Link your number once with a code from the app. Then message MeetingGuard like you would an assistant: it books the meeting and makes sure you never miss it.",
+    body: "Link your number once with a code from the app. Then message Meeting Guard AI like you would an assistant: it books the meeting and makes sure you never miss it.",
     points: [
       ["Meetings and tasks", "by message"],
       ["Confirm buttons before", "anything is saved"],
@@ -272,7 +264,7 @@ export const en = {
     ],
     phones: [
       {
-        where: "In MeetingGuard",
+        where: "In Meeting Guard AI",
         title: "Generate a code",
         body: "Tap Generate code, then copy it or open WhatsApp. One-time use, expires in minutes.",
       },
@@ -339,12 +331,12 @@ export const en = {
         body: "Create meetings and tasks by message and confirm with one tap. We never send messages you didn't ask for.",
       },
       "meeting-links": {
-        title: "Zoom and Teams links",
-        body: "Create a Zoom or Teams link straight from the app when you set up a meeting. When the alarm rings, one tap on Join now and you're in.",
+        title: "Google Meet, Zoom and Teams links",
+        body: "Create a Google Meet, Zoom or Teams link straight from the app when you set up a meeting. When the alarm rings, one tap on Join now and you're in.",
       },
       integrations: {
         title: "Calendars and tasks in sync",
-        body: "Google Calendar today. Outlook, Microsoft To Do and Google Tasks are on the way.",
+        body: "Google Calendar, Outlook, Microsoft To Do and Google Tasks, all kept in sync with the app.",
       },
     },
     visuals: {
@@ -359,7 +351,7 @@ export const en = {
       linkWhen: "Wed · 10:00 - 10:45",
       linkCreating: "Creating the link",
       live: "Live",
-      debrief: "Debriefs",
+      debrief: "Spoken debriefs",
       tasks: [
         { title: "Book flights", due: "Fri" },
         { title: "Review Q4 plan", due: "Mon" },
@@ -372,7 +364,7 @@ export const en = {
     eyebrow: "Daily briefing",
     line1: "Your day, read to you,",
     line2: "at the time you choose.",
-    body: "Every morning MeetingGuard reads your meetings, what's overdue and what's next. On Android, a full-screen summary is waiting when you wake up.",
+    body: "Every morning Meeting Guard AI reads your meetings, what's overdue and what's next. On Android, a full-screen summary is waiting when you wake up.",
     points: ["Today, overdue and tomorrow", "At the time you set", "Full-screen summary on Android"],
     androidOnly: "Full-screen summary: Android only",
   },
@@ -401,7 +393,7 @@ export const en = {
     },
   },
 
-  faqHome: { eyebrow: "FAQ", title: "Questions, answered." },
+  faqHome: { title: "FAQ" },
 
   cta: { line1: "Your next meeting", line2: "is already covered.", sentence: "Free to start. Set up in a minute." },
 
@@ -427,16 +419,15 @@ export type Dict = Widen<typeof en>;
 export const es: Dict = {
   lang: "es",
   skip: "Saltar al contenido",
-  available: (m: Month) => `Disponible en ${MONTHS_ES[m]}`,
 
   meta: {
-    homeTitle: "MeetingGuard: no te pierdas ninguna reunión",
+    homeTitle: "Meeting Guard AI: no te pierdas ninguna reunión",
     homeDescription:
-      "MeetingGuard es el asistente de reuniones con IA para profesionales ocupados. Di lo que necesitas, confirma la tarjeta y una alarma a pantalla completa se asegura de que no te lo pierdas. En inglés y español, para iPhone y Android.",
+      "Meeting Guard AI es el asistente de reuniones para profesionales ocupados. Di lo que necesitas, confirma la tarjeta y una alarma a pantalla completa se asegura de que no te lo pierdas. En inglés y español, para iPhone y Android.",
   },
 
   header: {
-    home: "Inicio de MeetingGuard",
+    home: "Inicio de Meeting Guard AI",
     primary: "Principal",
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
@@ -459,7 +450,7 @@ export const es: Dict = {
     appStore: "Consíguelo en el App Store",
     googlePlay: "Disponible en Google Play",
   },
-  qr: { scan: "Escanea para descargar", aria: "Código QR que abre el sitio web de MeetingGuard" },
+  qr: { scan: "Escanea para descargar", aria: "Código QR que abre el sitio web de Meeting Guard AI" },
 
   consent: {
     text: "Usamos analítica para mejorar este sitio, solo si lo aceptas.",
@@ -509,11 +500,11 @@ export const es: Dict = {
   },
 
   problem: {
-    eyebrow: "Por qué MeetingGuard",
+    eyebrow: "Por qué Meeting Guard AI",
     line1: "Tu calendario guarda el tiempo.",
-    line2a: "MeetingGuard",
+    line2a: "Meeting Guard AI",
     line2b: "lo protege.",
-    body: "Los calendarios solo guardan fechas. Cuando tu día se complica, las notificaciones pasivas se ignoran. MeetingGuard lee el mismo calendario y se asegura de que estés en la reunión correcta, justo a tiempo.",
+    body: "Los calendarios solo guardan fechas. Cuando tu día se complica, las notificaciones pasivas se ignoran. Meeting Guard AI lee el mismo calendario y se asegura de que estés en la reunión correcta, justo a tiempo.",
     calendar: "Calendario",
     today: "Hoy",
     month: "Octubre de 2026",
@@ -535,7 +526,7 @@ export const es: Dict = {
         steps: ["No pasa nada.", "Un pequeño aviso, descartado junto con todo lo demás.", "La llamada empieza sin ti."],
       },
       {
-        title: "Con MeetingGuard",
+        title: "Con Meeting Guard AI",
         outcome: "A tiempo",
         steps: [
           "Tu teléfono suena y una alarma a pantalla completa toma el control, incluso con la app cerrada.",
@@ -556,7 +547,7 @@ export const es: Dict = {
       {
         day: "Lun",
         title: "Dilo",
-        body: "Dile a MeetingGuard lo que necesitas con tus palabras, por voz o por texto, en inglés o español.",
+        body: "Dile a Meeting Guard AI lo que necesitas con tus palabras, por voz o por texto, en inglés o español.",
         points: [
           "Crea, mueve o cancela una reunión con la voz",
           "Una reunión y su tarea con una sola frase",
@@ -602,7 +593,7 @@ export const es: Dict = {
         label: "Miércoles · 28 de octubre de 2026",
         meetings: [
           { time: "10:00 - 10:45", title: "Llamada con inversores", place: "Zoom", source: "Creada con el asistente de IA" },
-          { time: "11:30 - 12:30", title: "Revisión de diseño con Marketing", place: "Zoom", source: "Creada en MeetingGuard" },
+          { time: "11:30 - 12:30", title: "Revisión de diseño con Marketing", place: "Zoom", source: "Creada en Meeting Guard AI" },
         ],
       },
     ],
@@ -661,7 +652,7 @@ export const es: Dict = {
     eyebrow: "WhatsApp",
     line1: "Agenda directamente",
     line2: "desde WhatsApp.",
-    body: "Vincula tu número una vez con un código de la app. Después escribe a MeetingGuard como a un asistente: reserva la reunión y se asegura de que no te la pierdas.",
+    body: "Vincula tu número una vez con un código de la app. Después escribe a Meeting Guard AI como a un asistente: reserva la reunión y se asegura de que no te la pierdas.",
     points: [
       ["Reuniones y tareas", "por mensaje"],
       ["Botones para confirmar", "antes de guardar nada"],
@@ -669,7 +660,7 @@ export const es: Dict = {
     ],
     phones: [
       {
-        where: "En MeetingGuard",
+        where: "En Meeting Guard AI",
         title: "Genera un código",
         body: "Toca Generar código y cópialo o abre WhatsApp. Es de un solo uso y caduca en minutos.",
       },
@@ -736,12 +727,12 @@ export const es: Dict = {
         body: "Crea reuniones y tareas por mensaje y confirma con un toque. Nunca enviamos mensajes que no hayas pedido.",
       },
       "meeting-links": {
-        title: "Enlaces de Zoom y Teams",
-        body: "Crea un enlace de Zoom o Teams directamente desde la app al programar una reunión. Cuando suene la alarma, un toque en Unirse ahora y ya estás dentro.",
+        title: "Enlaces de Google Meet, Zoom y Teams",
+        body: "Crea un enlace de Google Meet, Zoom o Teams directamente desde la app al programar una reunión. Cuando suene la alarma, un toque en Unirse ahora y ya estás dentro.",
       },
       integrations: {
         title: "Calendarios y tareas sincronizados",
-        body: "Google Calendar desde hoy. Outlook, Microsoft To Do y Google Tasks están en camino.",
+        body: "Google Calendar, Outlook, Microsoft To Do y Google Tasks, todo sincronizado con la app.",
       },
     },
     visuals: {
@@ -756,7 +747,7 @@ export const es: Dict = {
       linkWhen: "mié · 10:00 - 10:45",
       linkCreating: "Creando el enlace",
       live: "Activo",
-      debrief: "Resúmenes",
+      debrief: "Resúmenes hablados",
       tasks: [
         { title: "Reservar vuelos", due: "vie" },
         { title: "Revisar plan Q4", due: "lun" },
@@ -769,7 +760,7 @@ export const es: Dict = {
     eyebrow: "Resumen diario",
     line1: "Tu día, leído para ti,",
     line2: "a la hora que elijas.",
-    body: "Cada mañana MeetingGuard lee tus reuniones, lo pendiente y lo que viene. En Android, te espera un resumen a pantalla completa al despertar.",
+    body: "Cada mañana Meeting Guard AI lee tus reuniones, lo pendiente y lo que viene. En Android, te espera un resumen a pantalla completa al despertar.",
     points: ["Hoy, pendiente y mañana", "A la hora que configures", "Resumen a pantalla completa en Android"],
     androidOnly: "Resumen a pantalla completa: solo Android",
   },
@@ -798,7 +789,7 @@ export const es: Dict = {
     },
   },
 
-  faqHome: { eyebrow: "Preguntas", title: "Preguntas, resueltas." },
+  faqHome: { title: "Preguntas frecuentes" },
 
   cta: { line1: "Tu próxima reunión", line2: "ya está cubierta.", sentence: "Gratis para empezar. Listo en un minuto." },
 

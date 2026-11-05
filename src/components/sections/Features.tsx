@@ -5,11 +5,9 @@ import { AnimatePresence, motion, useInView } from "motion/react";
 import { AlarmClock, Bell, BellRing, CalendarDays, Check, CheckCheck, Link2, ListChecks, Loader2, MessageCircle, Mic, Reply, Video, Volume2 } from "lucide-react";
 import { featureAccents } from "@/components/icons/feature-icons";
 import { Reveal, useReducedMotionSafe } from "@/components/motion";
-import { AvailableLabel } from "@/components/page/blocks";
 import { AppMark } from "@/components/ui/Logo";
 import { useT } from "@/lib/language";
 import type { FeatureSlug } from "@/lib/routes";
-import { availability } from "@/lib/site";
 
 /* ---------- shared ---------- */
 
@@ -183,7 +181,118 @@ function AlarmVisual() {
 
 /* ---------- voice assistant ---------- */
 
-const WAVE_BARS = 30;
+const WAVE_BARS = 36;
+/** Tallest and shortest bar, in px. */
+const WAVE_MAX = 54;
+const WAVE_MIN = 3;
+/** How long the card "listens" before the words appear: about the time it takes to say the sentence. */
+const LISTEN_MS = 3300;
+
+/**
+ * Loudness over time (0 to 1), like someone speaking: words of 0.25 to 0.6 s
+ * that swell and fade like syllables, with short pauses of 0.1 to 0.25 s
+ * between them. One value per 80 ms.
+ */
+function loudnessSource(rand: () => number) {
+  let left = 0;
+  let len = 0;
+  let pause = false;
+  let peak = 0;
+  return () => {
+    if (left <= 0) {
+      pause = !pause;
+      len = left = pause ? 1 + Math.floor(rand() * 3) : 3 + Math.floor(rand() * 5);
+      peak = 0.6 + rand() * 0.4;
+    }
+    const k = len - left;
+    left -= 1;
+    if (pause) return 0.03;
+    const syllable = Math.sin((Math.PI * (k + 0.5)) / len);
+    return peak * (0.45 + 0.55 * syllable) * (0.75 + rand() * 0.25);
+  };
+}
+
+/** Violet on the left to blue on the right, one colour per bar. */
+const WAVE_COLORS = Array.from({ length: WAVE_BARS }, (_, i) => {
+  const stops = [
+    [167, 139, 250], // violet
+    [129, 140, 248], // indigo
+    [96, 165, 250], // blue
+  ];
+  const x = (i / (WAVE_BARS - 1)) * (stops.length - 1);
+  const a = stops[Math.floor(x)];
+  const b = stops[Math.min(stops.length - 1, Math.floor(x) + 1)];
+  const f = x - Math.floor(x);
+  return `rgb(${a.map((c, k) => Math.round(c + (b[k] - c) * f)).join(",")})`;
+});
+
+/**
+ * A bar's height at time `t` (s) for a loudness: a soft lens (tallest in the
+ * middle) with two gentle bumps drifting along the row, so the shape keeps
+ * flowing while every bar stays in place.
+ */
+function waveHeight(i: number, t: number, loud: number) {
+  const x = (i + 0.5) / WAVE_BARS;
+  const lens = Math.exp(-(((x - 0.5) / 0.36) ** 2));
+  const ripple = 0.5 + 0.3 * Math.sin(2 * Math.PI * (1.3 * x - 1.1 * t)) + 0.2 * Math.sin(2 * Math.PI * (2.7 * x + 1.6 * t) + 1.7);
+  return WAVE_MIN + (WAVE_MAX - WAVE_MIN) * Math.min(1, loud * 1.6) * lens * ripple;
+}
+
+/**
+ * The listening wave: rounded bars that rise and settle smoothly with the
+ * voice (every frame, eased), drop to soft dots in the pauses, and make the
+ * mic's halo breathe with the same loudness.
+ */
+function VoiceWave({ active, halo }: { active: boolean; halo: React.RefObject<HTMLSpanElement | null> }) {
+  const bars = useRef<(HTMLSpanElement | null)[]>([]);
+  useEffect(() => {
+    if (!active) return;
+    const source = loudnessSource(Math.random);
+    const heights = Array.from({ length: WAVE_BARS }, (_, i) => waveHeight(i, 0, 0.6));
+    const start = performance.now();
+    let loud = 0.6;
+    let target = 0.6;
+    let next = start;
+    let frame = 0;
+    const step = (now: number) => {
+      const t = (now - start) / 1000;
+      if (now >= next) {
+        target = source();
+        next = now + 80;
+      }
+      // quick to rise, slower to settle, like a voice meter
+      loud += (target - loud) * (target > loud ? 0.22 : 0.09);
+      for (let i = 0; i < WAVE_BARS; i++) {
+        heights[i] += (waveHeight(i, t, loud) - heights[i]) * 0.3;
+        const el = bars.current[i];
+        if (el) el.style.height = `${heights[i].toFixed(1)}px`;
+      }
+      if (halo.current) {
+        halo.current.style.transform = `scale(${(0.85 + 0.55 * loud).toFixed(3)})`;
+        halo.current.style.opacity = (0.35 + 0.65 * loud).toFixed(3);
+      }
+      frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [active, halo]);
+
+  // the first frame is the same on the server and in the browser
+  return (
+    <span className="flex h-14 w-[80%] items-center justify-between drop-shadow-[0_0_8px_rgba(139,124,250,0.45)]" aria-hidden>
+      {WAVE_COLORS.map((color, i) => (
+        <span
+          key={i}
+          ref={(el) => {
+            bars.current[i] = el;
+          }}
+          className="w-[3px] rounded-full"
+          style={{ height: `${waveHeight(i, 0, 0.6).toFixed(1)}px`, background: color }}
+        />
+      ))}
+    </span>
+  );
+}
 
 function SpeakVisual() {
   const t = useT();
@@ -198,7 +307,7 @@ function SpeakVisual() {
   useEffect(() => {
     if (!inView || reduce) return;
     let timer: ReturnType<typeof setTimeout>;
-    if (phase === 0) timer = setTimeout(() => setPhase(1), 1800);
+    if (phase === 0) timer = setTimeout(() => setPhase(1), LISTEN_MS);
     else if (phase === 1 && chars < phrase.length) timer = setTimeout(() => setChars((c) => c + 1), 45);
     else if (phase === 1) timer = setTimeout(() => setPhase(2), 500);
     else
@@ -211,31 +320,21 @@ function SpeakVisual() {
 
   const shownPhase = reduce ? 2 : phase;
   const text = reduce ? phrase : phrase.slice(0, chars);
+  const halo = useRef<HTMLSpanElement>(null);
 
   // stacked (mic over the words) so it fits a narrow tile; the words wrap instead of being cut off
   return (
     <div ref={ref} className="flex w-full max-w-[380px] flex-col items-center text-center">
       <span className="relative grid h-11 w-11 place-items-center">
-        {shownPhase === 0 && <span className="absolute inset-0 rounded-full bg-[#a78bfa]/25 [animation:glow-pulse_1.8s_ease-in-out_infinite]" />}
+        {/* while listening, the halo grows and fades with the voice */}
+        {shownPhase === 0 && <span ref={halo} className="absolute -inset-2 rounded-full bg-[radial-gradient(closest-side,rgba(139,124,250,0.55),rgba(96,165,250,0.15)_70%,transparent)]" />}
         <span className="relative grid h-9 w-9 place-items-center rounded-full bg-white/[0.08]">
           <Mic className="h-4 w-4 text-white/80" aria-hidden />
         </span>
       </span>
       <div className="mt-3 flex min-h-[4.5rem] w-full items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-2">
         {shownPhase === 0 ? (
-          // spread over about 80% of the box (87% of the inside, past the padding), taller in the middle and lower at the ends, like a voice
-          <span className="flex h-7 w-[87%] items-center justify-between" aria-hidden>
-            {Array.from({ length: WAVE_BARS }, (_, i) => (
-              <span
-                key={i}
-                className="w-[3px] rounded-full bg-[#a78bfa]/80"
-                style={{
-                  height: `${Math.round(35 + 65 * Math.sin((Math.PI * (i + 0.5)) / WAVE_BARS))}%`,
-                  animation: `listen-bar 1s ease-in-out ${((i * 5) % 11) * 0.09}s infinite`,
-                }}
-              />
-            ))}
-          </span>
+          <VoiceWave active={inView && !reduce} halo={halo} />
         ) : (
           <span className="text-[0.86rem] leading-snug text-white/85">
             {text}
@@ -305,9 +404,10 @@ function TasksVisual() {
           })}
         </AnimatePresence>
       </div>
-      <AvailableLabel className="mt-3 whitespace-normal!">
-        {v.debrief} · {t.available(availability.debrief)}
-      </AvailableLabel>
+      <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-1 text-[0.72rem] font-medium text-emerald-300">
+        <Mic className="h-3 w-3 shrink-0" aria-hidden />
+        {v.debrief}
+      </span>
     </div>
   );
 }
@@ -435,18 +535,19 @@ function WhatsAppVisual() {
   );
 }
 
-/* ---------- Zoom and Teams links ---------- */
+/* ---------- Google Meet, Zoom and Teams links ---------- */
 
-/** A meeting gets a Zoom link, then a Teams one (names only, no third-party logos). */
+/** A meeting gets a Google Meet link, then a Zoom one, then a Teams one (names only, no third-party logos). */
 function LinksVisual() {
   const t = useT();
   const v = t.features.visuals;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const phase = useCycle(4, 1500, inView); // 0 Zoom, creating · 1 Zoom link · 2 Teams, creating · 3 Teams link
-  const service = phase < 2 ? 0 : 1;
+  const phase = useCycle(6, 1500, inView); // per service: creating, then its link (Google Meet, Zoom, Teams)
+  const service = Math.floor(phase / 2);
   const ready = phase % 2 === 1;
   const services = [
+    { name: "Google Meet", url: "meet.google.com/kdw-qmzp-xra" },
     { name: "Zoom", url: "zoom.us/j/84629371054" },
     { name: "Teams", url: "teams.microsoft.com/l/meetup-join" },
   ];
@@ -454,11 +555,11 @@ function LinksVisual() {
     <div ref={ref} className="w-full max-w-[300px] rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-left">
       <p className="truncate text-[0.84rem] font-medium text-white">{v.linked}</p>
       <p className="mt-0.5 text-[0.72rem] text-white/50">{v.linkWhen}</p>
-      <div className="mt-3 grid grid-cols-2 rounded-lg bg-white/[0.05] p-0.5 text-[0.74rem]">
+      <div className="mt-3 grid grid-cols-[1.4fr_1fr_1fr] rounded-lg bg-white/[0.05] p-0.5 text-[0.74rem]">
         {services.map((s, i) => (
           <span
             key={s.name}
-            className={`relative z-10 flex items-center justify-center gap-1.5 py-1.5 transition-colors duration-500 ${i === service ? "text-white" : "text-white/50"}`}
+            className={`relative z-10 flex items-center justify-center gap-1.5 py-1.5 whitespace-nowrap transition-colors duration-500 ${i === service ? "text-white" : "text-white/50"}`}
           >
             {i === service && (
               <motion.span
@@ -492,17 +593,29 @@ function LinksVisual() {
 
 /* ---------- calendars and tasks ---------- */
 
-/** What syncs today and what is on the way (names only, no third-party logos). */
+/** The calendars and task lists that sync with the app (names only, no third-party logos). */
 function IntegrationsVisual() {
   const t = useT();
   const sources = [
-    { name: "Google Calendar", icon: CalendarDays, month: null },
-    { name: "Outlook", icon: CalendarDays, month: availability.outlook },
-    { name: "Microsoft To Do", icon: ListChecks, month: availability.microsoftToDo },
-    { name: "Google Tasks", icon: ListChecks, month: availability.googleTasks },
+    { name: "Google Calendar", icon: CalendarDays },
+    { name: "Outlook", icon: CalendarDays },
+    { name: "Microsoft To Do", icon: ListChecks },
+    { name: "Google Tasks", icon: ListChecks },
   ] as const;
   // row centres in the 176px-tall column (four 36px rows)
   const ys = [18, 64.7, 111.3, 158];
+  /*
+   * Each line has its own speed, start point and pause, so the dots never move
+   * together: `dur` is one trip in seconds, `out`/`back` are where each dot is at
+   * the start (a negative begin, so no dot waits in the corner), and `wait` is the
+   * share of each trip it rests before leaving.
+   */
+  const flows = [
+    { dur: 2.3, out: -0.4, back: -1.6, wait: 0.15 },
+    { dur: 3.4, out: -2.6, back: -0.7, wait: 0.35 },
+    { dur: 2.8, out: -1.3, back: -2.5, wait: 0.05 },
+    { dur: 3.9, out: -3.1, back: -1.2, wait: 0.25 },
+  ];
   const path = (y: number) => `M0 ${y} C 50 ${y}, 60 88, 110 88`;
   return (
     <div className="flex items-center justify-center">
@@ -510,20 +623,13 @@ function IntegrationsVisual() {
         {sources.map((s) => {
           const Icon = s.icon;
           return (
-            <span
-              key={s.name}
-              className={`flex h-9 items-center gap-2 rounded-xl px-3 ring-1 ${s.month ? "bg-white/[0.02] ring-white/[0.06]" : "bg-white/[0.06] ring-white/[0.1]"}`}
-            >
-              <Icon className={`h-4 w-4 ${s.month ? "text-white/35" : "text-[#8ab4ff]"}`} aria-hidden />
-              <span className={`text-[0.78rem] whitespace-nowrap ${s.month ? "text-white/45" : "text-white"}`}>{s.name}</span>
-              {s.month ? (
-                <span className="ml-1 rounded-full bg-warm/10 px-1.5 py-0.5 text-[0.6rem] whitespace-nowrap text-warm">{t.available(s.month)}</span>
-              ) : (
-                <span className="ml-1 flex items-center gap-1 text-[0.6rem] text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  {t.features.visuals.live}
-                </span>
-              )}
+            <span key={s.name} className="flex h-9 items-center gap-2 rounded-xl bg-white/[0.06] px-3 ring-1 ring-white/[0.1]">
+              <Icon className="h-4 w-4 text-[#8ab4ff]" aria-hidden />
+              <span className="text-[0.78rem] whitespace-nowrap text-white">{s.name}</span>
+              <span className="ml-1 flex items-center gap-1 text-[0.6rem] text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                {t.features.visuals.live}
+              </span>
             </span>
           );
         })}
@@ -531,23 +637,32 @@ function IntegrationsVisual() {
       <svg viewBox="0 0 110 176" className="hidden h-[176px] w-[110px] shrink-0 sm:block" aria-hidden>
         {sources.map((s, i) => (
           <g key={s.name}>
-            <path
-              d={path(ys[i])}
-              fill="none"
-              style={{ stroke: `color-mix(in oklab, var(--color-white) ${s.month ? 8 : 20}%, transparent)` }}
-              strokeWidth="1"
-              strokeDasharray={s.month ? "3 4" : undefined}
-            />
-            {!s.month && (
-              <>
-                <circle r="2.4" fill="#6ea8ff">
-                  <animateMotion path={path(ys[i])} dur="2.6s" repeatCount="indefinite" />
-                </circle>
-                <circle r="2.4" fill="#c7d2fe">
-                  <animateMotion path={path(ys[i])} dur="2.6s" begin="1.3s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear" />
-                </circle>
-              </>
-            )}
+            <path d={path(ys[i])} fill="none" style={{ stroke: "color-mix(in oklab, var(--color-white) 20%, transparent)" }} strokeWidth="1" />
+            {/* to the app, then back from it; each rests a moment, then eases along the line */}
+            <circle r="2.4" fill="#6ea8ff">
+              <animateMotion
+                path={path(ys[i])}
+                dur={`${flows[i].dur}s`}
+                begin={`${flows[i].out}s`}
+                repeatCount="indefinite"
+                calcMode="spline"
+                keyPoints="0;0;1"
+                keyTimes={`0;${flows[i].wait};1`}
+                keySplines="0 0 1 1;0.45 0 0.55 1"
+              />
+            </circle>
+            <circle r="2.4" fill="#c7d2fe">
+              <animateMotion
+                path={path(ys[i])}
+                dur={`${flows[(i + 2) % 4].dur}s`}
+                begin={`${flows[i].back}s`}
+                repeatCount="indefinite"
+                calcMode="spline"
+                keyPoints="1;1;0"
+                keyTimes={`0;${flows[(i + 1) % 4].wait};1`}
+                keySplines="0 0 1 1;0.45 0 0.55 1"
+              />
+            </circle>
           </g>
         ))}
       </svg>

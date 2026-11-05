@@ -13,7 +13,7 @@ import { STRAIGHT_FRAME } from "./geometry";
 
 /*
  * The real WhatsApp-linking flow on two phones. Beats:
- *   0 "Generate code" tapped · 1 code card shown (MeetingGuard app)
+ *   0 "Generate code" tapped · 1 code card shown (Meeting Guard AI app)
  *   2 code sent · 3 "linked" reply · 4 booking request
  *   5 proposal with Confirm/Cancel · 6 Confirm · 7 Done (WhatsApp)
  * Each phone plays its beats once it is in view and the previous phone has
@@ -28,7 +28,7 @@ export const LINK_CODE = "891675";
 
 /* WhatsApp dark theme */
 const WA = { bg: "#0b141a", bar: "#1f2c34", out: "#005c4b", in: "#1f2c34", tick: "#53bdeb", green: "#00a884" };
-/* MeetingGuard app theme (from the app's WhatsApp screen) */
+/* Meeting Guard AI app theme (from the app's WhatsApp screen) */
 const APP = { bg: "#0e1524", card: "#131b2c", line: "#263048", accent: "#b3b7ff", ink: "#1b1f4d", muted: "#9aa3b8" };
 
 const pop = {
@@ -37,7 +37,7 @@ const pop = {
   transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-/* ---------- phone 1: MeetingGuard app ---------- */
+/* ---------- phone 1: Meeting Guard AI app ---------- */
 
 function AppLinkScreen({ step }: { step: number }) {
   const t = useT();
@@ -195,10 +195,10 @@ function ChatScreen({ step }: { step: number }) {
       )}
       {step >= 3 && (
         <Bubble from="bot" time="11:42">
-          Your WhatsApp is now linked to MeetingGuard. Ask me about your meetings, for example &ldquo;What do I have
+          Your WhatsApp is now linked to Meeting Guard AI. Ask me about your meetings, for example &ldquo;What do I have
           tomorrow?&rdquo;
           <span className="mt-[8px] block text-white/75">
-            Tu WhatsApp quedó vinculado a MeetingGuard. Pregúntame por tus reuniones, por ejemplo «¿Qué tengo mañana?»
+            Tu WhatsApp quedó vinculado a Meeting Guard AI. Pregúntame por tus reuniones, por ejemplo «¿Qué tengo mañana?»
           </span>
         </Bubble>
       )}

@@ -7,7 +7,7 @@ import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "404 | MeetingGuard",
+  title: "404 | Meeting Guard AI",
   robots: { index: false, follow: true },
 };
 

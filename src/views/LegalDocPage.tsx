@@ -32,7 +32,7 @@ export function LegalDocPage({ lang, doc }: { lang: Lang; doc: LegalDocKey }) {
           <ArrowLeft className="h-4 w-4" aria-hidden /> {BACK[lang]}
         </Link>
         <Reveal>
-          <p className="eyebrow mt-10">MeetingGuard AI</p>
+          <p className="eyebrow mt-10">Meeting Guard AI</p>
           <Headline as="h1" id="legal-title" line1={d.title} className="mt-3" />
           {d.updated && <p className="mt-3 text-sm text-white/55">{d.updated}</p>}
           {d.intro.map((p) => (
