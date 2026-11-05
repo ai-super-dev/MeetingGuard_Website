@@ -97,6 +97,10 @@ export const agendaEn = {
   calendarPage: {
     previousMonth: "Previous month",
     nextMonth: "Next month",
+    previousWeek: "Previous week",
+    nextWeek: "Next week",
+    previousDay: "Previous day",
+    nextDay: "Next day",
     goToToday: "Go to today",
     todayMarker: "today",
     hasTasks: "with tasks",
@@ -731,6 +735,10 @@ export const agendaEs: AgendaDict = {
 
   calendarPage: {
     previousMonth: "Mes anterior",
+    previousWeek: "Semana anterior",
+    nextWeek: "Semana siguiente",
+    previousDay: "Día anterior",
+    nextDay: "Día siguiente",
     nextMonth: "Mes siguiente",
     goToToday: "Ir a hoy",
     todayMarker: "hoy",

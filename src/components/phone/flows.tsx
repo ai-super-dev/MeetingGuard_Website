@@ -2,13 +2,13 @@
 
 /*
  * Stand-in screens for flows that have no exported screenshot yet (voice,
- * confirm card, agenda, morning summary, tasks, Android permission). They use
+ * confirm card, debrief, agenda, morning summary, tasks, Android permission). They use
  * the app's dark theme; swap each for Dusko's real screenshot through
  * PhoneShot's `image` prop when it arrives.
  */
 
 import type { ReactNode } from "react";
-import { ArrowLeft, Check, Clock, Keyboard, ListChecks, Lock, Mic, Sun, Users, Video, Volume2 } from "lucide-react";
+import { ArrowLeft, Bot, Check, ClipboardList, Clock, Keyboard, Link2, ListChecks, Lock, Mic, Sun, User, Users, Video, Volume2, X } from "lucide-react";
 import { AppMark } from "@/components/ui/Logo";
 import { useT } from "@/lib/language";
 import { Screen } from "./Device";
@@ -116,6 +116,121 @@ export function ConfirmScreen({ height = SHOT_H, time = "16:12", confirmed = fal
           {confirmed && <Check className="h-[18px] w-[18px]" strokeWidth={3} aria-hidden />}
           {s.confirm}
         </span>
+      </div>
+    </Screen>
+  );
+}
+
+/**
+ * Follow up: the app's debrief (rebuilt from a screenshot of the AI assistant).
+ * The debrief card with what was agreed, then the assistant's answer: one
+ * proposed task per commitment, linked to the meeting, each saved only once
+ * confirmed (the first already is).
+ */
+export function DebriefScreen({ height = SHOT_H, time = "10:50" }: { height?: number; time?: string }) {
+  const t = useT();
+  const s = t.screens;
+  return (
+    <Screen className="bg-[#0e1524]" time={time} height={height}>
+      {/* the assistant's header and subtitle */}
+      <div className="mt-[14px] flex items-center gap-[12px] px-[16px]">
+        <ArrowLeft className="h-[22px] w-[22px]" style={{ color: APP.text }} aria-hidden />
+        <span className="flex-1 text-[20px] font-medium" style={{ color: APP.text }}>
+          {s.assistantTitle}
+        </span>
+        <span className="rounded-full px-[10px] py-[4px] text-[12px] font-semibold" style={{ background: APP.chip, color: APP.text }}>
+          {t.lang.toUpperCase()}
+        </span>
+      </div>
+      <div className="mt-[12px] flex items-center gap-[10px] border-b px-[16px] pb-[12px]" style={{ borderColor: APP.line }}>
+        <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full" style={{ background: APP.chip, color: APP.accent }}>
+          <Bot className="h-[17px] w-[17px]" aria-hidden />
+        </span>
+        <span className="text-[13.5px] leading-snug" style={{ color: APP.muted }}>
+          {s.assistantTagline}
+        </span>
+      </div>
+
+      <div className="px-[14px] pt-[14px]">
+        {/* the debrief card */}
+        <div className="rounded-[20px] border px-[14px] pt-[13px] pb-[12px]" style={{ background: APP.card, borderColor: APP.line }}>
+          <p className="flex items-center gap-[9px] text-[16px] font-semibold" style={{ color: APP.text }}>
+            <ClipboardList className="h-[19px] w-[19px] shrink-0" style={{ color: APP.accent }} aria-hidden />
+            <span className="min-w-0 flex-1 truncate">{s.debriefFor(t.alarm.title)}</span>
+            <X className="h-[18px] w-[18px] shrink-0" style={{ color: APP.muted }} aria-hidden />
+          </p>
+          <p className="mt-[8px] text-[12px] leading-[1.45]" style={{ color: APP.muted }}>
+            {s.debriefHint}
+          </p>
+          <p className="mt-[10px] rounded-[14px] px-[12px] py-[10px] text-[15px] leading-[1.45]" style={{ background: APP.bg, color: APP.text }}>
+            {s.debriefSpoken}
+          </p>
+          <div className="mt-[11px] flex items-center justify-between">
+            <span className="grid h-[38px] w-[38px] place-items-center rounded-full" style={{ background: APP.chip, color: APP.text }}>
+              <Mic className="h-[18px] w-[18px]" aria-hidden />
+            </span>
+            <span className="flex h-[40px] items-center gap-[8px] rounded-full px-[18px] text-[15px] font-semibold" style={{ background: APP.accent, color: APP.ink }}>
+              <ListChecks className="h-[17px] w-[17px]" aria-hidden />
+              {s.createTasks}
+            </span>
+          </div>
+        </div>
+
+        {/* the assistant's answer */}
+        <div className="mt-[14px] flex gap-[9px]">
+          <span className="mt-[2px] grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full" style={{ background: APP.chip, color: APP.accent }}>
+            <Bot className="h-[15px] w-[15px]" aria-hidden />
+          </span>
+          <p className="rounded-[16px] rounded-tl-[6px] px-[12px] py-[9px] text-[13.5px] leading-[1.45]" style={{ background: APP.chip, color: APP.text }}>
+            {s.debriefReply}
+          </p>
+        </div>
+
+        {/* one proposed task per commitment */}
+        <div className="mt-[10px] space-y-[8px] pl-[35px]">
+          {s.debriefTasks.map((task, i) => {
+            const done = i === 0;
+            return (
+              <div
+                key={task.title}
+                className="rounded-[14px] border px-[11px] py-[9px]"
+                style={{ background: APP.card, borderColor: done ? "#1f9d6a" : APP.line }}
+              >
+                <div className="flex items-center gap-[8px]">
+                  <p className="min-w-0 flex-1 truncate text-[14.5px] font-semibold" style={{ color: APP.text }}>
+                    {task.title}
+                  </p>
+                  {done ? (
+                    <span className="flex shrink-0 items-center gap-[4px] rounded-full px-[9px] py-[3px] text-[11.5px] font-semibold text-[#fff]" style={{ background: "#1f9d6a" }}>
+                      <Check className="h-[12px] w-[12px]" strokeWidth={3.5} aria-hidden />
+                      {s.confirmed}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 rounded-full px-[11px] py-[3px] text-[11.5px] font-semibold" style={{ background: APP.accent, color: APP.ink }}>
+                      {s.confirm}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-[6px] flex flex-wrap gap-[5px] text-[11px]">
+                  {task.who && (
+                    <span className="flex items-center gap-[4px] rounded-full px-[8px] py-[2px]" style={{ background: APP.chip, color: APP.muted }}>
+                      <User className="h-[10px] w-[10px]" aria-hidden />
+                      {task.who}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-[4px] rounded-full px-[8px] py-[2px]" style={{ background: APP.chip, color: "#ffd9a0" }}>
+                    <Clock className="h-[10px] w-[10px]" aria-hidden />
+                    {task.due}
+                  </span>
+                  <span className="flex items-center gap-[4px] rounded-full px-[8px] py-[2px]" style={{ background: APP.chip, color: APP.accent }}>
+                    <Link2 className="h-[10px] w-[10px]" aria-hidden />
+                    {t.alarm.title}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </Screen>
   );

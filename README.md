@@ -77,8 +77,8 @@ header's Sign in button leads to it; set `agendaOpen` in `src/lib/site.ts` to
 | Sign in (Google, Microsoft, or email and password, as in the app) | `/app/sign-in` |
 | Dashboard: greeting, happening now and next meeting, tasks, quick actions, today, your week | `/app` |
 | Meetings: search, upcoming, past and all, by source; details, create, edit, move, delete | `/app/meetings` |
-| Calendar: the month with dots per source; the selected day's tasks and meetings | `/app/calendar` |
-| Tasks: by due date, overdue and done; quick capture; edit, complete, delete | `/app/tasks` |
+| Calendar: month (dots per source, the selected day's tasks and meetings), week and day (hour grid, tasks on top, click a slot for a new meeting) | `/app/calendar?view=week` |
+| Tasks: by due date, overdue and done (each open task counts in one card: Today is what is still ahead today); edit, complete, delete | `/app/tasks` |
 | Profile: plan, manage subscription in the store, sign out, delete account | `/app/account` |
 | Guest invitation (no account needed): accept, decline, propose a time | `/app/invite?t=<token>` |
 

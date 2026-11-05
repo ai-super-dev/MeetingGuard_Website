@@ -141,39 +141,39 @@ export const en = {
 
   how: {
     eyebrow: "How it works",
-    title: "Say it. Confirm it. Never miss it.",
-    body: "One meeting, from the sentence you say to the moment it starts.",
+    title: "Prepare. Arrive on time. Follow up.",
+    body: "One meeting, from the moment you plan it to the tasks that come out of it.",
     group: "How it works steps",
     show: "Show step",
     steps: [
       {
         day: "Mon",
-        title: "Say it",
-        body: "Tell Meeting Guard AI what you need in plain words, by voice or by text, in English or Spanish.",
+        title: "Prepare",
+        body: "Say or type what you need, in English or Spanish. A card shows exactly what it understood, and nothing is saved until you confirm.",
         points: [
-          "Create, move or cancel a meeting by voice",
-          "A meeting and its task from one sentence",
-          "Type to correct anything it misheard",
-        ],
-      },
-      {
-        day: "Mon",
-        title: "Confirm it",
-        body: "You see a card with exactly what it understood. Nothing is saved until you confirm.",
-        points: [
-          "Title, time, people and the call link on one card",
-          "Change anything before you confirm",
-          "Saved to your calendar and invitations sent",
+          "Meeting, people and the Meet, Zoom or Teams link on one card",
+          "Preparation tips and private notes for the meeting",
+          "Saved to your calendars, invitations sent",
         ],
       },
       {
         day: "Wed",
-        title: "Never miss it",
-        body: "Fifteen minutes before, an alarm takes over the screen, even with the app closed.",
+        title: "Arrive on time",
+        body: "Fifteen minutes before, an alarm takes over the screen, even with the app closed. One tap on Join now and you're in the call.",
         points: [
           "Full-screen alarm with sound and voice readout",
           "Snooze or dismiss in one tap",
           "Still rings after your phone restarts",
+        ],
+      },
+      {
+        day: "Wed",
+        title: "Follow up",
+        body: "Five minutes after the meeting, the app asks how it went. Tap Debrief and say what was agreed: each commitment becomes a task for you to confirm.",
+        points: [
+          "Who does what and by when, in up to 60 seconds",
+          "Each task linked to the meeting, saved only when you confirm",
+          "Synced to Microsoft To Do and Google Tasks if you use them",
         ],
       },
     ],
@@ -250,6 +250,20 @@ export const en = {
       { title: "Review the Q4 plan", due: "Next week", link: "Design review" },
     ],
     taskDone: "Done",
+    // the app's debrief, its own words (ai.json and the server's reply)
+    assistantTitle: "AI assistant",
+    assistantTagline: "Manage meetings and tasks by chatting or talking",
+    debriefFor: (title: string) => `Debrief: ${title}`,
+    debriefHint: "Tell me what was agreed: who does what, and by when. Speak for up to 60 seconds, or type. I will turn it into tasks for you to confirm.",
+    debriefSpoken: "Ana sends the revised deck by Friday, Luis books the follow-up call next week, and I send the budget tomorrow.",
+    createTasks: "Create tasks",
+    debriefReply: "I turned your debrief into the tasks below. Review them and confirm the ones you want to keep.",
+    debriefTasks: [
+      { title: "Send the revised deck", who: "Ana", due: "Friday" },
+      { title: "Book the follow-up call", who: "Luis", due: "Next week" },
+      { title: "Send the budget", who: "", due: "Tomorrow" },
+    ],
+    confirmed: "Confirmed",
   },
 
   whatsapp: {
@@ -335,8 +349,16 @@ export const en = {
         body: "Create a Google Meet, Zoom or Teams link straight from the app when you set up a meeting. When the alarm rings, one tap on Join now and you're in.",
       },
       integrations: {
-        title: "Calendars and tasks in sync",
-        body: "Google Calendar, Outlook, Microsoft To Do and Google Tasks, all kept in sync with the app.",
+        title: "Two-way sync with To Do and Google Tasks",
+        body: "Add or tick off a task wherever you are: in Microsoft To Do, Google Tasks or Meeting Guard AI. The change shows up in the others by itself. Google Calendar and Outlook stay in sync too.",
+      },
+      debrief: {
+        title: "Debrief after every meeting",
+        body: "Five minutes after a meeting ends, the app asks how it went. Tap Debrief, say who does what and by when, and confirm the follow-up tasks it proposes, each linked to the meeting.",
+      },
+      notes: {
+        title: "Notes and files for every meeting",
+        body: "Write private notes for each meeting, synced across your devices and never sent to the AI. Attach documents, photos or audio up to 50 MB: files stay on the phone where you added them.",
       },
     },
     visuals: {
@@ -357,6 +379,23 @@ export const en = {
         { title: "Review Q4 plan", due: "Mon" },
       ],
       newTaskShort: "Send the deck",
+      sync: {
+        tickThere: (service: string) => `Tick it off in ${service}`,
+        doneHere: "Done in Meeting Guard AI too",
+        addHere: "Add a task in Meeting Guard AI",
+        thereToo: (service: string) => `It appears in ${service} too`,
+        bothWays: "Works both ways",
+      },
+      notes: "Notes",
+      private: "Private",
+      noteText: "Ask about the Q1 runway. Bring the updated deck.",
+      files: ["deck.pdf", "budget.xlsx", "whiteboard.jpg"],
+      onPhone: "Files stay on this phone",
+      followUp: (title: string) => `How did "${title}" go?`,
+      fiveMin: "5 min after the meeting",
+      debriefOpen: "Debrief",
+      listening: "Listening",
+      confirmedAll: (n: number) => `${n} tasks confirmed`,
     },
   },
 
@@ -539,39 +578,39 @@ export const es: Dict = {
 
   how: {
     eyebrow: "Cómo funciona",
-    title: "Dilo. Confírmalo. No te lo pierdas.",
-    body: "Una reunión, desde la frase que dices hasta el momento en que empieza.",
+    title: "Prepárate. Llega a tiempo. Haz el seguimiento.",
+    body: "Una reunión, desde que la planificas hasta las tareas que salen de ella.",
     group: "Pasos de cómo funciona",
     show: "Mostrar paso",
     steps: [
       {
         day: "Lun",
-        title: "Dilo",
-        body: "Dile a Meeting Guard AI lo que necesitas con tus palabras, por voz o por texto, en inglés o español.",
+        title: "Prepárate",
+        body: "Di o escribe lo que necesitas, en inglés o español. Una tarjeta muestra exactamente lo que entendió y no se guarda nada hasta que confirmas.",
         points: [
-          "Crea, mueve o cancela una reunión con la voz",
-          "Una reunión y su tarea con una sola frase",
-          "Escribe para corregir lo que no entendió",
-        ],
-      },
-      {
-        day: "Lun",
-        title: "Confírmalo",
-        body: "Ves una tarjeta con exactamente lo que entendió. No se guarda nada hasta que confirmas.",
-        points: [
-          "Título, hora, personas y enlace en una tarjeta",
-          "Cambia lo que quieras antes de confirmar",
-          "Guardada en tu calendario, con invitaciones enviadas",
+          "Reunión, personas y enlace de Meet, Zoom o Teams en una tarjeta",
+          "Consejos de preparación y notas privadas para la reunión",
+          "Guardada en tus calendarios, con invitaciones enviadas",
         ],
       },
       {
         day: "Mié",
-        title: "No te lo pierdas",
-        body: "Quince minutos antes, una alarma ocupa la pantalla, incluso con la app cerrada.",
+        title: "Llega a tiempo",
+        body: "Quince minutos antes, una alarma ocupa la pantalla, incluso con la app cerrada. Un toque en Unirse ahora y estás en la llamada.",
         points: [
           "Alarma a pantalla completa con sonido y lectura en voz",
           "Pospón o descarta con un toque",
           "Sigue sonando aunque el teléfono se reinicie",
+        ],
+      },
+      {
+        day: "Mié",
+        title: "Haz el seguimiento",
+        body: "Cinco minutos después de la reunión, la app te pregunta qué tal fue. Toca Resumen y di lo acordado: cada compromiso se convierte en una tarea que tú confirmas.",
+        points: [
+          "Quién hace qué y para cuándo, en hasta 60 segundos",
+          "Cada tarea vinculada a la reunión, guardada solo cuando confirmas",
+          "Sincronizadas con Microsoft To Do y Google Tasks si los usas",
         ],
       },
     ],
@@ -646,6 +685,19 @@ export const es: Dict = {
       { title: "Revisar el plan del Q4", due: "Próxima semana", link: "Revisión de diseño" },
     ],
     taskDone: "Hecha",
+    assistantTitle: "Asistente de IA",
+    assistantTagline: "Gestiona reuniones y tareas chateando o hablando",
+    debriefFor: (title: string) => `Resumen: ${title}`,
+    debriefHint: "Cuéntame qué se acordó: quién hace qué y para cuándo. Habla hasta 60 segundos o escribe. Lo convertiré en tareas para que las confirmes.",
+    debriefSpoken: "Ana envía la presentación revisada el viernes, Luis reserva la llamada de seguimiento la próxima semana y yo envío el presupuesto mañana.",
+    createTasks: "Crear tareas",
+    debriefReply: "Convertí tu resumen en las tareas de abajo. Revísalas y confirma las que quieras conservar.",
+    debriefTasks: [
+      { title: "Enviar la presentación revisada", who: "Ana", due: "Viernes" },
+      { title: "Reservar la llamada de seguimiento", who: "Luis", due: "Próxima semana" },
+      { title: "Enviar el presupuesto", who: "", due: "Mañana" },
+    ],
+    confirmed: "Confirmada",
   },
 
   whatsapp: {
@@ -731,8 +783,16 @@ export const es: Dict = {
         body: "Crea un enlace de Google Meet, Zoom o Teams directamente desde la app al programar una reunión. Cuando suene la alarma, un toque en Unirse ahora y ya estás dentro.",
       },
       integrations: {
-        title: "Calendarios y tareas sincronizados",
-        body: "Google Calendar, Outlook, Microsoft To Do y Google Tasks, todo sincronizado con la app.",
+        title: "Sincronización en ambos sentidos con To Do y Google Tasks",
+        body: "Añade o marca una tarea donde estés: en Microsoft To Do, Google Tasks o Meeting Guard AI. El cambio aparece en los demás por sí solo. Google Calendar y Outlook también se mantienen sincronizados.",
+      },
+      debrief: {
+        title: "Resumen después de cada reunión",
+        body: "Cinco minutos después de terminar una reunión, la app te pregunta qué tal fue. Toca Resumen, di quién hace qué y para cuándo, y confirma las tareas de seguimiento que propone, cada una vinculada a la reunión.",
+      },
+      notes: {
+        title: "Notas y archivos en cada reunión",
+        body: "Escribe notas privadas para cada reunión, sincronizadas entre tus dispositivos y nunca enviadas a la IA. Adjunta documentos, fotos o audio de hasta 50 MB: los archivos se quedan en el teléfono donde los añadiste.",
       },
     },
     visuals: {
@@ -753,6 +813,23 @@ export const es: Dict = {
         { title: "Revisar plan Q4", due: "lun" },
       ],
       newTaskShort: "Enviar la presentación",
+      sync: {
+        tickThere: (service: string) => `Márcala como hecha en ${service}`,
+        doneHere: "También hecha en Meeting Guard AI",
+        addHere: "Añade una tarea en Meeting Guard AI",
+        thereToo: (service: string) => `También aparece en ${service}`,
+        bothWays: "Funciona en ambos sentidos",
+      },
+      notes: "Notas",
+      private: "Privadas",
+      noteText: "Preguntar por la liquidez del T1. Llevar la presentación actualizada.",
+      files: ["presentacion.pdf", "presupuesto.xlsx", "pizarra.jpg"],
+      onPhone: "Los archivos se quedan en este teléfono",
+      followUp: (title: string) => `¿Qué tal fue «${title}»?`,
+      fiveMin: "5 min después de la reunión",
+      debriefOpen: "Resumen",
+      listening: "Escuchando",
+      confirmedAll: (n: number) => `${n} tareas confirmadas`,
     },
   },
 

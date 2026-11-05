@@ -27,8 +27,8 @@ export function splitPath(pathname: string): { lang: Lang; path: string } {
   return { lang: "en", path: p };
 }
 
-/** The seven features shown as tiles on the home page. */
-export const FEATURE_SLUGS = ["voice-assistant", "alarms", "tasks", "agenda", "whatsapp", "meeting-links", "integrations"] as const;
+/** The features shown as tiles on the home page. */
+export const FEATURE_SLUGS = ["voice-assistant", "alarms", "tasks", "agenda", "whatsapp", "meeting-links", "integrations", "debrief", "notes"] as const;
 export type FeatureSlug = (typeof FEATURE_SLUGS)[number];
 
 /** Every page, language-neutral. */

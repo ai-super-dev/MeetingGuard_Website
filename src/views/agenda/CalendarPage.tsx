@@ -5,17 +5,18 @@ import { ChevronLeft, ChevronRight, ListPlus, Plus } from "lucide-react";
 import { byDay, type Selection } from "@/components/agenda/Calendar";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { SOURCE_COLOR } from "@/components/agenda/look";
-import { suggestedTime, useMeetingFlows } from "@/components/agenda/MeetingFlows";
+import { suggestedTime, useMeetingFlows, type MeetingFlows } from "@/components/agenda/MeetingFlows";
 import { MeetingRow, useDayTitle } from "@/components/agenda/MeetingRow";
 import { TaskEditor, type TaskDraft } from "@/components/agenda/TaskDialogs";
-import { Button, IconButton, TaskCheck, useToast } from "@/components/agenda/ui";
+import { TimeGrid } from "@/components/agenda/TimeGrid";
+import { Button, IconButton, Segmented, TaskCheck, useToast } from "@/components/agenda/ui";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { compareWithinDay } from "@/lib/agenda/meetingsList";
 import { expandAll } from "@/lib/agenda/recurrence";
 import { calendarOf, displayZone, setTaskDone, useAgenda } from "@/lib/agenda/store";
-import { addDays, addMonths, dayKey, dayStart, fmtDay, fmtMonth, fmtTime, fromZoned, isDayKey, monthStart, weekday } from "@/lib/agenda/time";
-import type { Calendar, Task } from "@/lib/agenda/types";
+import { addDays, addMonths, dayKey, dayStart, fmtDay, fmtDayRange, fmtMonth, fmtTime, fromZoned, isDayKey, monthStart, weekday } from "@/lib/agenda/time";
+import type { Calendar, Occurrence, Task } from "@/lib/agenda/types";
 import { useLang } from "@/lib/language";
 
 /** One dot per source on a day, in this order. Outlook only appears when the account has it. */
@@ -23,11 +24,16 @@ const DOT_ORDER: Calendar[] = ["meetingguard", "google", "outlook", "device"];
 const LEGEND: Calendar[] = ["meetingguard", "google", "device"];
 const TASK_COLOR = "#1fa37a";
 
-/** A day and an open meeting from the address (?date=2026-11-02&open=id). */
+type View = "month" | "week" | "day";
+const VIEWS: View[] = ["month", "week", "day"];
+
+/** The view, a day and an open meeting from the address (?view=week&date=2026-11-02&open=id); the month by default. */
 function readAddress() {
   const q = new URLSearchParams(window.location.search);
   const date = q.get("date") ?? "";
+  const view = q.get("view") as View;
   return {
+    view: VIEWS.includes(view) ? view : ("month" as View),
     date: isDayKey(date) ? date : "",
     open: q.get("open") ? ({ id: q.get("open") as string, key: q.get("key") ?? "" } satisfies Selection) : null,
   };
@@ -53,22 +59,27 @@ function CalendarView() {
   const dayTitle = useDayTitle(today);
 
   const [start] = useState(readAddress);
+  const [view, setView] = useState<View>(start.view);
   const [selected, setSelected] = useState(start.date || today);
   const [month, setMonth] = useState(monthStart(start.date || today));
   const [task, setTask] = useState<TaskDraft | null>(null);
   const flows = useMeetingFlows(start.open);
 
-  // keep the address in step, so a reload opens the same day
+  // keep the address in step, so a reload or a shared link opens the same view and day
   useEffect(() => {
-    window.history.replaceState(window.history.state, "", `?date=${selected}`);
-  }, [selected]);
+    window.history.replaceState(window.history.state, "", `?${view === "month" ? "" : `view=${view}&`}date=${selected}`);
+  }, [view, selected]);
 
   // six weeks, Sunday first
   const grid = useMemo(() => {
     const first = addDays(month, -weekday(month));
     return Array.from({ length: 42 }, (_, i) => addDays(first, i));
   }, [month]);
-  const perDay = useMemo(() => byDay(expandAll(s.meetings, dayStart(addDays(grid[0], -1), zone), dayStart(addDays(grid[41], 2), zone)), zone), [s.meetings, grid, zone]);
+  // the six weeks also hold the selected day's whole week, so the week and day views use the same meetings
+  const occs = useMemo(() => expandAll(s.meetings, dayStart(addDays(grid[0], -1), zone), dayStart(addDays(grid[41], 2), zone)), [s.meetings, grid, zone]);
+  const perDay = useMemo(() => byDay(occs, zone), [occs, zone]);
+  // the selected day's week, Sunday first like the month
+  const weekDays = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(selected, i - weekday(selected))), [selected]);
   // tasks stay on their own date, as in the app
   const tasksByDay = useMemo(() => {
     const map = new Map<string, Task[]>();
@@ -78,7 +89,7 @@ function CalendarView() {
 
   const dayMeetings = [...(perDay.get(selected) ?? [])].sort(compareWithinDay);
   const dayTasks = [...(tasksByDay.get(selected) ?? [])].sort((x, y) => Number(x.status === "done") - Number(y.status === "done") || (x.dueTime ?? "99:99").localeCompare(y.dueTime ?? "99:99"));
-  const showingToday = selected === today && month === monthStart(today);
+  const showingToday = view === "month" ? selected === today && month === monthStart(today) : view === "week" ? weekDays.includes(today) : selected === today;
   const legend = s.meetings.some((m) => calendarOf(m) === "outlook") ? DOT_ORDER : LEGEND;
 
   const select = (day: string) => {
@@ -91,6 +102,17 @@ function CalendarView() {
     // keep the selection inside the month: today when it is there, otherwise the 1st
     setSelected(next === monthStart(today) ? today : next);
   };
+  const step = (delta: 1 | -1) => (view === "month" ? changeMonth(delta) : select(addDays(selected, view === "week" ? 7 * delta : delta)));
+  const openDay = (day: string) => {
+    select(day);
+    setView("day");
+  };
+  const newMeetingAt = (day: string, time?: string) => flows.newMeeting(day, time ?? suggestedTime(day, today, now, zone));
+  const nav = {
+    month: { prev: a.calendarPage.previousMonth, next: a.calendarPage.nextMonth, title: fmtMonth(month, lang) },
+    week: { prev: a.calendarPage.previousWeek, next: a.calendarPage.nextWeek, title: fmtDayRange(weekDays[0], weekDays[6], lang) },
+    day: { prev: a.calendarPage.previousDay, next: a.calendarPage.nextDay, title: fmtDay(selected, lang, { weekday: "long", month: "long", day: "numeric", year: "numeric" }) },
+  }[view];
 
   const summary = [dayMeetings.length ? a.calendar.count(dayMeetings.length) : a.calendarPage.noMeetings, ...(dayTasks.length ? [a.calendarPage.taskCount(dayTasks.length)] : [])].join(" · ");
 
@@ -101,13 +123,13 @@ function CalendarView() {
       {/* the month, and the two ways to add something to the selected day */}
       <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
         <div className="flex min-w-0 flex-1 items-center gap-1 max-sm:basis-full">
-          <IconButton label={a.calendarPage.previousMonth} onClick={() => changeMonth(-1)}>
+          <IconButton label={nav.prev} onClick={() => step(-1)}>
             <ChevronLeft className="h-5 w-5" />
           </IconButton>
           <h2 aria-live="polite" className="min-w-0 truncate px-1 text-center text-[1.15rem] font-semibold first-letter:uppercase max-sm:flex-1 sm:text-[1.25rem]">
-            {fmtMonth(month, lang)}
+            {nav.title}
           </h2>
-          <IconButton label={a.calendarPage.nextMonth} onClick={() => changeMonth(1)}>
+          <IconButton label={nav.next} onClick={() => step(1)}>
             <ChevronRight className="h-5 w-5" />
           </IconButton>
           {!showingToday && (
@@ -116,8 +138,21 @@ function CalendarView() {
             </Button>
           )}
         </div>
+        {/* on a phone the views take a row of their own, three equal parts */}
+        <div className="shrink-0 max-sm:w-full max-sm:[&_[role=radio]]:flex-1 max-sm:[&>div]:flex">
+          <Segmented
+            label={a.toolbar.view}
+            value={view}
+            onChange={setView}
+            options={[
+              { value: "month", label: a.toolbar.month },
+              { value: "week", label: a.toolbar.week },
+              { value: "day", label: a.toolbar.day },
+            ]}
+          />
+        </div>
         <div className="grid shrink-0 grid-cols-2 gap-2 max-sm:w-full sm:flex">
-          <Button variant="meeting" onClick={() => flows.newMeeting(selected, suggestedTime(selected, today, now, zone))} className="whitespace-nowrap max-sm:px-2.5!">
+          <Button variant="meeting" onClick={() => newMeetingAt(selected)} className="whitespace-nowrap max-sm:px-2.5!">
             <Plus className="h-4 w-4" aria-hidden />
             {a.toolbar.newMeeting}
           </Button>
@@ -128,6 +163,42 @@ function CalendarView() {
         </div>
       </div>
 
+      {view === "day" && (
+        <TimeGrid
+          days={[selected]}
+          occs={occs}
+          tasks={tasksByDay}
+          zone={zone}
+          today={today}
+          now={now}
+          onOpen={flows.details}
+          onNew={newMeetingAt}
+          onTask={(t) => setTask({ id: t.id })}
+          className="mt-4 h-[70dvh] min-h-[460px] lg:h-auto lg:min-h-0 lg:flex-1"
+        />
+      )}
+
+      {view === "week" && (
+        <>
+          <TimeGrid
+            days={weekDays}
+            occs={occs}
+            tasks={tasksByDay}
+            zone={zone}
+            today={today}
+            now={now}
+            onOpen={flows.details}
+            onNew={newMeetingAt}
+            onDay={openDay}
+            onTask={(t) => setTask({ id: t.id })}
+            className="mt-4 max-md:hidden md:h-[70dvh] md:min-h-[460px] lg:h-auto lg:min-h-0 lg:flex-1"
+          />
+          {/* seven columns don't fit a phone: the week as a list by day */}
+          <WeekList days={weekDays} perDay={perDay} tasksByDay={tasksByDay} today={today} zone={zone} now={now} flows={flows} onDay={openDay} onTask={(t) => setTask({ id: t.id })} />
+        </>
+      )}
+
+      {view === "month" && (
       <div className="mt-4 grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-stretch">
         {/* the month grid */}
         <section aria-label={fmtMonth(month, lang)} className="surface rounded-2xl p-3 sm:p-4 lg:flex lg:min-h-0 lg:flex-col">
@@ -209,9 +280,66 @@ function CalendarView() {
           </div>
         </section>
       </div>
+      )}
 
       {task && <TaskEditor draft={task} onClose={() => setTask(null)} />}
       {flows.dialogs}
+    </div>
+  );
+}
+
+/** The week on a phone: each day's tasks and meetings, under a heading that opens the day. */
+function WeekList({
+  days,
+  perDay,
+  tasksByDay,
+  today,
+  zone,
+  now,
+  flows,
+  onDay,
+  onTask,
+}: {
+  days: string[];
+  perDay: Map<string, Occurrence[]>;
+  tasksByDay: Map<string, Task[]>;
+  today: string;
+  zone: string;
+  now: number;
+  flows: MeetingFlows;
+  onDay: (day: string) => void;
+  onTask: (t: Task) => void;
+}) {
+  const a = useA();
+  const dayTitle = useDayTitle(today);
+  return (
+    <div className="mt-4 space-y-5 md:hidden">
+      {days.map((d) => {
+        const meetings = [...(perDay.get(d) ?? [])].sort(compareWithinDay);
+        const tasks = tasksByDay.get(d) ?? [];
+        return (
+          <section key={d} aria-label={dayTitle(d)}>
+            <div className="mb-2 flex items-baseline justify-between gap-4">
+              <button type="button" onClick={() => onDay(d)} className={`min-w-0 truncate text-left text-[0.95rem] font-semibold first-letter:uppercase hover:underline ${d === today ? "text-accent-soft" : "text-white/85"}`}>
+                {dayTitle(d)}
+              </button>
+              <span className="shrink-0 text-[0.78rem] text-white/50">{meetings.length ? a.calendar.count(meetings.length) : a.calendarPage.noMeetings}</span>
+            </div>
+            <div className="space-y-2.5">
+              {tasks.length > 0 && (
+                <ul aria-label={a.tasks.title} className="surface rounded-2xl py-1">
+                  {tasks.map((t) => (
+                    <DayTask key={t.id} task={t} zone={zone} onOpen={() => onTask(t)} />
+                  ))}
+                </ul>
+              )}
+              {meetings.map((o) => (
+                <MeetingRow key={o.meeting.id + o.key} o={o} zone={zone} now={now} flows={flows} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }

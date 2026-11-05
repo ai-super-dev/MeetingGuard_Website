@@ -1,7 +1,7 @@
-import { AlarmClock, ListChecks, MessageCircle, Mic, RefreshCw, Video, Volume2, type LucideIcon } from "lucide-react";
+import { AlarmClock, ClipboardCheck, ListChecks, MessageCircle, Mic, Paperclip, RefreshCw, Video, Volume2, type LucideIcon } from "lucide-react";
 import type { FeatureSlug } from "@/lib/routes";
 
-/** Neutral icons for the seven features (no third-party logos). */
+/** Neutral icons for the features (no third-party logos). */
 export const featureIcons: Record<FeatureSlug, LucideIcon> = {
   "voice-assistant": Mic,
   alarms: AlarmClock,
@@ -10,6 +10,8 @@ export const featureIcons: Record<FeatureSlug, LucideIcon> = {
   whatsapp: MessageCircle,
   "meeting-links": Video,
   integrations: RefreshCw,
+  debrief: ClipboardCheck,
+  notes: Paperclip,
 };
 
 /** Accent per feature, used by the home tiles. */
@@ -21,4 +23,6 @@ export const featureAccents: Record<FeatureSlug, string> = {
   whatsapp: "#22c55e",
   "meeting-links": "#f472b6",
   integrations: "#4f8cff",
+  debrief: "#fb923c",
+  notes: "#38bdf8",
 };

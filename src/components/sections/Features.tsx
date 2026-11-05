@@ -2,7 +2,30 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { AnimatePresence, motion, useInView } from "motion/react";
-import { AlarmClock, Bell, BellRing, CalendarDays, Check, CheckCheck, Link2, ListChecks, Loader2, MessageCircle, Mic, Reply, Video, Volume2 } from "lucide-react";
+import {
+  AlarmClock,
+  ArrowLeft,
+  ArrowRight,
+  Bell,
+  BellRing,
+  CalendarDays,
+  Check,
+  CheckCheck,
+  ClipboardList,
+  FileSpreadsheet,
+  FileText,
+  Image as ImageIcon,
+  Link2,
+  ListChecks,
+  Loader2,
+  Lock,
+  MessageCircle,
+  Mic,
+  Reply,
+  Smartphone,
+  Video,
+  Volume2,
+} from "lucide-react";
 import { featureAccents } from "@/components/icons/feature-icons";
 import { Reveal, useReducedMotionSafe } from "@/components/motion";
 import { AppMark } from "@/components/ui/Logo";
@@ -673,6 +696,289 @@ function IntegrationsVisual() {
   );
 }
 
+/* ---------- two-way task sync ---------- */
+
+type SyncSide = { name: string; app?: boolean; tasks: { title: string; done: boolean; fresh?: boolean }[]; lit: boolean };
+
+/** One side: its name and its tasks, lit up while the change happens there. */
+function SyncCard({ side }: { side: SyncSide }) {
+  return (
+    <div
+      className={`min-w-0 flex-1 rounded-xl border p-2.5 transition-[border-color,background-color,box-shadow] duration-500 ${
+        side.lit ? "border-[#4f8cff]/50 bg-[#4f8cff]/[0.07] shadow-[0_0_22px_rgba(79,140,255,0.18)]" : "border-white/[0.08] bg-white/[0.03]"
+      }`}
+    >
+      <p className="flex items-center gap-1.5 text-[0.7rem] font-semibold text-white/80">
+        {side.app ? <AppMark className="h-4 w-4 shrink-0" sizes="32px" /> : <ListChecks className="h-4 w-4 shrink-0 text-[#8ab4ff]" aria-hidden />}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span key={side.name} className="truncate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            {side.name}
+          </motion.span>
+        </AnimatePresence>
+      </p>
+      <div className="mt-2 flex h-[62px] flex-col justify-start gap-1.5">
+        <AnimatePresence initial={false}>
+          {side.tasks.map((task) => (
+            <motion.div
+              key={task.title}
+              layout
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[0.76rem] transition-colors duration-500 ${task.fresh ? "bg-[#4f8cff]/15" : "bg-white/[0.05]"}`}
+            >
+              <span className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-500 ${task.done ? "border-emerald-400 bg-emerald-400" : "border-white/35"}`}>
+                {task.done && <Check className="h-2.5 w-2.5 text-on-inverse" strokeWidth={4} aria-hidden />}
+              </span>
+              <span className={`min-w-0 flex-1 truncate ${task.done ? "text-white/45 line-through" : "text-white/90"}`}>{task.title}</span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The two directions told as two short scenes, each with a caption:
+ * a task ticked off in Microsoft To Do is done in Meeting Guard AI too, then a
+ * task added in Meeting Guard AI appears in Google Tasks. A dot travels the line
+ * between them the way the change goes.
+ */
+function TaskSyncVisual() {
+  const t = useT();
+  const v = t.features.visuals;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  // 0-3 To Do -> app: rest, ticked there, travelling, done here · 4-7 app -> Google Tasks: rest, added here, travelling, there too
+  const phase = useCycle(8, 1400, inView);
+  const toApp = phase < 4;
+  const p = phase % 4;
+  const service = toApp ? "Microsoft To Do" : "Google Tasks";
+  const [first] = v.tasks.map((x) => x.title);
+  const fresh = v.newTaskShort;
+
+  const outside: SyncSide = toApp
+    ? { name: service, tasks: [{ title: first, done: p >= 1 }], lit: p === 1 }
+    : { name: service, tasks: [...(p >= 3 ? [{ title: fresh, done: false, fresh: true }] : []), { title: first, done: true }], lit: p === 3 };
+  const app: SyncSide = toApp
+    ? { name: "Meeting Guard AI", app: true, tasks: [{ title: first, done: p >= 3 }], lit: p === 3 }
+    : { name: "Meeting Guard AI", app: true, tasks: [...(p >= 1 ? [{ title: fresh, done: false, fresh: true }] : []), { title: first, done: true }], lit: p === 1 };
+
+  const caption = toApp ? (p < 3 ? v.sync.tickThere(service) : v.sync.doneHere) : p < 3 ? v.sync.addHere : v.sync.thereToo(service);
+  const arrived = p === 3;
+
+  return (
+    <div ref={ref} className="w-full max-w-[420px]">
+      {/* what is happening, in words */}
+      <div className="flex h-7 items-center justify-center">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={caption}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.3 }}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.74rem] font-medium ${arrived ? "bg-emerald-400/10 text-emerald-300" : "bg-white/[0.06] text-white/80"}`}
+          >
+            {arrived ? <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <span className="h-1.5 w-1.5 rounded-full bg-[#4f8cff]" />}
+            {caption}
+          </motion.span>
+        </AnimatePresence>
+      </div>
+
+      <div className="mt-3 flex items-center">
+        <SyncCard side={outside} />
+        {/* the line between them, with the change travelling along it */}
+        <div className="relative mx-1.5 h-px w-8 shrink-0 bg-white/15 sm:mx-2 sm:w-12" aria-hidden>
+          {p === 2 && (
+            <motion.span
+              key={phase}
+              className="absolute -top-[3.5px] -ml-[3.5px] h-[8px] w-[8px] rounded-full bg-[#4f8cff] shadow-[0_0_10px_3px_rgba(79,140,255,0.6)]"
+              initial={{ left: toApp ? "0%" : "100%" }}
+              animate={{ left: toApp ? "100%" : "0%" }}
+              transition={{ duration: 1.1, ease: [0.45, 0, 0.25, 1] }}
+            />
+          )}
+        </div>
+        <SyncCard side={app} />
+      </div>
+
+      {/* both ways, at a glance */}
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-[0.68rem] text-white/45">
+        <ArrowLeft className="h-3 w-3" aria-hidden />
+        {v.sync.bothWays}
+        <ArrowRight className="h-3 w-3" aria-hidden />
+      </p>
+    </div>
+  );
+}
+
+/* ---------- notes and files ---------- */
+
+const FILE_ICONS = [FileText, FileSpreadsheet, ImageIcon];
+const FILE_SIZES = ["2.4 MB", "86 KB", "1.1 MB"];
+
+/** A meeting's private note, then its files arriving one by one, kept on this phone. */
+function NotesVisual() {
+  const t = useT();
+  const v = t.features.visuals;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  const shown = useCycle(v.files.length + 2, 1300, inView); // 0 note only, then one more file each step, then a pause
+  const count = Math.min(shown, v.files.length);
+  return (
+    <div ref={ref} className="w-full max-w-[340px] rounded-2xl border border-white/[0.08] bg-panel p-3.5 text-left shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+      <p className="truncate text-[0.84rem] font-medium text-white">{v.linked}</p>
+      <p className="text-[0.7rem] text-white/50">{v.linkWhen}</p>
+      <div className="mt-2.5 rounded-xl bg-white/[0.04] px-3 py-2">
+        <p className="flex items-center justify-between text-[0.66rem] font-semibold tracking-wide text-white/55 uppercase">
+          {v.notes}
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[0.6rem] font-medium tracking-normal normal-case">
+            <Lock className="h-2.5 w-2.5" aria-hidden />
+            {v.private}
+          </span>
+        </p>
+        <p className="mt-1 text-[0.74rem] leading-snug text-white/80">{v.noteText}</p>
+      </div>
+      <div className="mt-2 flex h-[60px] flex-wrap content-start gap-1.5">
+        <AnimatePresence initial={false}>
+          {v.files.slice(0, count).map((name, i) => {
+            const Icon = FILE_ICONS[i % FILE_ICONS.length];
+            return (
+              <motion.span
+                key={name}
+                initial={{ opacity: 0, scale: 0.9, y: 4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35 }}
+                className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-[#38bdf8]/25 bg-[#38bdf8]/10 px-2 py-1 text-[0.68rem] text-white/85"
+              >
+                <Icon className="h-3 w-3 shrink-0 text-[#38bdf8]" aria-hidden />
+                <span className="truncate">{name}</span>
+                <span className="shrink-0 text-white/45">{FILE_SIZES[i]}</span>
+              </motion.span>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+      <p className="mt-1 flex items-center gap-1.5 border-t border-white/[0.06] pt-2 text-[0.68rem] text-white/55">
+        <Smartphone className="h-3 w-3 shrink-0" aria-hidden />
+        {v.onPhone}
+      </p>
+    </div>
+  );
+}
+
+/* ---------- debrief ---------- */
+
+/**
+ * The real flow: the follow-up notification five minutes after the meeting,
+ * Debrief while listening, the proposed tasks linked to the meeting, then
+ * confirmed one by one.
+ */
+function DebriefVisual() {
+  const t = useT();
+  const v = t.features.visuals;
+  const tasks = t.screens.debriefTasks;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  // 0 notification · 1 listening · 2 proposed · 3-5 confirmed one by one · 6 all done
+  const phase = useCycle(7, 1300, inView);
+  const confirmed = Math.max(0, Math.min(tasks.length, phase - 2));
+  return (
+    <div ref={ref} className="w-full max-w-[360px] text-left">
+      <div className="flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-panel px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.3)]">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/[0.06]">
+          <AppMark className="h-5 w-5" sizes="40px" />
+        </span>
+        <span className="min-w-0 flex-1 leading-tight">
+          <span className="block truncate text-[0.76rem] font-medium text-white">{v.followUp(v.linked)}</span>
+          <span className="block text-[0.64rem] text-white/50">{v.fiveMin}</span>
+        </span>
+        <span
+          className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[0.68rem] font-semibold transition-colors duration-500 ${phase === 1 ? "bg-[#fb923c] text-[#2a1405]" : "bg-[#fb923c]/15 text-[#fdba74]"}`}
+        >
+          {phase === 1 ? <Mic className="h-3 w-3" aria-hidden /> : <ClipboardList className="h-3 w-3" aria-hidden />}
+          {phase === 1 ? v.listening : v.debriefOpen}
+        </span>
+      </div>
+      <div className="mt-2 flex h-[118px] flex-col justify-start gap-1.5">
+        <AnimatePresence initial={false} mode="popLayout">
+          {/* before the tasks: what the person says, with the voice meter while listening */}
+          {phase < 2 && (
+            <motion.div
+              key="said"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.35 }}
+              className="rounded-xl border border-[#fb923c]/20 bg-[#fb923c]/[0.05] px-3 py-2.5"
+            >
+              <span className="flex h-4 items-center gap-[3px]" aria-hidden>
+                {Array.from({ length: 18 }, (_, k) => (
+                  <span
+                    key={k}
+                    className="w-[2px] rounded-full bg-[#fb923c]"
+                    style={{ height: "100%", opacity: phase === 1 ? 0.9 : 0.35, animation: phase === 1 ? `listen-bar 0.9s ease-in-out ${(k % 6) * 0.11}s infinite` : "none", transform: phase === 1 ? undefined : "scaleY(0.3)" }}
+                  />
+                ))}
+              </span>
+              <p className={`mt-2 line-clamp-3 text-[0.72rem] leading-snug transition-opacity duration-500 ${phase === 1 ? "text-white/85" : "text-white/40"}`}>
+                &ldquo;{t.screens.debriefSpoken}&rdquo;
+              </p>
+            </motion.div>
+          )}
+          {phase >= 2 &&
+            tasks.map((task, i) => {
+              const done = i < confirmed;
+              return (
+                <motion.div
+                  key={task.title}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, delay: i * 0.12 }}
+                  className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 transition-colors duration-500 ${done ? "border-emerald-400/30 bg-emerald-400/[0.07]" : "border-white/[0.08] bg-white/[0.03]"}`}
+                >
+                  <span className={`grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border transition-colors duration-500 ${done ? "border-emerald-400 bg-emerald-400" : "border-white/30"}`}>
+                    {done && <Check className="h-2 w-2 text-on-inverse" strokeWidth={4} aria-hidden />}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[0.72rem] text-white/85">
+                    {task.who && <span className="text-white/50">{task.who} · </span>}
+                    {task.title}
+                  </span>
+                  <span className="shrink-0 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[0.6rem] text-white/55">{task.due}</span>
+                </motion.div>
+              );
+            })}
+        </AnimatePresence>
+      </div>
+      <div className="mt-1.5 flex h-6 items-center gap-2 text-[0.68rem]">
+        <span className="inline-flex items-center gap-1 text-white/50">
+          <Link2 className="h-3 w-3" aria-hidden />
+          {v.linked}
+        </span>
+        <AnimatePresence>
+          {phase === 6 && (
+            <motion.span
+              initial={{ opacity: 0, y: 3 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="ml-auto inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2 py-0.5 font-medium text-emerald-300"
+            >
+              <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
+              {v.confirmedAll(tasks.length)}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
 /* ---------- section ---------- */
 
 export function Features() {
@@ -690,12 +996,17 @@ export function Features() {
           </h2>
         </Reveal>
 
-        {/* wide: two half-width tiles per row for the first two rows, then the voice tile half-width beside two small ones */}
+        {/*
+          wide: half-width tiles in pairs (two-way task sync high up, beside the meeting links,
+          then notes and files beside the debrief), and last the voice tile beside two small ones
+        */}
         <div className="mx-auto mt-14 grid max-w-[1080px] gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Tile slug="whatsapp" className="md:col-span-2" {...f.tiles.whatsapp} visual={<WhatsAppVisual />} />
           <Tile slug="alarms" className="md:col-span-2" {...f.tiles.alarms} visual={<AlarmVisual />} delay={0.05} />
-          <Tile slug="meeting-links" className="md:col-span-2" {...f.tiles["meeting-links"]} visual={<LinksVisual />} delay={0.05} />
-          <Tile slug="integrations" className="md:col-span-2" {...f.tiles.integrations} visual={<IntegrationsVisual />} delay={0.1} />
+          <Tile slug="integrations" className="md:col-span-2" {...f.tiles.integrations} visual={<TaskSyncVisual />} delay={0.05} />
+          <Tile slug="meeting-links" className="md:col-span-2" {...f.tiles["meeting-links"]} visual={<LinksVisual />} delay={0.1} />
+          <Tile slug="notes" className="md:col-span-2" {...f.tiles.notes} visual={<NotesVisual />} delay={0.05} />
+          <Tile slug="debrief" className="md:col-span-2" {...f.tiles.debrief} visual={<DebriefVisual />} delay={0.1} />
           <Tile slug="voice-assistant" className="md:col-span-2" {...f.tiles["voice-assistant"]} visual={<SpeakVisual />} delay={0.05} />
           <Tile slug="tasks" {...f.tiles.tasks} visual={<TasksVisual />} delay={0.1} />
           <Tile slug="agenda" {...f.tiles.agenda} visual={<AgendaVisual />} delay={0.15} />
@@ -706,4 +1017,4 @@ export function Features() {
 }
 
 /* the visuals double as illustrations on the feature pages */
-export { AgendaVisual, AlarmVisual, IntegrationsVisual, LinksVisual, SpeakVisual, TasksVisual, WhatsAppVisual };
+export { AgendaVisual, AlarmVisual, DebriefVisual, IntegrationsVisual, LinksVisual, NotesVisual, SpeakVisual, TaskSyncVisual, TasksVisual, WhatsAppVisual };

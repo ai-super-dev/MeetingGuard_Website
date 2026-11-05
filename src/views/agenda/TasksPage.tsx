@@ -68,10 +68,10 @@ function Tasks() {
     if (t.dueDate === addDays(today, 1)) return "tomorrow";
     return "upcoming";
   };
-  // as in the app, Today also lists what is overdue
+  // every open task counts in one card only: Today is what is still ahead today, and anything past its time is Overdue
   const inFilter: Record<Filter, (t: Task) => boolean> = {
     overdue: (t) => isOverdue(t, today, now),
-    today: (t) => t.status === "open" && !!t.dueDate && t.dueDate <= today,
+    today: (t) => t.status === "open" && t.dueDate === today && !isOverdue(t, today, now),
     upcoming: (t) => t.status === "open" && !!t.dueDate && t.dueDate > today,
     done: (t) => t.status === "done",
     all: () => true,
