@@ -238,6 +238,18 @@ const signedIn = async (run: () => Promise<void>) => {
   }
 };
 
+/**
+ * Called when the sign-in page opens: downloads the sign-in code and its helper
+ * frame now, so the click itself only opens the window. Opened late (after a
+ * first-visit download), the window is blocked, mostly with ad blockers.
+ */
+export function prepareSignIn() {
+  if (!LIVE) return;
+  void loadRemote()
+    .then((r) => r.prepareSignIn())
+    .catch(() => {});
+}
+
 export async function signInWithGoogle(lang: Lang) {
   if (!LIVE) return demoSignIn({ uid: "preview-google", name: "Alex Morgan", email: "alex.morgan@gmail.com", providers: ["google.com"] }, lang);
   const r = await loadRemote();

@@ -9,6 +9,7 @@ import {
   connectAuthEmulator,
   EmailAuthProvider,
   getAuth,
+  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   OAuthProvider,
@@ -77,6 +78,14 @@ function appleProvider() {
 }
 
 export const onUser = (listener: (user: User | null) => void) => onAuthStateChanged(auth, (u) => listener(u ? toUser(u) : null));
+/**
+ * Loads the sign-in helper frame (from the auth domain) before any click. The
+ * sign-in window must open the moment the button is clicked: a window opened
+ * after a download is treated as unrequested and blocked, by the browser and
+ * more so by ad blockers. With nothing pending this is a no-op on the account.
+ */
+export const prepareSignIn = () => getRedirectResult(auth).then(() => undefined, () => undefined);
+
 export const signInGoogle = () => signInWithPopup(auth, googleProvider()).then(() => undefined);
 export const signInApple = () => signInWithPopup(auth, appleProvider()).then(() => undefined);
 export const signInPassword = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => undefined);

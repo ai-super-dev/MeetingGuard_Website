@@ -9,7 +9,7 @@ import { Button, Field, inputClass, Spinner } from "@/components/agenda/ui";
 import { GoogleIcon } from "@/components/icons/brand";
 import { APPLE_SIGN_IN } from "@/lib/agenda/config";
 import { useA } from "@/lib/agenda/i18n";
-import { AuthError, sendPasswordReset, signInWithApple, signInWithGoogle, signInWithPassword, takeDeletedNotice, useAgenda } from "@/lib/agenda/store";
+import { AuthError, prepareSignIn, sendPasswordReset, signInWithApple, signInWithGoogle, signInWithPassword, takeDeletedNotice, useAgenda } from "@/lib/agenda/store";
 import { isEmail } from "@/lib/agenda/validation";
 import { useHref, useLang, useT } from "@/lib/language";
 
@@ -43,6 +43,11 @@ function SignIn() {
   useEffect(() => {
     if (s.ready && s.user) router.replace(href("/app"));
   }, [s.ready, s.user, router, href]);
+
+  // the sign-in code and its helper frame are fetched now, so a click opens the window at once
+  useEffect(() => {
+    prepareSignIn();
+  }, []);
 
   if (!s.ready || s.user) return <Spinner label={a.loading} />;
 
