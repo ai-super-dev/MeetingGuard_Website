@@ -108,7 +108,8 @@ function RefusedDialog({ who }: { who: RefusedAccount }) {
       <div className="relative px-6 pt-9 text-center sm:px-8">
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-[radial-gradient(60%_100%_at_50%_0%,rgba(79,141,249,0.24),transparent)]" />
         <span className="relative mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-white/[0.06] shadow-[0_12px_32px_rgba(37,99,235,0.28)] ring-1 ring-white/10">
-          <AppMark className="h-10 w-10" sizes="80px" />
+          {/* the picture has a clear margin around the shield, so it is scaled up (from its centre) to fill the tile */}
+          <AppMark className="h-16 w-16 scale-[1.25]" sizes="160px" />
         </span>
         <span className="relative mt-5 inline-flex items-center gap-1.5 rounded-full border border-[#4f8df9]/30 bg-[#4f8df9]/10 px-2.5 py-1 text-[0.72rem] font-semibold text-[color:color-mix(in_srgb,#4f8df9_70%,var(--color-white))]">
           <Smartphone className="h-3.5 w-3.5" aria-hidden />
