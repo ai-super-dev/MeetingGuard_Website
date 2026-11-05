@@ -6,14 +6,26 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { BareFrame } from "@/components/agenda/Frame";
 import { Button, Field, inputClass, Spinner } from "@/components/agenda/ui";
-import { GoogleIcon } from "@/components/icons/brand";
-import { APPLE_SIGN_IN } from "@/lib/agenda/config";
+import { GoogleIcon, MicrosoftIcon } from "@/components/icons/brand";
+import { APPLE_SIGN_IN, LIVE, MSAL_CLIENT_ID } from "@/lib/agenda/config";
 import { useA } from "@/lib/agenda/i18n";
-import { AuthError, prepareSignIn, sendPasswordReset, signInWithApple, signInWithGoogle, signInWithPassword, takeDeletedNotice, useAgenda } from "@/lib/agenda/store";
+import { AuthError, prepareSignIn, sendPasswordReset, signInWithApple, signInWithGoogle, signInWithMicrosoft, signInWithPassword, takeDeletedNotice, useAgenda } from "@/lib/agenda/store";
 import { isEmail } from "@/lib/agenda/validation";
 import { useHref, useLang, useT } from "@/lib/language";
 
 type Errors = { email?: string; password?: string; form?: string };
+type Provider = "google" | "microsoft" | "apple";
+
+/** Shown once the Azure app registration's client id is set (the preview always offers it). */
+const MICROSOFT_SIGN_IN = !LIVE || !!MSAL_CLIENT_ID;
+const SIGN_IN: Record<Provider, (lang: Parameters<typeof signInWithGoogle>[0]) => Promise<void>> = {
+  google: signInWithGoogle,
+  microsoft: signInWithMicrosoft,
+  apple: signInWithApple,
+};
+
+const providerButton =
+  "flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] text-[0.92rem] font-medium transition-colors hover:border-white/30 disabled:opacity-60";
 
 export function SignInPage() {
   const href = useHref();
@@ -36,7 +48,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
-  const [busy, setBusy] = useState<"" | "google" | "apple" | "password" | "reset">("");
+  const [busy, setBusy] = useState<"" | Provider | "password" | "reset">("");
   const [deleted] = useState(takeDeletedNotice);
 
   // already signed in: straight to the agenda
@@ -63,11 +75,12 @@ function SignIn() {
     if (code !== "cancelled") setErrors({ form: a.signIn.errors[code] });
   };
 
-  const withProvider = async (provider: "google" | "apple") => {
+  // the sign-in window opens straight from the click, before anything is awaited
+  const withProvider = async (provider: Provider) => {
     setErrors({});
     setBusy(provider);
     try {
-      await (provider === "google" ? signInWithGoogle : signInWithApple)(lang);
+      await SIGN_IN[provider](lang);
       // signed in: the agenda opens; refused: the buttons are free again under the message
       setBusy("");
     } catch (err) {
@@ -115,24 +128,18 @@ function SignIn() {
               </p>
             )}
 
-            <button
-              type="button"
-              onClick={() => withProvider("google")}
-              disabled={!!busy}
-              aria-busy={busy === "google" || undefined}
-              className="mt-6 flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] text-[0.92rem] font-medium transition-colors hover:border-white/30 disabled:opacity-60"
-            >
+            <button type="button" onClick={() => withProvider("google")} disabled={!!busy} aria-busy={busy === "google" || undefined} className={`mt-6 ${providerButton}`}>
               <GoogleIcon className="h-[18px] w-[18px]" />
               {a.signIn.google}
             </button>
+            {MICROSOFT_SIGN_IN && (
+              <button type="button" onClick={() => withProvider("microsoft")} disabled={!!busy} aria-busy={busy === "microsoft" || undefined} className={`mt-2 ${providerButton}`}>
+                <MicrosoftIcon className="h-[17px] w-[17px]" />
+                {a.signIn.microsoft}
+              </button>
+            )}
             {APPLE_SIGN_IN && (
-              <button
-                type="button"
-                onClick={() => withProvider("apple")}
-                disabled={!!busy}
-                aria-busy={busy === "apple" || undefined}
-                className="mt-2 flex h-11 w-full items-center justify-center gap-3 rounded-lg border border-white/15 bg-white/[0.03] text-[0.92rem] font-medium transition-colors hover:border-white/30 disabled:opacity-60"
-              >
+              <button type="button" onClick={() => withProvider("apple")} disabled={!!busy} aria-busy={busy === "apple" || undefined} className={`mt-2 ${providerButton}`}>
                 {a.signIn.apple}
               </button>
             )}

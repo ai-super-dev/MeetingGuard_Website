@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Meeting Guard AI</title>
+    <link rel="icon" href="/icon.png" type="image/png" />
+    <!--
+      Where Microsoft's sign-in window comes back (src/lib/agenda/microsoft.ts).
+      It hands the answer to the sign-in page over a BroadcastChannel and closes.
+      Each site address + /auth/microsoft/ is a "Single-page application"
+      redirect URI on the app's Azure registration.
+    -->
+    <style>
+      html { color-scheme: dark; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #07070a; color: #fff; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; }
+      p { margin: 0 24px; color: rgba(255, 255, 255, 0.7); }
+    </style>
+  </head>
+  <body>
+    <p id="note">Signing you in…<br />Iniciando sesión…</p>
+    <script>
+      (function () {
+        var q = new URLSearchParams(location.search);
+        var message = { state: q.get("state") || "", code: q.get("code") || "", error: q.get("error") || "" };
+        // the code is now in this page only: take it out of the address bar and history
+        history.replaceState(null, "", location.pathname);
+        try {
+          var channel = new BroadcastChannel("mg-microsoft-sign-in");
+          channel.postMessage(message);
+          channel.close();
+        } catch (e) {}
+        setTimeout(function () {
+          window.close();
+          // still open (not a sign-in window, or the browser keeps it): say so
+          document.getElementById("note").innerHTML = "You can close this window.<br />Puedes cerrar esta ventana.";
+        }, 400);
+      })();
+    </script>
+  </body>
+</html>

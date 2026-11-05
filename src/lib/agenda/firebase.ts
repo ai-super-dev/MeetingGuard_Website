@@ -16,6 +16,7 @@ import {
   reauthenticateWithCredential,
   reauthenticateWithPopup,
   sendPasswordResetEmail,
+  signInWithCustomToken,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut,
@@ -64,7 +65,9 @@ const plainDoc = (data: DocumentData) => plain(data) as Raw;
 const TRUSTED_PROVIDERS = ["google.com", "apple.com"];
 
 function toUser(u: FirebaseUser): User {
-  const providers = u.providerData.map((p) => p.providerId);
+  // a Microsoft account signs in with a token from the app's server, so Firebase lists no provider for it (the app reads it the same way)
+  const listed = u.providerData.map((p) => p.providerId);
+  const providers = listed.length ? listed : ["microsoft.com"];
   return { uid: u.uid, name: u.displayName || (u.email ?? "").split("@")[0], email: u.email ?? "", providers, verified: u.emailVerified || providers.some((p) => TRUSTED_PROVIDERS.includes(p)) };
 }
 
@@ -123,6 +126,33 @@ async function popupSignIn(provider: AuthProvider): Promise<{ name: string; emai
 
 export const signInGoogle = () => popupSignIn(googleProvider());
 export const signInApple = () => popupSignIn(appleProvider());
+/* ---------- Continue with Microsoft (the app's microsoftSignIn function) ---------- */
+
+const MICROSOFT_CALL_MS = 20_000;
+
+/**
+ * The app's server checks Microsoft's id_token and answers with a sign-in token
+ * for the same account as in the app. signInOnly: an account the app was never
+ * used with is refused (not-found, reason microsoft_user_not_found), never created.
+ */
+async function microsoftToken(m: { idToken: string; nonce: string }) {
+  const call = httpsCallable<unknown, { customToken: string; uid: string }>(functions, "microsoftSignIn", { timeout: MICROSOFT_CALL_MS });
+  return (await call({ idToken: m.idToken, nonce: m.nonce, signInOnly: true })).data;
+}
+
+export async function signInMicrosoft(m: { idToken: string; nonce: string }) {
+  await signInWithCustomToken(auth, (await microsoftToken(m)).customToken);
+}
+
+/** Before deletion: a fresh sign-in to the same account. Another Microsoft account is refused, never a switch. */
+export async function reauthenticateMicrosoft(m: { idToken: string; nonce: string }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Nobody is signed in");
+  const answer = await microsoftToken(m);
+  if (answer.uid !== user.uid) throw Object.assign(new Error("Another Microsoft account"), { code: "auth/user-mismatch" });
+  await signInWithCustomToken(auth, answer.customToken);
+}
+
 export const signInPassword = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => undefined);
 export const sendReset = (email: string) => sendPasswordResetEmail(auth, email);
 export const signOut = () => firebaseSignOut(auth);

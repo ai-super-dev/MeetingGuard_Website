@@ -65,6 +65,18 @@ export function TikTokIcon(props: IconProps) {
 }
 
 /** Google's "G", for the "Continue with Google" button (as Google's sign-in branding rules allow). */
+/** The Microsoft mark: four squares. */
+export function MicrosoftIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path fill="#F25022" d="M1 1h10.5v10.5H1z" />
+      <path fill="#7FBA00" d="M12.5 1H23v10.5H12.5z" />
+      <path fill="#00A4EF" d="M1 12.5h10.5V23H1z" />
+      <path fill="#FFB900" d="M12.5 12.5H23V23H12.5z" />
+    </svg>
+  );
+}
+
 export function GoogleIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

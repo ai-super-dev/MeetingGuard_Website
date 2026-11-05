@@ -695,8 +695,8 @@ function DeleteAccount({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const providers = s.user?.providers ?? [];
-  // the server requires a recent sign-in: a window for Google and Apple, the password otherwise
-  const popupProvider = providers.includes("apple.com") ? "Apple" : providers.includes("google.com") ? "Google" : "";
+  // the server requires a recent sign-in: a window for Google, Apple and Microsoft, the password otherwise
+  const popupProvider = providers.includes("apple.com") ? "Apple" : providers.includes("google.com") ? "Google" : providers.includes("microsoft.com") ? "Microsoft" : "";
   const needsPassword = LIVE && !popupProvider;
   const ready = typed.trim().toUpperCase() === a.account.deleteWord && (!needsPassword || !!password);
 

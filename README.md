@@ -74,7 +74,7 @@ header's Sign in button leads to it; set `agendaOpen` in `src/lib/site.ts` to
 
 | Page | URL |
 | --- | --- |
-| Sign in (Google, or email and password, as in the app) | `/app/sign-in` |
+| Sign in (Google, Microsoft, or email and password, as in the app) | `/app/sign-in` |
 | Dashboard: greeting, happening now and next meeting, tasks, quick actions, today, your week | `/app` |
 | Meetings: search, upcoming, past and all, by source; details, create, edit, move, delete | `/app/meetings` |
 | Calendar: the month with dots per source; the selected day's tasks and meetings | `/app/calendar` |
@@ -114,6 +114,18 @@ To turn it on: register a Web app in the Firebase console and copy its config;
 add the site's domain under Authentication > Settings > Authorized domains; and
 for Apple, add a Services ID to the Apple provider and set
 `NEXT_PUBLIC_APPLE_SIGN_IN=1`.
+
+Continue with Microsoft works as in the app (its ARCHITECTURE section 31): the
+site runs Microsoft's own sign-in in a window (`src/lib/agenda/microsoft.ts`,
+code with PKCE, scopes `openid profile email`), and the app's server function
+`microsoftSignIn` checks the id_token and answers with a sign-in token for the
+same account as in the app. The website sends `signInOnly: true`, so a Microsoft
+account the app was never used with gets the "set up the app first" window and
+nothing is created. The window comes back to `public/auth/microsoft/index.html`.
+It needs `NEXT_PUBLIC_MSAL_CLIENT_ID` (the app's Azure registration), and each
+site address followed by `/auth/microsoft/` listed as a "Single-page
+application" redirect URI on that registration (an address that isn't listed,
+`www.` included, gets Microsoft's redirect error).
 
 Every read and write goes through `src/lib/agenda/store.ts`. Other files:
 

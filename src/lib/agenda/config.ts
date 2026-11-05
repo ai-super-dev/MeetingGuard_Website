@@ -22,5 +22,12 @@ export const FUNCTIONS_REGION = process.env.NEXT_PUBLIC_FUNCTIONS_REGION || "us-
 /** Sign in with Apple needs a Services ID in Firebase before it works on the web, so it is switched on separately. */
 export const APPLE_SIGN_IN = process.env.NEXT_PUBLIC_APPLE_SIGN_IN === "1";
 
+/**
+ * Continue with Microsoft: the app's Azure app registration (public values, the
+ * app's EXPO_PUBLIC_MSAL_CLIENT_ID and _TENANT). Empty hides the button.
+ */
+export const MSAL_CLIENT_ID = process.env.NEXT_PUBLIC_MSAL_CLIENT_ID ?? "";
+export const MSAL_TENANT = process.env.NEXT_PUBLIC_MSAL_TENANT || "common";
+
 /** For testing against the local Firebase emulators. */
 export const EMULATOR_HOST = process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST ?? "";

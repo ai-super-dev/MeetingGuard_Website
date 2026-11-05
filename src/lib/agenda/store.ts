@@ -29,6 +29,7 @@ import { useSyncExternalStore } from "react";
 import type { Lang } from "@/lib/routes";
 import { LIVE } from "./config";
 import type * as Remote from "./firebase";
+import { MicrosoftError, requestMicrosoftIdToken } from "./microsoft";
 import { applyMeetingPatch, applyTaskPatch, buildMeeting, buildTask, DEFAULT_PREFERENCES, FREE, isAppPreferences, meetingToDoc, nextTimestamp, parseEntitlement, parseMeeting, parsePreferences, parseTask, taskToDoc, tombstoneMeeting } from "./records";
 import { reconcileAnchor, splitRecurrenceAt, withOverride } from "./recurrence";
 import { addDays, dayKey, deviceZone, fromZoned, setClock, timeKey, weekStart } from "./time";
@@ -359,7 +360,7 @@ export function meetingSync(
 
 /* ---------- Sign in ---------- */
 
-export type AuthCode = "wrongPassword" | "network" | "tooMany" | "popupBlocked" | "otherMethod" | "disabled" | "unavailable" | "generic";
+export type AuthCode = "wrongPassword" | "network" | "tooMany" | "popupBlocked" | "otherMethod" | "otherAccount" | "disabled" | "unavailable" | "generic";
 
 /** A sign-in that failed, with the reason the screen turns into words; "cancelled" shows nothing. */
 export class AuthError extends Error {
@@ -368,8 +369,18 @@ export class AuthError extends Error {
   }
 }
 
+/** The reason the app's server functions add to an error (details.reason). */
+const reasonOf = (err: unknown) => (err as { details?: { reason?: unknown } })?.details?.reason;
+
 function toAuthError(err: unknown): AuthError {
+  if (err instanceof AuthError) return err;
+  if (err instanceof MicrosoftError) return new AuthError(err.reason === "failed" ? "generic" : err.reason);
+  // microsoftSignIn's answers
+  if (reasonOf(err) === "email_in_use") return new AuthError("otherMethod");
+  if (reasonOf(err) === "microsoft_not_configured") return new AuthError("unavailable");
   const code = (err as { code?: string })?.code ?? "";
+  if (["functions/unavailable", "functions/deadline-exceeded"].includes(code)) return new AuthError("network");
+  if (code === "auth/user-mismatch") return new AuthError("otherAccount");
   if (["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-email", "auth/missing-password"].includes(code)) return new AuthError("wrongPassword");
   if (["auth/popup-closed-by-user", "auth/cancelled-popup-request", "auth/user-cancelled"].includes(code)) return new AuthError("cancelled");
   if (code === "auth/network-request-failed") return new AuthError("network");
@@ -442,6 +453,29 @@ export async function signInWithApple(lang: Lang) {
   await providerSignIn(r.signInApple);
 }
 
+/**
+ * Microsoft's window, then the app's server: the same account as in the app, or
+ * the "set up the app first" window for one the app was never used with (the
+ * server creates nothing for the website). The window opens before anything is
+ * awaited, or the browser blocks it.
+ */
+export async function signInWithMicrosoft(lang: Lang) {
+  clearBlocked();
+  if (!LIVE) return demoSignIn({ uid: "preview-microsoft", name: "Alex Morgan", email: "alex.morgan@outlook.com", providers: ["microsoft.com"] }, lang);
+  const identity = requestMicrosoftIdToken();
+  try {
+    const [r, m] = await Promise.all([loadRemote(), identity]);
+    try {
+      await r.signInMicrosoft(m);
+    } catch (err) {
+      if (reasonOf(err) === "microsoft_user_not_found") return showRefused({ name: m.name, email: m.email });
+      throw err;
+    }
+  } catch (err) {
+    throw toAuthError(err);
+  }
+}
+
 export async function signInWithPassword(email: string, password: string, lang: Lang) {
   clearBlocked();
   if (!LIVE) {
@@ -487,14 +521,17 @@ export async function signOut() {
 
 /**
  * Deletes the account and everything in it through the app's own server
- * function, which requires a recent sign-in: Google and Apple accounts confirm
- * in a window, email accounts with their password.
+ * function, which requires a recent sign-in: Google, Apple and Microsoft
+ * accounts confirm in a window, email accounts with their password.
  */
 export async function deleteAccount(password?: string) {
   if (LIVE) {
+    // Microsoft's window opens first, before anything is awaited
+    const microsoft = state.user?.providers.includes("microsoft.com") ? requestMicrosoftIdToken() : null;
     const r = await loadRemote();
     try {
-      await r.reauthenticate(password);
+      if (microsoft) await r.reauthenticateMicrosoft(await microsoft);
+      else await r.reauthenticate(password);
     } catch (err) {
       throw toAuthError(err);
     }
