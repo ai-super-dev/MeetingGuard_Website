@@ -21,6 +21,8 @@
   --color-on-inverse: #0b0b0e;
   --color-accent-soft: #ff8a95; /* step numbers, small accent text */
   --color-warm: #ffd9a0; /* "Available <month>" labels */
+  --color-sync-cloud: #1a73e8; /* the web agenda's sync cloud: the blue of the Google Tasks mark */
+  --color-sync-arrow: #ffffff; /* the arrow in it */
 
   /* The single brand accent — crimson, the colour of a critical alert */
   --color-accent: #ff4d5e;
@@ -140,6 +142,23 @@ body {
 }
 
 /* ---------- Motion ---------- */
+
+/* The arrow in the sync cloud: it rises in, rests, then lifts away, like an upload. */
+@keyframes sync-lift {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-2.5px);
+  }
+}
 
 @keyframes rise {
   from {

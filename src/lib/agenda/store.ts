@@ -289,6 +289,74 @@ export function phoneStatus(m: Pick<Meeting, "pushPending" | "external" | "updat
   return null;
 }
 
+/** A service that the website's changes reach through the app on the phone. */
+export type SyncPlace = "todo" | "gtasks" | "google" | "outlook";
+
+/**
+ * The quiet sync mark on a task or meeting row: on its way (the app hasn't
+ * sent it yet), late (still not sent after a day: open the app), or synced,
+ * with the services it's in. Only what the record says, never a guess.
+ */
+export type SyncStatus = {
+  state: "syncing" | "late" | "synced";
+  places: SyncPlace[];
+  /** Saved in the last couple of minutes: the arrow in the cloud moves, then rests. */
+  fresh: boolean;
+};
+
+/** How long after a save the sync mark keeps moving. */
+export const SYNC_FRESH_MS = 2 * 60 * 1000;
+
+function pending(updatedAt: string, places: SyncPlace[], now: number): SyncStatus {
+  const age = now - Date.parse(updatedAt);
+  return age > PHONE_LATE_MS ? { state: "late", places, fresh: false } : { state: "syncing", places, fresh: age < SYNC_FRESH_MS };
+}
+
+/**
+ * A task's sync with Microsoft To Do and Google Tasks. Nothing while neither is
+ * turned on in the app, and nothing on a done task that is already there.
+ */
+export function taskSync(
+  t: Pick<Task, "pushPending" | "external" | "updatedAt" | "status">,
+  prefs: Pick<Preferences, "todoListId" | "gtasksListId">,
+  now: number,
+): SyncStatus | null {
+  if (t.pushPending) {
+    const places: SyncPlace[] = [];
+    if (prefs.todoListId) places.push("todo");
+    if (prefs.gtasksListId) places.push("gtasks");
+    return places.length ? pending(t.updatedAt, places, now) : null;
+  }
+  if (t.status === "done") return null;
+  // the app writes the ids once the task really exists there
+  const has = (key: string) => typeof t.external?.[key] === "string" && t.external[key] !== "";
+  const places: SyncPlace[] = [];
+  if (has("todoTaskId")) places.push("todo");
+  if (has("gtasksTaskId")) places.push("gtasks");
+  return places.length ? { state: "synced", places, fresh: false } : null;
+}
+
+/**
+ * A meeting's sync with Google Calendar and Outlook. A change made here is on
+ * its way even with no calendar connected (the app still sends invitations and
+ * creates the Meet link). Synced marks only on Meeting Guard AI's own meetings:
+ * an imported one already says where it comes from.
+ */
+export function meetingSync(
+  m: Pick<Meeting, "pushPending" | "external" | "updatedAt" | "source" | "status">,
+  targets: { google: boolean; outlook: boolean },
+  now: number,
+): SyncStatus | null {
+  if (m.pushPending) {
+    return pending(m.updatedAt, (["google", "outlook"] as const).filter((p) => targets[p]), now);
+  }
+  if (m.status === "cancelled" || calendarOf(m) !== "meetingguard") return null;
+  const places: SyncPlace[] = [];
+  if (m.external.googleEventId) places.push("google");
+  if (m.external.outlookEventId) places.push("outlook");
+  return places.length ? { state: "synced", places, fresh: false } : null;
+}
+
 /* ---------- Sign in ---------- */
 
 export type AuthCode = "wrongPassword" | "network" | "tooMany" | "popupBlocked" | "otherMethod" | "disabled" | "unavailable" | "generic";

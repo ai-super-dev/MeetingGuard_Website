@@ -5,10 +5,11 @@ import Link from "next/link";
 import { AlertCircle, Bell, CalendarClock, CalendarDays, CheckCircle2, Clock, Inbox, Link2, ListChecks, ListTodo, Pencil, Plus, Search, SearchX, Sun, Trash2, X } from "lucide-react";
 import { AgendaFrame } from "@/components/agenda/Frame";
 import { DeleteTaskDialog, TaskEditor, useDueLabel, type TaskDraft } from "@/components/agenda/TaskDialogs";
+import { SyncLateNote, SyncMark, usePlaceNames } from "@/components/agenda/SyncMark";
 import { Button, IconButton, TaskCheck, useToast } from "@/components/agenda/ui";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
-import { displayZone, setTaskDone, useAgenda } from "@/lib/agenda/store";
+import { displayZone, setTaskDone, taskSync, useAgenda } from "@/lib/agenda/store";
 import { addDays, dayKey, fromZoned } from "@/lib/agenda/time";
 import type { Task } from "@/lib/agenda/types";
 import { useHref } from "@/lib/language";
@@ -88,6 +89,11 @@ function Tasks() {
     return words.every((w) => text.includes(w));
   };
   const shown = s.tasks.filter((t) => inFilter[filter](t) && matches(t));
+
+  // one note for every task the phone still hasn't sent after a day, instead of a warning on each row
+  const placeNames = usePlaceNames();
+  const late = s.tasks.map((t) => taskSync(t, s.prefs, now)).filter((x) => x?.state === "late");
+  const latePlaces = (["todo", "gtasks"] as const).filter((p) => late.some((x) => x?.places.includes(p)));
   const inGroup = (g: Group) =>
     shown
       .filter((t) => groupOf(t) === g)
@@ -135,6 +141,8 @@ function Tasks() {
         ))}
       </div>
 
+      {late.length > 0 && <SyncLateNote className="mt-5" text={a.sync.lateTasks(late.length, placeNames([...latePlaces]))} />}
+
       {/* the list */}
       <div className="mt-8 space-y-6">
         {!total && (
@@ -169,7 +177,7 @@ function Tasks() {
               </h2>
               <ul className="divide-y divide-white/[0.06]">
                 {list.map((t) => (
-                  <TaskRow key={t.id} task={t} overdue={g === "overdue"} onEdit={() => setEditing({ id: t.id })} onDelete={() => setDeleting(t)} />
+                  <TaskRow key={t.id} task={t} now={now} overdue={g === "overdue"} onEdit={() => setEditing({ id: t.id })} onDelete={() => setDeleting(t)} />
                 ))}
               </ul>
             </section>
@@ -252,7 +260,7 @@ function Empty({ icon, title, body, action, onAction }: { icon: ReactNode; title
 
 const chip = "inline-flex max-w-full items-center gap-1.5 rounded-md bg-white/[0.05] px-2 py-1 text-[0.75rem] text-white/60";
 
-function TaskRow({ task: t, overdue, onEdit, onDelete }: { task: Task; overdue: boolean; onEdit: () => void; onDelete: () => void }) {
+function TaskRow({ task: t, now, overdue, onEdit, onDelete }: { task: Task; now: number; overdue: boolean; onEdit: () => void; onDelete: () => void }) {
   const a = useA();
   const s = useAgenda();
   const href = useHref();
@@ -261,6 +269,7 @@ function TaskRow({ task: t, overdue, onEdit, onDelete }: { task: Task; overdue: 
   const zone = displayZone(s);
   const meeting = t.meetingId ? s.meetings.find((m) => m.id === t.meetingId) : undefined;
   const isDone = t.status === "done";
+  const sync = taskSync(t, s.prefs, now);
 
   const toggle = async (done: boolean) => {
     try {
@@ -308,8 +317,8 @@ function TaskRow({ task: t, overdue, onEdit, onDelete }: { task: Task; overdue: 
             </Link>
           )}
           {t.meetingId && !meeting && <span className={chip}>{a.tasks.meetingGone}</span>}
-          {/* a change made here, not yet sent by the phone to To Do or Google Tasks (only when that sync is on in the app) */}
-          {t.pushPending && (s.prefs.todoListId || s.prefs.gtasksListId) && <span className={`${chip} bg-warm/10! font-medium text-warm!`}>{a.details.waitingChip}</span>}
+          {/* on its way to Microsoft To Do and Google Tasks through the phone, or already there */}
+          {sync && <SyncMark status={sync} className="-my-0.5" />}
         </div>
       </div>
       <div className="-my-1.5 flex shrink-0">

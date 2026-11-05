@@ -6,12 +6,13 @@ import { AgendaFrame } from "@/components/agenda/Frame";
 import { SOURCE_COLOR } from "@/components/agenda/look";
 import { suggestedTime, useMeetingFlows } from "@/components/agenda/MeetingFlows";
 import { MeetingRow, useDayTitle } from "@/components/agenda/MeetingRow";
+import { SyncLateNote, usePlaceNames } from "@/components/agenda/SyncMark";
 import { Button, IconButton, TONES } from "@/components/agenda/ui";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
 import { buildSections, hasActiveFilters, LIST_FUTURE_DAYS, LIST_PAST_DAYS, type SourceFilter, type TimeFilter } from "@/lib/agenda/meetingsList";
 import { expandAll } from "@/lib/agenda/recurrence";
-import { calendarOf, displayZone, useAgenda } from "@/lib/agenda/store";
+import { calendarOf, displayZone, linkState, meetingSync, useAgenda } from "@/lib/agenda/store";
 import { addDays, dayKey, dayStart } from "@/lib/agenda/time";
 import type { Calendar } from "@/lib/agenda/types";
 
@@ -50,6 +51,12 @@ function Meetings() {
   const count = sections.reduce((sum, section) => sum + section.items.length, 0);
   const newMeeting = () => flows.newMeeting(today, suggestedTime(today, today, now, zone));
   const sources = [...MAIN_SOURCES, ...OTHER_SOURCES.filter((src) => s.meetings.some((m) => calendarOf(m) === src))];
+
+  // one note for every change the phone still hasn't sent after a day, instead of a warning on each row
+  const placeNames = usePlaceNames();
+  const targets = linkState(s);
+  const late = s.meetings.map((m) => meetingSync(m, targets, now)).filter((x) => x?.state === "late");
+  const latePlaces = (["google", "outlook"] as const).filter((p) => late.some((x) => x?.places.includes(p)));
 
   return (
     // as on Tasks: the full width up to 1180px, then centred at about 84%
@@ -108,6 +115,7 @@ function Meetings() {
           {a.calendar.count(count)}
         </p>
       )}
+      {late.length > 0 && <SyncLateNote className="mt-3" text={a.sync.lateMeetings(late.length, placeNames([...latePlaces]))} />}
 
       {/* the list */}
       {sections.length > 0 ? (

@@ -124,7 +124,7 @@ export function TaskEditor({ draft, onClose }: { draft: TaskDraft; onClose: () =
     try {
       if (existing) await updateTask(existing.id, fields);
       else await createTask(fields);
-      toast(a.toast.taskSaved);
+      toast(existing ? a.toast.taskSaved : a.toast.taskAdded);
       onClose();
     } catch {
       setBusy(false);

@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { MapPin, MoreVertical, Repeat, Video } from "lucide-react";
 import { useA } from "@/lib/agenda/i18n";
-import { calendarOf, joinUrl, phoneStatus } from "@/lib/agenda/store";
+import { calendarOf, joinUrl, linkState, meetingSync, useAgenda } from "@/lib/agenda/store";
 import { addDays, dayKey, fmtDay, fmtRange, fmtTime } from "@/lib/agenda/time";
 import type { Occurrence } from "@/lib/agenda/types";
 import { useLang } from "@/lib/language";
 import { SOURCE_COLOR } from "./look";
 import type { MeetingFlows } from "./MeetingFlows";
+import { SyncMark } from "./SyncMark";
 
 /** "Today · November 2, 2026", or the full date further away. */
 export function useDayTitle(today: string) {
@@ -27,6 +28,7 @@ export function useDayTitle(today: string) {
 export function MeetingRow({ o, zone, now, flows }: { o: Occurrence; zone: string; now: number; flows: MeetingFlows }) {
   const a = useA();
   const lang = useLang();
+  const s = useAgenda();
   const m = o.meeting;
   const sel = { id: m.id, key: o.key };
   const cancelled = m.status === "cancelled";
@@ -40,8 +42,7 @@ export function MeetingRow({ o, zone, now, flows }: { o: Occurrence; zone: strin
       : `${fmtDay(dayKey(o.start, zone), lang, short)} ${fmtTime(o.start, lang, zone)} - ${fmtDay(dayKey(o.end, zone), lang, short)} ${fmtTime(o.end, lang, zone)}`;
   const place = m.location?.address || (m.conference ? a.form.provider[m.conference.provider] : joinUrl(m) ? a.meetingsPage.online : "");
   const isVideo = !m.location?.address;
-  const status = phoneStatus(m, now);
-  const waiting = status === "waiting" || status === "late";
+  const sync = meetingSync(m, linkState(s), now);
 
   return (
     <div className="surface relative flex rounded-2xl transition-colors hover:border-white/20">
@@ -59,7 +60,6 @@ export function MeetingRow({ o, zone, now, flows }: { o: Occurrence; zone: strin
           <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.74rem] text-white/50">
             {live && <span className="rounded-md bg-accent/15 px-1.5 py-0.5 font-medium text-accent-soft">{a.calendar.now}</span>}
             {cancelled && <span className="rounded-md bg-white/[0.08] px-1.5 py-0.5 font-medium text-white/70">{a.details.cancelled}</span>}
-            {waiting && <span className="rounded-md bg-warm/10 px-1.5 py-0.5 font-medium text-warm">{a.details.waitingChip}</span>}
             {m.recurrence && (
               <span className="inline-flex items-center gap-1">
                 <Repeat className="h-3 w-3" aria-hidden />
@@ -70,6 +70,8 @@ export function MeetingRow({ o, zone, now, flows }: { o: Occurrence; zone: strin
           </span>
         </span>
       </button>
+      {/* on its way to the calendars through the phone, or already there */}
+      {sync && <SyncMark status={sync} className="self-center" />}
       <RowMenu title={o.title} onOpen={() => flows.details(sel)} onEdit={() => flows.edit(sel)} onDelete={() => flows.remove(sel)} />
     </div>
   );

@@ -19,6 +19,7 @@ import {
   phoneStatus,
   removeMeeting,
   SeriesEndError,
+  SYNC_FRESH_MS,
   setTaskDone,
   shiftedTask,
   updateMeeting,
@@ -33,6 +34,7 @@ import { useLang } from "@/lib/language";
 import { hostOf, type Selection } from "./Calendar";
 import { SOURCE_COLOR } from "./look";
 import { ChoiceChips, FloatField, FormSection, Helper, ListGroup, PickerRow, RadioRow, Subheading, Switch, ToggleChip } from "./form";
+import { SyncGlyph } from "./SyncMark";
 import { Button, Dialog, Field, IconButton, inputClass, SavingRing, useToast } from "./ui";
 
 /** Which meetings of a series a change applies to. */
@@ -79,8 +81,10 @@ function PhoneLine({ meeting: m, now, zone }: { meeting: Meeting; now: number; z
   if (!text) return null;
   const waiting = status === "waiting" || status === "late";
   return (
-    <p role="status" className={`mt-4 text-[0.78rem] ${waiting ? "text-warm" : "text-white/45"}`}>
-      {text}
+    <p role="status" className={`mt-4 flex items-start gap-2 text-[0.78rem] leading-snug ${status === "late" ? "text-warm" : waiting ? "text-white/60" : "text-white/45"}`}>
+      {/* calm while on its way; amber only once it's late */}
+      {waiting && <SyncGlyph state={status === "late" ? "late" : "syncing"} moving={now - Date.parse(m.updatedAt) < SYNC_FRESH_MS} className="-mt-px h-[18px] w-[18px]" />}
+      <span>{text}</span>
     </p>
   );
 }

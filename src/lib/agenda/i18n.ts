@@ -180,12 +180,25 @@ export const agendaEn = {
     synced: (source: string) => `This meeting is also in ${source}. Your changes reach ${source} when the Meeting Guard AI app on your phone syncs.`,
     /** Where a change made here stands, as last reported by the phone. */
     phone: {
-      waiting: "Waiting for your phone. The Meeting Guard AI app sends this change to your calendars the next time it syncs.",
-      late: (since: string) => `Waiting for your phone since ${since}. Open the Meeting Guard AI app once so it can sync.`,
+      waiting: "Saved. The Meeting Guard AI app sends this change to your calendars the next time it syncs.",
+      late: (since: string) => `Not synced since ${since}. Open Meeting Guard AI on your phone to finish syncing.`,
       google: "On Google Calendar.",
       outlook: "On Outlook.",
     },
-    waitingChip: "Waiting for your phone",
+  },
+  /** The small sync mark on task and meeting rows, and the note when something is late. */
+  sync: {
+    places: { todo: "Microsoft To Do", gtasks: "Google Tasks", google: "Google Calendar", outlook: "Outlook" },
+    and: "and",
+    title: { syncing: "Syncing", late: "Not synced yet", synced: "Synced" },
+    syncing: (places: string) =>
+      places ? `Saved. It appears in ${places} the next time the Meeting Guard AI app syncs.` : "Saved. The Meeting Guard AI app finishes it the next time it syncs.",
+    late: (places: string) => (places ? `Open Meeting Guard AI on your phone to send it to ${places}.` : "Open Meeting Guard AI on your phone to finish syncing."),
+    synced: (places: string) => `In ${places}.`,
+    lateTasks: (n: number, places: string) =>
+      `${n === 1 ? "1 task hasn't" : `${n} tasks haven't`} reached ${places} yet. Open Meeting Guard AI on your phone to finish syncing.`,
+    lateMeetings: (n: number, places: string) =>
+      `${n === 1 ? "1 meeting change hasn't" : `${n} meeting changes haven't`} reached ${places || "your calendars"} yet. Open Meeting Guard AI on your phone to finish syncing.`,
   },
   reminder: reminderEn,
   intensity: { max: "Maximum", medium: "Medium", light: "Light" },
@@ -370,7 +383,8 @@ export const agendaEn = {
     saved: "Saved. Your phone updates its alarms when it syncs.",
     moved: "Moved. Your phone updates its alarms when it syncs.",
     cancelled: "Meeting deleted.",
-    taskSaved: "Task saved. Its reminder reaches your phone when it syncs.",
+    taskAdded: "Task added.",
+    taskSaved: "Task saved.",
     taskDone: "Marked as done.",
     taskUndone: "Marked as not done.",
     taskDeleted: "Task deleted.",
@@ -798,12 +812,26 @@ export const agendaEs: AgendaDict = {
     attachmentsNote: "Solo están disponibles en la app móvil, en el teléfono donde se añadieron.",
     synced: (source: string) => `Esta reunión también está en ${source}. Tus cambios llegan a ${source} cuando la app Meeting Guard AI de tu teléfono se sincroniza.`,
     phone: {
-      waiting: "Esperando a tu teléfono. La app Meeting Guard AI envía este cambio a tus calendarios la próxima vez que se sincronice.",
-      late: (since: string) => `Esperando a tu teléfono desde ${since}. Abre la app Meeting Guard AI una vez para que se sincronice.`,
+      waiting: "Guardado. La app Meeting Guard AI envía este cambio a tus calendarios la próxima vez que se sincronice.",
+      late: (since: string) => `Sin sincronizar desde ${since}. Abre Meeting Guard AI en tu teléfono para terminar la sincronización.`,
       google: "En Google Calendar.",
       outlook: "En Outlook.",
     },
-    waitingChip: "Esperando a tu teléfono",
+  },
+  sync: {
+    places: { todo: "Microsoft To Do", gtasks: "Google Tasks", google: "Google Calendar", outlook: "Outlook" },
+    and: "y",
+    title: { syncing: "Sincronizando", late: "Aún sin sincronizar", synced: "Sincronizado" },
+    syncing: (places: string) =>
+      places
+        ? `Guardado. Aparecerá en ${places} la próxima vez que se sincronice la app Meeting Guard AI.`
+        : "Guardado. La app Meeting Guard AI lo completará la próxima vez que se sincronice.",
+    late: (places: string) => (places ? `Abre Meeting Guard AI en tu teléfono para que llegue a ${places}.` : "Abre Meeting Guard AI en tu teléfono para terminar la sincronización."),
+    synced: (places: string) => `En ${places}.`,
+    lateTasks: (n: number, places: string) =>
+      `${n === 1 ? "1 tarea todavía no ha llegado" : `${n} tareas todavía no han llegado`} a ${places}. Abre Meeting Guard AI en tu teléfono para terminar la sincronización.`,
+    lateMeetings: (n: number, places: string) =>
+      `${n === 1 ? "1 cambio de reunión todavía no ha llegado" : `${n} cambios de reuniones todavía no han llegado`} a ${places || "tus calendarios"}. Abre Meeting Guard AI en tu teléfono para terminar la sincronización.`,
   },
   reminder: reminderEs,
   intensity: { max: "Máxima", medium: "Media", light: "Ligera" },
@@ -985,7 +1013,8 @@ export const agendaEs: AgendaDict = {
     saved: "Guardado. Tu teléfono actualiza sus alarmas al sincronizar.",
     moved: "Movida. Tu teléfono actualiza sus alarmas al sincronizar.",
     cancelled: "Reunión eliminada.",
-    taskSaved: "Tarea guardada. Su recordatorio llega a tu teléfono al sincronizar.",
+    taskAdded: "Tarea añadida.",
+    taskSaved: "Tarea guardada.",
     taskDone: "Marcada como hecha.",
     taskUndone: "Marcada como pendiente.",
     taskDeleted: "Tarea eliminada.",
