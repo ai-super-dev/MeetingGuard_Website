@@ -1,6 +1,7 @@
 /**
- * The official WhatsApp glyph (from Simple Icons), the one exception to the
- * site's no-third-party-logos rule: the client asked for it in the hero.
+ * The official WhatsApp glyph (from Simple Icons), shown because the client
+ * asked for it: in the hero and on the WhatsApp feature card (the other
+ * services' logos are in ServiceLogos.tsx).
  * Meta's brand rules: keep it unaltered, in its own green, and no larger than
  * the text beside it.
  */

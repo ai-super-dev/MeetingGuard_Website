@@ -19,14 +19,14 @@ import {
   ListChecks,
   Loader2,
   Lock,
-  MessageCircle,
   Mic,
   Reply,
   Smartphone,
-  Video,
   Volume2,
 } from "lucide-react";
 import { featureAccents } from "@/components/icons/feature-icons";
+import { GoogleMeetLogo, GoogleTasksLogo, MicrosoftToDoLogo, TeamsLogo, ZoomLogo } from "@/components/icons/ServiceLogos";
+import { WhatsAppLogo } from "@/components/icons/WhatsAppLogo";
 import { Reveal, useReducedMotionSafe } from "@/components/motion";
 import { AppMark } from "@/components/ui/Logo";
 import { useT } from "@/lib/language";
@@ -498,7 +498,7 @@ function WhatsAppVisual() {
   const phase = useCycle(4, 1500, inView); // 0 ask · 1 card · 2 confirmed · 3 done
   const pop = { initial: { opacity: 0, y: 6, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { duration: 0.35 } };
   return (
-    // WhatsApp's own dark chat colours, kept in both site themes (the name and a generic chat icon, no logo)
+    // WhatsApp's own dark chat colours, kept in both site themes (the name with the WhatsApp logo, as in the hero)
     <div
       ref={ref}
       className="theme-dark w-full max-w-[360px] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b141a] text-[0.78rem] shadow-[0_24px_60px_rgba(0,0,0,0.35)]"
@@ -512,7 +512,7 @@ function WhatsAppVisual() {
           <span className="block text-[0.66rem] text-white/50">{v.chatOnline}</span>
         </span>
         <span className="flex shrink-0 items-center gap-1 rounded-full bg-[#25D366]/15 px-2 py-1 text-[0.66rem] font-semibold text-[#25D366]">
-          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+          <WhatsAppLogo className="h-3.5 w-3.5" />
           WhatsApp
         </span>
       </div>
@@ -560,7 +560,7 @@ function WhatsAppVisual() {
 
 /* ---------- Google Meet, Zoom and Teams links ---------- */
 
-/** A meeting gets a Google Meet link, then a Zoom one, then a Teams one (names only, no third-party logos). */
+/** A meeting gets a Google Meet link, then a Zoom one, then a Teams one (each tab with the service's logo). */
 function LinksVisual() {
   const t = useT();
   const v = t.features.visuals;
@@ -570,9 +570,9 @@ function LinksVisual() {
   const service = Math.floor(phase / 2);
   const ready = phase % 2 === 1;
   const services = [
-    { name: "Google Meet", url: "meet.google.com/kdw-qmzp-xra" },
-    { name: "Zoom", url: "zoom.us/j/84629371054" },
-    { name: "Teams", url: "teams.microsoft.com/l/meetup-join" },
+    { name: "Google Meet", url: "meet.google.com/kdw-qmzp-xra", Logo: GoogleMeetLogo },
+    { name: "Zoom", url: "zoom.us/j/84629371054", Logo: ZoomLogo },
+    { name: "Teams", url: "teams.microsoft.com/l/meetup-join", Logo: TeamsLogo },
   ];
   return (
     <div ref={ref} className="w-full max-w-[300px] rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-left">
@@ -591,7 +591,8 @@ function LinksVisual() {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
-            <Video className="h-3.5 w-3.5" aria-hidden />
+            {/* the logo stays in its own colours; only the name dims on the other tabs */}
+            <s.Logo className="h-3.5 w-3.5 shrink-0" />
             {s.name}
           </span>
         ))}
@@ -709,10 +710,20 @@ function SyncCard({ side }: { side: SyncSide }) {
       }`}
     >
       <p className="flex items-center gap-1.5 text-[0.7rem] font-semibold text-white/80">
-        {side.app ? <AppMark className="h-4 w-4 shrink-0" sizes="32px" /> : <ListChecks className="h-4 w-4 shrink-0 text-[#8ab4ff]" aria-hidden />}
+        {side.app && <AppMark className="h-4 w-4 shrink-0" sizes="32px" />}
+        {/* a service's logo changes along with its name */}
         <AnimatePresence mode="wait" initial={false}>
-          <motion.span key={side.name} className="truncate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-            {side.name}
+          <motion.span
+            key={side.name}
+            className="flex min-w-0 items-center gap-1.5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {side.name === "Microsoft To Do" && <MicrosoftToDoLogo className="h-4 w-4 shrink-0" />}
+            {side.name === "Google Tasks" && <GoogleTasksLogo className="h-4 w-4 shrink-0" />}
+            <span className="truncate">{side.name}</span>
           </motion.span>
         </AnimatePresence>
       </p>
