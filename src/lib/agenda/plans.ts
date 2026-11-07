@@ -1,15 +1,19 @@
 /*
  * Plans. The web reads the same entitlement record as the app and works out
- * the plan the same way. In the app, plans differ only in daily AI assistant
- * requests: meetings, tasks, alerts and calendars are in every plan, so nothing
+ * the plan the same way. In the app, plans differ only in AI actions:
+ * meetings, tasks, alerts and calendars are in every plan, so nothing
  * on the web agenda (which has no assistant) is locked. Subscriptions are
  * bought and managed only in the stores for now; there is no web checkout.
  */
 
 import type { Entitlement, Plan } from "./types";
 
-/** AI assistant requests a day, set by the server (shown as the app shows them). */
-export const DAILY_AI_LIMITS: Record<Plan, number> = { free: 5, pro: 100, premium: 500 };
+/**
+ * AI actions per month on the paid plans, set by the server (the app's
+ * AI_ALLOWANCES in src/core/aiContract.ts). Free has an introductory allowance
+ * instead: 10 actions in the first 7 days, up to 3 a day (its own text).
+ */
+export const MONTHLY_AI_ACTIONS: Record<Exclude<Plan, "free">, number> = { pro: 100, premium: 400 };
 
 export type Cycle = "monthly" | "yearly";
 

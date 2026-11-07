@@ -10,7 +10,7 @@ import { StoreBadges } from "@/components/ui/StoreBadges";
 import { LIVE } from "@/lib/agenda/config";
 import { useNow } from "@/lib/agenda/hooks";
 import { useA } from "@/lib/agenda/i18n";
-import { ANNUAL_DISCOUNT_PERCENT, DAILY_AI_LIMITS, effectivePlan, formatUsd, hasStoreSubscription, MANAGE_URL, POPULAR, PRICES, type Cycle } from "@/lib/agenda/plans";
+import { ANNUAL_DISCOUNT_PERCENT, effectivePlan, formatUsd, hasStoreSubscription, MANAGE_URL, MONTHLY_AI_ACTIONS, POPULAR, PRICES, type Cycle } from "@/lib/agenda/plans";
 import { normalizeAlertTimes } from "@/lib/agenda/records";
 import { AuthError, deleteAccount, displayZone, resetDemo, setDemoPlan, setDisplayZone, signOut, updatePreferences, useAgenda, whatsappStatus, type WhatsAppStatus } from "@/lib/agenda/store";
 import { allZones, dayKey, deviceZone, fmtDay, LOCALE } from "@/lib/agenda/time";
@@ -255,8 +255,8 @@ function PlanSection() {
 
               <ul className="mt-6 space-y-2.5">
                 {(plan === "free"
-                  ? [{ text: a.account.features.requests(DAILY_AI_LIMITS.free) }, { text: a.account.features.meetings }, { text: a.account.features.calendars }]
-                  : [{ text: a.account.features.everythingFree, plus: true }, { text: a.account.features.requests(DAILY_AI_LIMITS[plan]) }]
+                  ? [{ text: a.account.features.introductory }, { text: a.account.features.meetings }, { text: a.account.features.calendars }]
+                  : [{ text: a.account.features.everythingFree, plus: true }, { text: a.account.features.actionsPerMonth(MONTHLY_AI_ACTIONS[plan]) }]
                 ).map((f) => (
                   <li key={f.text} className={`flex items-start gap-2.5 text-[0.86rem] ${"plus" in f ? "text-white/60" : ""}`}>
                     {"plus" in f ? <CirclePlus className="mt-0.5 h-4 w-4 shrink-0 text-white/50" aria-hidden /> : <Check className={`mt-0.5 h-4 w-4 shrink-0 ${GREEN}`} aria-hidden />}
@@ -329,7 +329,8 @@ function Price({ plan, cycle }: { plan: Plan; cycle: Cycle }) {
             {a.account.billedYearly(formatUsd(price.yearly))}
           </>
         ) : (
-          a.account.trial
+          // no store trial any more; the empty line keeps the cards level with Free's
+          " "
         )}
       </p>
     </div>
