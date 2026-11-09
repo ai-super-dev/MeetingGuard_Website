@@ -412,7 +412,12 @@ export const en = {
     eyebrow: "Pricing",
     line1: "Start free.",
     line2: "Upgrade when you're ready.",
-    points: ["Free plan, no card needed", "3-day free trial", "Pro from USD 7.99 a month"],
+    // the three plans, as the app's Plans screen says them (allowances of November 5, no store trial)
+    plans: [
+      { name: "Free to start", detail: "10 AI actions in your first 7 days (up to 3 a day)" },
+      { name: "Pro, USD 7.99 a month", detail: "100 AI actions per month" },
+      { name: "Premium, USD 14.99 a month", detail: "400 AI actions per month" },
+    ],
     note: "Subscriptions are bought inside the app on Google Play or the App Store.",
   },
 
@@ -846,7 +851,11 @@ export const es: Dict = {
     eyebrow: "Precios",
     line1: "Empieza gratis.",
     line2: "Mejora cuando quieras.",
-    points: ["Plan gratuito, sin tarjeta", "3 días de prueba gratis", "Pro desde 7,99 USD al mes"],
+    plans: [
+      { name: "Gratis para empezar", detail: "10 acciones de IA en tus primeros 7 días (hasta 3 al día)" },
+      { name: "Pro, 7,99 USD al mes", detail: "100 acciones de IA al mes" },
+      { name: "Premium, 14,99 USD al mes", detail: "400 acciones de IA al mes" },
+    ],
     note: "Las suscripciones se compran dentro de la app en Google Play o el App Store.",
   },
 

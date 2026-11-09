@@ -11,7 +11,11 @@ export const faq: Record<Lang, FaqItem[]> = {
     },
     {
       q: "Is Meeting Guard AI free?",
-      a: "Yes, there is a free plan. Pro and Premium add more, and you can try them free for 3 days.",
+      a: "Yes, it's free to start: your first 7 days include 10 AI actions (up to 3 a day). Pro includes 100 AI actions per month and Premium 400. Creating meetings and tasks by hand, your reminders and export are always free.",
+    },
+    {
+      q: "Are there limits on the AI assistant?",
+      a: "AI actions are counted per month on paid plans and renew on the day you subscribed. A question the assistant asks you back does not count, up to two in a row. Creating by hand, your reminders and export are never limited.",
     },
     {
       q: "Will the alarm ring if the app is closed?",
@@ -27,7 +31,7 @@ export const faq: Record<Lang, FaqItem[]> = {
     },
     {
       q: "How does the debrief after a meeting work?",
-      a: "Five minutes after a meeting ends, the app sends a notification asking how it went (you can turn this off in the alert settings). Tap Debrief there, or Debrief this meeting in the meeting's details, then say or type what was agreed: who does what and by when, in up to 60 seconds. The AI proposes one task per commitment, linked to the meeting, and nothing is saved until you confirm each one. A debrief counts as one AI assistant request.",
+      a: "Five minutes after a meeting ends, the app sends a notification asking how it went (you can turn this off in the alert settings). Tap Debrief there, or Debrief this meeting in the meeting's details, then say or type what was agreed: who does what and by when, in up to 60 seconds. The AI proposes one task per commitment, linked to the meeting, and nothing is saved until you confirm each one. A debrief counts as one AI action.",
     },
     {
       q: "Do tasks sync both ways with Google Tasks and Microsoft To Do?",
@@ -45,7 +49,11 @@ export const faq: Record<Lang, FaqItem[]> = {
     },
     {
       q: "¿Meeting Guard AI es gratis?",
-      a: "Sí, hay un plan gratuito. Pro y Premium añaden más, y puedes probarlos gratis durante 3 días.",
+      a: "Sí, es gratis para empezar: tus primeros 7 días incluyen 10 acciones de IA (hasta 3 al día). Pro incluye 100 acciones de IA al mes y Premium 400. Crear reuniones y tareas a mano, tus recordatorios y la exportación son siempre gratis.",
+    },
+    {
+      q: "¿El asistente de IA tiene límites?",
+      a: "En los planes de pago, las acciones de IA se cuentan por mes y se renuevan el día en que te suscribiste. Una pregunta que el asistente te hace de vuelta no cuenta, hasta dos seguidas. Crear a mano, tus recordatorios y la exportación nunca tienen límite.",
     },
     {
       q: "¿La alarma suena con la app cerrada?",
@@ -61,7 +69,7 @@ export const faq: Record<Lang, FaqItem[]> = {
     },
     {
       q: "¿Cómo funciona el resumen después de una reunión?",
-      a: "Cinco minutos después de terminar una reunión, la app te envía una notificación preguntando qué tal fue (puedes desactivarla en los ajustes de alertas). Toca Resumen ahí, o Resumir esta reunión en los detalles de la reunión, y di o escribe lo acordado: quién hace qué y para cuándo, en hasta 60 segundos. La IA propone una tarea por cada compromiso, vinculada a la reunión, y no se guarda nada hasta que confirmas cada una. Un resumen cuenta como una consulta al asistente de IA.",
+      a: "Cinco minutos después de terminar una reunión, la app te envía una notificación preguntando qué tal fue (puedes desactivarla en los ajustes de alertas). Toca Resumen ahí, o Resumir esta reunión en los detalles de la reunión, y di o escribe lo acordado: quién hace qué y para cuándo, en hasta 60 segundos. La IA propone una tarea por cada compromiso, vinculada a la reunión, y no se guarda nada hasta que confirmas cada una. Un resumen cuenta como una acción de IA.",
     },
     {
       q: "¿Las tareas se sincronizan en ambos sentidos con Google Tasks y Microsoft To Do?",

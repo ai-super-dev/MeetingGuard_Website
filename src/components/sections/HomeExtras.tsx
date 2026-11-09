@@ -7,7 +7,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView } from "motion/react";
-import { CalendarCheck2, Check, Gift, Mail, Sparkles, Timer, Volume2 } from "lucide-react";
+import { CalendarCheck2, Check, Crown, Gift, Mail, Sparkles, Volume2 } from "lucide-react";
 import { WaitlistForm } from "@/components/forms/Forms";
 import { Reveal, useReducedMotionSafe } from "@/components/motion";
 import { CheckList, Headline, Tag } from "@/components/page/blocks";
@@ -59,7 +59,7 @@ export function Briefing() {
 export function PricingTeaser() {
   const t = useT();
   const p = t.pricingTeaser;
-  const icons = [Gift, Timer, Sparkles];
+  const icons = [Gift, Sparkles, Crown];
   return (
     <section id="pricing" aria-labelledby="pricing-title" className="relative overflow-x-clip py-14 sm:py-[4.5rem]">
       <div className="container-page">
@@ -71,14 +71,15 @@ export function PricingTeaser() {
           <p className="eyebrow relative">{p.eyebrow}</p>
           <Headline id="pricing-title" line1={p.line1} line2={p.line2} className="relative mt-3" />
           <ul className="relative mx-auto mt-9 grid max-w-3xl gap-3 sm:grid-cols-3">
-            {p.points.map((point, i) => {
+            {p.plans.map((plan, i) => {
               const Icon = icons[i];
               return (
-                <li key={point} className="flex flex-col items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-5">
+                <li key={plan.name} className="flex flex-col items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-5">
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent/12 text-accent-soft">
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
-                  <span className="text-[0.92rem] font-medium text-white/85">{point}</span>
+                  <span className="text-[0.92rem] font-medium text-white/85">{plan.name}</span>
+                  <span className="-mt-1.5 text-[0.84rem] leading-snug text-white/60">{plan.detail}</span>
                 </li>
               );
             })}
