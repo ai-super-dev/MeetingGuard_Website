@@ -15,6 +15,7 @@ import { effectivePlan } from "@/lib/agenda/plans";
 import { leaveRefused, useAgenda, type RefusedAccount } from "@/lib/agenda/store";
 import { useHref } from "@/lib/language";
 import { splitPath } from "@/lib/routes";
+import { AlertsBar } from "./MeetingAlerts";
 import { Button, Dialog, Spinner } from "./ui";
 
 const NAV = [
@@ -270,6 +271,7 @@ export function AgendaFrame({ title, children, actions }: { title: string; child
       {!LIVE && <DemoBanner />}
       <OfflineBanner />
       {s.loadFailed && <LoadFailedBanner />}
+      {!s.blocked && <AlertsBar />}
 
       <main id="main" className="px-4 pt-4 pb-28 lg:px-8 lg:pb-10">
         {children}

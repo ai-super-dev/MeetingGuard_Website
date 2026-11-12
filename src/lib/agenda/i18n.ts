@@ -311,7 +311,7 @@ export const agendaEn = {
     tips: "Preparation tips",
     tipsLabel: "One tip per line",
     alerts: "Alerts",
-    alertsOnPhone: "Alerts arrive on your phone through the app.",
+    alertsOnPhone: "Alerts arrive on your phone through the app, and in this browser while the agenda is open.",
     alertsOff: "Meeting alerts are turned off in your alert settings, so this meeting won't alert you. These choices apply if you turn them back on.",
     whenToRemind: "When to remind you",
     useDefaultAlerts: "Use my default reminders",
@@ -646,6 +646,41 @@ export const agendaEn = {
     loading: "Opening the invitation",
   },
 
+  // meeting alerts in this browser, in the app's words (alerts.json)
+  alerts: {
+    heading: { upcoming: "Your meeting is about to start", now: "Your meeting is starting now", started: "Your meeting has already started" },
+    mediumHeading: "Upcoming meeting",
+    lightHeading: "Meeting reminder",
+    lead: (min: number) =>
+      min > 0 && min % 1440 === 0 ? `in ${min / 1440} day${min === 1440 ? "" : "s"}` : min > 0 && min % 60 === 0 ? `in ${min / 60} hour${min === 60 ? "" : "s"}` : `in ${min} minute${min === 1 ? "" : "s"}`,
+    when: { upcoming: (lead: string) => `Starts ${lead}`, now: "Starting now", started: (min: number) => `Started ${min} minute${min === 1 ? "" : "s"} ago` },
+    notification: {
+      upcoming: (title: string, lead: string) => `${title} starts ${lead}`,
+      now: (title: string) => `${title} is starting now`,
+      started: (title: string) => `${title} has started`,
+    },
+    voice: {
+      upcoming: (title: string, lead: string, time: string) => `Attention. Your meeting ${title} starts ${lead}, at ${time}.`,
+      now: (title: string) => `Attention. Your meeting ${title} is starting now.`,
+      started: (title: string) => `Your meeting ${title} has already started.`,
+      location: (place: string) => `Location: ${place}.`,
+    },
+    autoSnooze: (s: number) => `Auto-snooze in ${s} second${s === 1 ? "" : "s"}`,
+    acknowledge: "I'm on it",
+    join: "Join now",
+    snooze: (min: number) => `Snooze ${min} min`,
+    minimize: "Minimize",
+    expand: "Meeting alert minimized. Click to expand.",
+    dismiss: "Dismiss",
+    untitled: "Meeting",
+    soundBlocked: "Your browser held back the sound. Click anywhere on the page to hear it.",
+    bar: {
+      text: "Your meeting alerts also ring in this browser while the agenda is open. Allow notifications to see them when this tab is in the background.",
+      turnOn: "Turn on alerts",
+      later: "Not now",
+    },
+  },
+
   common: { close: "Close", cancel: "Cancel", back: "Back", retry: "Try again", saving: "Saving", optional: "optional" },
 };
 
@@ -949,7 +984,7 @@ export const agendaEs: AgendaDict = {
     tips: "Consejos de preparación",
     tipsLabel: "Un consejo por línea",
     alerts: "Alertas",
-    alertsOnPhone: "Las alertas llegan a tu teléfono a través de la app.",
+    alertsOnPhone: "Las alertas llegan a tu teléfono a través de la app, y a este navegador mientras la agenda está abierta.",
     alertsOff: "Las alertas de reuniones están desactivadas en tus ajustes de alertas, así que esta reunión no te avisará. Estas opciones se aplicarán si las vuelves a activar.",
     whenToRemind: "Cuándo avisarte",
     useDefaultAlerts: "Usar mis recordatorios predeterminados",
@@ -1277,6 +1312,40 @@ export const agendaEs: AgendaDict = {
     sentWith: "Enviado con Meeting Guard AI",
     getApp: "Descarga Meeting Guard AI",
     loading: "Abriendo la invitación",
+  },
+
+  alerts: {
+    heading: { upcoming: "Tu reunión está a punto de empezar", now: "Tu reunión empieza ahora", started: "Tu reunión ya ha empezado" },
+    mediumHeading: "Próxima reunión",
+    lightHeading: "Recordatorio de reunión",
+    lead: (min: number) =>
+      min > 0 && min % 1440 === 0 ? `en ${min / 1440} día${min === 1440 ? "" : "s"}` : min > 0 && min % 60 === 0 ? `en ${min / 60} hora${min === 60 ? "" : "s"}` : `en ${min} minuto${min === 1 ? "" : "s"}`,
+    when: { upcoming: (lead: string) => `Empieza ${lead}`, now: "Empieza ahora", started: (min: number) => `Empezó hace ${min} minuto${min === 1 ? "" : "s"}` },
+    notification: {
+      upcoming: (title: string, lead: string) => `${title} empieza ${lead}`,
+      now: (title: string) => `${title} empieza ahora`,
+      started: (title: string) => `${title} ya ha empezado`,
+    },
+    voice: {
+      upcoming: (title: string, lead: string, time: string) => `Atención. Tu reunión ${title} empieza ${lead}. Hora de inicio: ${time}.`,
+      now: (title: string) => `Atención. Tu reunión ${title} está empezando ahora.`,
+      started: (title: string) => `Tu reunión ${title} ya ha empezado.`,
+      location: (place: string) => `Lugar: ${place}.`,
+    },
+    autoSnooze: (s: number) => `Se pospondrá automáticamente en ${s} segundo${s === 1 ? "" : "s"}`,
+    acknowledge: "Entendido, voy",
+    join: "Unirse ahora",
+    snooze: (min: number) => `Posponer ${min} min`,
+    minimize: "Minimizar",
+    expand: "Alerta de reunión minimizada. Haz clic para ampliarla.",
+    dismiss: "Cerrar",
+    untitled: "Reunión",
+    soundBlocked: "Tu navegador ha retenido el sonido. Haz clic en cualquier parte de la página para oírlo.",
+    bar: {
+      text: "Las alertas de tus reuniones también suenan en este navegador mientras la agenda está abierta. Permite las notificaciones para verlas cuando esta pestaña esté en segundo plano.",
+      turnOn: "Activar alertas",
+      later: "Ahora no",
+    },
   },
 
   common: { close: "Cerrar", cancel: "Cancelar", back: "Volver", retry: "Reintentar", saving: "Guardando", optional: "opcional" },

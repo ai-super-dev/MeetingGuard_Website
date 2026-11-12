@@ -6,6 +6,7 @@ import { ThemeRestore } from "@/components/layout/ThemeToggle";
 import { LangProvider } from "@/lib/language";
 import type { Lang } from "@/lib/routes";
 import { THEME_SCRIPT } from "@/lib/theme";
+import { AgendaAlerts } from "./MeetingAlerts";
 import { ToastProvider } from "./ui";
 
 export const agendaViewport: Viewport = {
@@ -30,6 +31,7 @@ export function AgendaDocument({ lang, children }: { lang: Lang; children: React
           <ToastProvider>
             <SkipLink />
             {children}
+            <AgendaAlerts />
           </ToastProvider>
         </LangProvider>
       </body>

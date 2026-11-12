@@ -164,6 +164,8 @@ export type Preferences = {
   language: "en" | "es";
   alertEnabled: boolean;
   alertIntensity: AlertIntensity;
+  /** Read only: the intensity for meetings from Google, Outlook or the phone calendar; null follows alertIntensity. */
+  importedAlertIntensity: AlertIntensity | null;
   alertSoundType: AlertSoundType;
   alertVolume: number;
   vibrationEnabled: boolean;
