@@ -27,7 +27,7 @@ const IMPORTED = new Set(["google", "outlook", "device"]);
 
 /** One alert due to ring. */
 export type DueAlert = {
-  /** Unique per meeting, date and alert time (or snooze). */
+  /** Unique per meeting, date, alert time and the time it rings (or snooze). */
   id: string;
   meetingId: string;
   /** The date of a series ("" for single meetings). */
@@ -60,7 +60,8 @@ export function alertOffsetsOf(m: Pick<Meeting, "customAlertTimes">, prefs: Pick
   return [...new Set(source.filter((v) => Number.isInteger(v) && v >= 0))].sort((a, b) => b - a);
 }
 
-const alertId = (meetingId: string, key: string, offset: number) => `${meetingId}|${key}|${offset}`;
+// with its time, as in the app: a meeting moved to another time gets new alerts, not ones already answered
+const alertId = (meetingId: string, key: string, offset: number, fireAt: number) => `${meetingId}|${key}|${offset}|${fireAt}`;
 export const snoozeId = (meetingId: string, key: string, fireAt: number) => `${meetingId}|${key}|s${fireAt}`;
 /** The meeting date an alert belongs to. */
 export const occurrenceId = (a: Pick<DueAlert, "meetingId" | "key">) => `${a.meetingId}|${a.key}`;
@@ -81,7 +82,7 @@ export function planAlerts(meetings: readonly Meeting[], prefs: Preferences, fro
       for (const offset of offsets) {
         const fireAt = start - offset * MINUTE;
         if (fireAt < from || fireAt >= to) continue;
-        out.push({ id: alertId(m.id, o.key, offset), meetingId: m.id, key: o.key, fireAt, start, end: o.end.getTime(), title: o.title, intensity, offset });
+        out.push({ id: alertId(m.id, o.key, offset, fireAt), meetingId: m.id, key: o.key, fireAt, start, end: o.end.getTime(), title: o.title, intensity, offset });
       }
     }
   }
