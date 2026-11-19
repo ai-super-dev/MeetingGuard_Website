@@ -6,7 +6,9 @@ import type { Lang } from "@/lib/routes";
  * TERMS-UPDATE-FOR-WEBSITE-2026-11-06.md: Part A for the terms, Part B for
  * the privacy policy (the sections it does not list are unchanged from the
  * page of September 28, 2026) and Part C for the delete account page, which
- * Meta requires for the WhatsApp integration and Google Play links to. Keep both
+ * Meta requires for the WhatsApp integration and Google Play links to. The
+ * privacy policy also has the in-app meeting summaries text of November 16
+ * and PRIVACY-FATHOM-FOR-WEBSITE-2026-11-18.md (Postmark kept 45 days). Keep both
  * languages in step, use plain punctuation only (no dashes as pauses, no
  * ellipsis, no curly quotes), and keep the Limited Use text word for word:
  * Google reads this page when it reviews the app.
@@ -33,7 +35,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
       "path": "/privacy-policy",
       "title": "Privacy Policy",
       "description": "How Meeting Guard AI collects, uses and protects your data.",
-      "updated": "Last updated: November 9, 2026",
+      "updated": "Last updated: November 19, 2026",
       "intro": [
         "This policy explains what information the Meeting Guard AI app collects, how we use it, who we share it with and the choices you have. Meeting Guard AI is provided by AETERNUM TECH LTD (\"we\", \"us\")."
       ],
@@ -56,7 +58,8 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "AI assistant usage: how many AI actions you make, when your free allowance started and when your paid allowance renews, to apply the allowance of your plan.",
               "Subscriptions: if you buy Pro or Premium, the App Store or Google Play handles the payment and we never receive your card or bank details. RevenueCat, which manages subscriptions on our behalf, sends our server a record of each subscription event, such as a purchase, renewal, plan change, billing problem, cancellation or expiry (the plan, the store, the product, the price and currency, the dates and, for a cancellation or an expiry, its reason), so we know which plan you have and when it renews or ends.",
               "Crash and error reports, and performance measurements of a sample of app sessions, when crash reporting is enabled in your version of the app: device model, operating system, app version, technical details of the error and how long screens and network requests take. We design these reports to leave out your meetings, notes and messages, and email addresses are removed from error reports before they are sent.",
-              "WhatsApp: if you link your WhatsApp number, we store that phone number, your WhatsApp profile name, the date you linked it and the conversation state: the last 10 messages of the chat, yours and the assistant's, and any proposal that waits for your confirmation (see \"WhatsApp assistant\")."
+              "WhatsApp: if you link your WhatsApp number, we store that phone number, your WhatsApp profile name, the date you linked it and the conversation state: the last 10 messages of the chat, yours and the assistant's, and any proposal that waits for your confirmation (see \"WhatsApp assistant\").",
+              "Meeting summaries: if you turn them on, we store your private summary address, the mailboxes you list, the meeting summaries that reach that address and the tasks suggested from them (see \"Meeting summaries by email\"). If you connect Fathom, also the keys of that connection, encrypted (see \"Meeting summaries from Fathom\")."
             ]
           ]
         },
@@ -80,6 +83,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "Provide the app: keep your meetings, tasks and notes up to date on your devices, schedule your alerts and reminders and show your agenda.",
               "Sync the calendars and task lists you connect.",
               "Answer your requests to the AI assistant, in the app or on WhatsApp, and apply the AI allowance of your plan.",
+              "File the meeting summaries you send us under your meetings and, when you ask, suggest tasks from them.",
               "Manage your subscription, if you buy one.",
               "Keep the service secure, prevent abuse and fix errors."
             ],
@@ -142,6 +146,35 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
           ]
         },
         {
+          "heading": "Meeting summaries by email",
+          "body": [
+            "Meeting summaries are optional and may not be available for your account yet. Meeting Guard AI does not join, record or listen to your meetings. If you turn summaries on, under Meeting summaries in Settings, you get a private email address and list the mailboxes where your notetaker's emails arrive. The meeting summary that your notetaker already emails you is then sent on to that private address, by you or by a rule in your mailbox. Meeting Guard AI checks that each email is genuine and files the summary under the matching meeting, or keeps it in your summary inbox until you file it.",
+            "Our email provider, Postmark, receives each email first, processes it in the United States and keeps its copy for 45 days. Postmark passes the email to our server (Google Cloud Functions), which stores the summary in your Meeting Guard AI account (Google Firebase): its text, its subject, the email addresses in it, the date, the sender's domain and the meeting it is filed under. Only you can see your summaries in the app; other Meeting Guard AI users cannot reach them.",
+            "Summaries are encrypted in transit and at rest by Google Cloud. In addition, Meeting Guard AI encrypts each summary's text, subject and the email addresses in it with its own key, kept in Google Secret Manager. Your private address, the mailboxes you list, and details such as the date, the sender's domain and the meeting it is filed under do not get this extra layer. This is not end-to-end encryption: people with administrative access to our systems could technically decrypt it.",
+            "A summary that your notetaker did not sign, that was changed after it was sent, or that was not sent to one of your own mailboxes is refused, and its content is not kept by Meeting Guard AI; Postmark still keeps its copy for 45 days. A real summary sent straight to your private address waits in your summary inbox for your OK.",
+            "The text of a summary goes to OpenAI only when you ask for AI suggestions of tasks, in the app or by replying AI on WhatsApp. Our server then sends OpenAI the summary's text, with the title of the meeting it is filed under and the date, but never its subject or your other meetings and tasks, under the conditions described in \"AI assistant (OpenAI)\". The first AI suggestions for a summary use 1 AI action; the action items as written can be shown without AI. The suggestions are stored with the summary and encrypted the same way. Nothing becomes a task until you accept it. A task you add is an ordinary task: its title and the people on it are not encrypted with our extra key, its reminder shows the title on your lock screen, and when a Microsoft To Do or Google Tasks sync is on it is copied there.",
+            "If you linked WhatsApp, you can ask there for the suggested tasks of your newest summary. Only the suggested tasks and the sentences they came from are sent to your phone, through Meta, never the whole summary, and they stay in your chat, its notification previews and your WhatsApp backups until you delete them there.",
+            [
+              "Summaries filed under a meeting or kept: 12 months after they arrive, then deleted.",
+              "Summaries waiting in the inbox: 60 days after they arrive, or 60 days after you move one back to the inbox, whichever is later.",
+              "Refused emails: only a daily count, the reason and a verified sender domain, for 30 days; never their content.",
+              "Suggested tasks are part of their summary and are deleted with it. Tasks you add are yours: they stay until you delete them, also after you delete the summary or disconnect.",
+              "You can delete any summary, or all of them, at any time. They leave our live database at once and our backups within 21 days. Postmark's copy expires 45 days after the email arrives. The original email stays in your own mailbox.",
+              "When you disconnect summaries in the app, your private address stops working at once and you choose whether to keep or delete the summaries already received. When you delete your account, your private address, the mailboxes you list and all your summaries are deleted with it.",
+              "Copies outside our database, such as a reminder on your lock screen, your WhatsApp chat or a task copied to Microsoft To Do or Google Tasks, are not reached when you delete a summary or disconnect: delete them there."
+            ]
+          ]
+        },
+        {
+          "heading": "Meeting summaries from Fathom",
+          "body": [
+            "If you use Fathom, you can connect it instead of forwarding its emails: tap Connect Fathom under Meeting summaries and approve the access in Fathom. Connecting also gives you your private summary address (see \"Meeting summaries by email\"), because every summary is kept with it.",
+            "After each meeting that Fathom records for you, Fathom sends our server (Google Cloud Functions) that meeting's title, its times, its video-call link, Fathom's summary and its action items, with the names and email addresses of the people they are assigned to. Our server can also ask Fathom for your recordings of the last 7 days, to pick up one that did not arrive. We only receive your own recordings, and never the recording itself, its video or its transcript.",
+            "To keep the connection, we store the keys Fathom gives us for your account (an access key, a key to renew it, and the key that signs Fathom's deliveries), encrypted with our own key kept in Google Secret Manager, together with when you connected and when the last summary arrived. A summary from Fathom is then stored, encrypted, filed and kept exactly like a summary by email, under the same rules and for the same time.",
+            "You can disconnect Fathom at any time under Meeting summaries: we ask Fathom to stop sending summaries and delete the keys at once. Disconnecting meeting summaries or deleting your account also disconnects Fathom. If Fathom cannot be reached at that moment, you can remove the connection in your Fathom settings. Fathom processes your meetings under its own privacy policy."
+          ]
+        },
+        {
           "heading": "Notifications",
           "body": [
             "Meeting alerts, task reminders, the reminder to follow up after a meeting ends and, if you turn it on, the daily briefing are scheduled on your device by the operating system, based on your meetings, tasks and alert settings. They show details such as the meeting or task title and time, also on the lock screen according to your phone's notification settings. We do not send push notifications from a server and we do not use notifications for marketing."
@@ -153,7 +186,9 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
             "We share personal information only with:",
             [
               "Google (Firebase Authentication, Cloud Firestore and Cloud Functions), which hosts your account and data and runs our server code.",
-              "OpenAI, which processes your requests to the AI assistant.",
+              "OpenAI, which processes your requests to the AI assistant and, when you ask for them, the suggested tasks from a meeting summary.",
+              "Postmark, our email provider, when you turn on meeting summaries: it receives the emails sent to your private summary address, processes them in the United States and keeps its copy for 45 days.",
+              "Fathom, when you connect it: we receive your meeting summaries from it, and we send it only the requests needed to keep that connection, never other data from your Meeting Guard AI account.",
               "Microsoft, when you sign in with Microsoft or connect Outlook or To Do.",
               "Apple, when you sign in with Apple.",
               "The speech recognition service of your phone (Apple on an iPhone, usually Google on Android), when you use voice input: it may receive the audio to turn it into text.",
@@ -166,7 +201,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "The people you invite: when you ask the app to send invitations or to share a meeting, the recipients receive the meeting details.",
               "Authorities, when the law requires it, or a company that takes over the service, which must follow this policy."
             ],
-            "Our service providers (Google Cloud and Firebase, OpenAI, RevenueCat, Sentry, Expo, Zoom and, for WhatsApp messages, Meta) may use your information only to provide their service to us and must protect it at least as well as this policy describes. When you sign in with Google, Apple or Microsoft, connect one of their services or use your phone's speech recognition, that company also applies its own terms and privacy policy."
+            "Our service providers (Google Cloud and Firebase, OpenAI, Postmark, RevenueCat, Sentry, Expo, Zoom and, for WhatsApp messages, Meta) may use your information only to provide their service to us and must protect it at least as well as this policy describes. When you sign in with Google, Apple or Microsoft, connect one of their services or use your phone's speech recognition, that company also applies its own terms and privacy policy."
           ]
         },
         {
@@ -180,11 +215,12 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
           "body": [
             "We keep your information while your account exists.",
             [
-              "You can delete your account at any time in the app: Settings > Account > Delete account. This permanently deletes your account, meetings, tasks, notes, preferences, assistant usage records, subscription status, WhatsApp link and Microsoft sign-in record from our servers, signs you out and removes the app's access to your Google account or Apple account. Deleting your account does not cancel a subscription bought in the App Store or Google Play: cancel it there.",
+              "You can delete your account at any time in the app: Settings > Account > Delete account. This permanently deletes your account, meetings, tasks, notes, preferences, meeting summaries and private summary address, Fathom connection, assistant usage records, subscription status, WhatsApp link and Microsoft sign-in record from our servers, signs you out and removes the app's access to your Google account or Apple account. Deleting your account does not cancel a subscription bought in the App Store or Google Play: cancel it there.",
               "If you can't sign in anymore, write to support@meetingguard.ai from the email address of your account and ask us to delete it.",
               "When you delete a meeting, a minimal record without its content (identifiers and time) is kept for up to 60 days so the deletion reaches your other devices and calendars; after that our server erases it automatically.",
               "Events that the app added to Google Calendar, Outlook or your phone's calendar, and tasks it added to Google Tasks or Microsoft To Do, stay there until you delete them.",
               "The Zoom meetings that the app created for you (with their title, time and join link) are not deleted automatically when you delete your account: they stay on our Zoom account until you ask us to delete them at support@meetingguard.ai.",
+              "Meeting summaries are kept for 12 months when they are filed under a meeting or kept, and for 60 days while they wait in your summary inbox; Postmark keeps its copy of each email for 45 days (see \"Meeting summaries by email\").",
               "The WhatsApp link (your phone number and WhatsApp profile name) is kept until you unlink it or delete your account. The conversation state is no longer used after 15 minutes without messages and is deleted once 30 days pass without messages.",
               "If you bought a subscription, the records of its store events (purchases, renewals, plan changes, cancellations and expiry, with your anonymous user ID, the plan, the store, the product, the price and currency and the dates) are kept on our servers after you delete your account, as part of our revenue records.",
               "RevenueCat keeps its own record of your anonymous user ID, and of your purchases if you made any, after you delete your account.",
@@ -209,12 +245,12 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "Access your personal data and get a copy of it.",
               "Correct inaccurate data. You can edit your meetings, tasks, notes and settings in the app.",
               "Delete your data (see above).",
-              "Object to or restrict some processing, and withdraw your consent at any time, for example by disconnecting Google Calendar, Google Tasks, Outlook or Microsoft To Do, unlinking WhatsApp, turning off calendar access or not using the AI assistant.",
+              "Object to or restrict some processing, and withdraw your consent at any time, for example by disconnecting Google Calendar, Google Tasks, Outlook or Microsoft To Do, unlinking WhatsApp, disconnecting Fathom or meeting summaries, turning off calendar access or not using the AI assistant.",
               "Receive your data in a portable format.",
               "Complain to your local data protection authority."
             ],
             "To use these rights, write to support@meetingguard.ai. We will reply within the time required by law.",
-            "We process your data to provide the service you asked for (performance of a contract), with your consent (calendar and task connections, WhatsApp and the AI assistant) and for our legitimate interests (security and fixing errors)."
+            "We process your data to provide the service you asked for (performance of a contract), with your consent (calendar and task connections, WhatsApp, meeting summaries and the AI assistant) and for our legitimate interests (security and fixing errors)."
           ]
         },
         {
@@ -393,7 +429,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
       "path": "/privacy-policy",
       "title": "Política de privacidad",
       "description": "Cómo Meeting Guard AI recopila, usa y protege tus datos.",
-      "updated": "Última actualización: 9 de noviembre de 2026",
+      "updated": "Última actualización: 19 de noviembre de 2026",
       "intro": [
         "Esta política explica qué información recopila la app Meeting Guard AI, cómo la usamos, con quién la compartimos y qué opciones tienes. Meeting Guard AI es un servicio de AETERNUM TECH LTD (\"nosotros\")."
       ],
@@ -416,7 +452,8 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "Uso del asistente de IA: cuántas acciones de IA haces, cuándo empezaron tus acciones gratis y cuándo se renueva tu plan de pago, para aplicar las acciones incluidas en tu plan.",
               "Suscripciones: si compras Pro o Premium, App Store o Google Play gestionan el pago y nunca recibimos los datos de tu tarjeta ni de tu banco. RevenueCat, que gestiona las suscripciones en nuestro nombre, envía a nuestro servidor un registro de cada evento de la suscripción, como una compra, una renovación, un cambio de plan, un problema de cobro, una cancelación o un vencimiento (el plan, la tienda, el producto, el precio y la moneda, las fechas y, en una cancelación o un vencimiento, su motivo), para que sepamos qué plan tienes y cuándo se renueva o termina.",
               "Informes de fallos y errores, y mediciones de rendimiento de una parte de las sesiones de la app, cuando están activados en tu versión de la app: modelo del dispositivo, sistema operativo, versión de la app, datos técnicos del error y cuánto tardan las pantallas y las peticiones de red. Los diseñamos para que no incluyan tus reuniones, notas ni mensajes, y las direcciones de correo se eliminan de los informes de errores antes del envío.",
-              "WhatsApp: si vinculas tu número de WhatsApp, guardamos ese número de teléfono, tu nombre de perfil de WhatsApp, la fecha en que lo vinculaste y el estado de la conversación: los últimos 10 mensajes del chat, tuyos y del asistente, y cualquier propuesta pendiente de tu confirmación (consulta \"Asistente de WhatsApp\")."
+              "WhatsApp: si vinculas tu número de WhatsApp, guardamos ese número de teléfono, tu nombre de perfil de WhatsApp, la fecha en que lo vinculaste y el estado de la conversación: los últimos 10 mensajes del chat, tuyos y del asistente, y cualquier propuesta pendiente de tu confirmación (consulta \"Asistente de WhatsApp\").",
+              "Minutas de reuniones: si las activas, guardamos tu dirección privada de minutas, los buzones que indicas, las minutas que llegan a esa dirección y las tareas sugeridas a partir de ellas (consulta \"Minutas de reuniones por correo\"). Si conectas Fathom, también las claves de esa conexión, cifradas (consulta \"Minutas de reuniones desde Fathom\")."
             ]
           ]
         },
@@ -440,6 +477,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "Prestarte el servicio: mantener tus reuniones, tareas y notas al día en tus dispositivos, programar tus avisos y recordatorios y mostrar tu agenda.",
               "Sincronizar los calendarios y las listas de tareas que conectes.",
               "Responder a tus consultas al asistente de IA, en la app o por WhatsApp, y aplicar las acciones de IA incluidas en tu plan.",
+              "Archivar en tus reuniones las minutas que nos envías y, cuando lo pides, sugerir tareas a partir de ellas.",
               "Gestionar tu suscripción, si compras una.",
               "Mantener el servicio seguro, evitar abusos y corregir errores."
             ],
@@ -502,6 +540,35 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
           ]
         },
         {
+          "heading": "Minutas de reuniones por correo",
+          "body": [
+            "Las minutas de reuniones son opcionales y puede que todavía no estén disponibles para tu cuenta. Meeting Guard AI no se une a tus reuniones, no las graba y no las escucha. Si activas las minutas, en Minutas de reuniones de Ajustes, obtienes una dirección de correo privada e indicas los buzones donde llegan los correos de tu asistente de notas. Después, la minuta que tu asistente de notas ya te envía por correo se reenvía a esa dirección privada, a mano o con una regla de tu buzón. Meeting Guard AI comprueba que cada correo es auténtico y archiva la minuta en la reunión que corresponde, o la guarda en tu bandeja de minutas hasta que la archives.",
+            "Nuestro proveedor de correo, Postmark, recibe primero cada correo, lo trata en Estados Unidos y conserva su copia durante 45 días. Postmark entrega el correo a nuestro servidor (Google Cloud Functions), que guarda la minuta en tu cuenta de Meeting Guard AI (Google Firebase): su texto, su asunto, las direcciones de correo que contiene, la fecha, el dominio del remitente y la reunión en la que está archivada. Solo tú puedes ver tus minutas en la app; los demás usuarios de Meeting Guard AI no pueden acceder a ellas.",
+            "Google Cloud cifra las minutas en tránsito y en reposo. Además, Meeting Guard AI cifra el texto de cada minuta, su asunto y las direcciones de correo que contiene con una clave propia, guardada en Google Secret Manager. Tu dirección privada, los buzones que indicas y datos como la fecha, el dominio del remitente y la reunión en la que está archivada no tienen esta capa adicional. No es cifrado de extremo a extremo: las personas con acceso administrativo a nuestros sistemas podrían técnicamente descifrarlas.",
+            "Una minuta que tu asistente de notas no firmó, que se modificó después de enviarse o que no se envió a uno de tus propios buzones se rechaza, y Meeting Guard AI no guarda su contenido; Postmark sigue conservando su copia durante 45 días. Una minuta real enviada directamente a tu dirección privada espera en tu bandeja de minutas hasta que des tu visto bueno.",
+            "El texto de una minuta solo se envía a OpenAI cuando pides sugerencias de tareas con IA, en la app o respondiendo IA en WhatsApp. Entonces nuestro servidor envía a OpenAI el texto de la minuta, con el título de la reunión en la que está archivada y la fecha, pero nunca su asunto ni tus otras reuniones y tareas, en las condiciones que se describen en \"Asistente de IA (OpenAI)\". Las primeras sugerencias con IA de una minuta usan 1 acción de IA; las acciones tal como están escritas pueden verse sin IA. Las sugerencias se guardan con la minuta y se cifran de la misma forma. Nada se convierte en tarea hasta que lo aceptas. Una tarea que añades es una tarea normal: su título y las personas de la tarea no se cifran con nuestra clave adicional, su recordatorio muestra el título en la pantalla de bloqueo y, si la sincronización con Microsoft To Do o Google Tasks está activada, se copia allí.",
+            "Si vinculaste WhatsApp, puedes pedir allí las tareas sugeridas de tu minuta más reciente. Solo se envían a tu teléfono, a través de Meta, las tareas sugeridas y las frases de las que salen, nunca la minuta completa, y se quedan en tu chat, en las vistas previas de las notificaciones y en tus copias de seguridad de WhatsApp hasta que las elimines allí.",
+            [
+              "Minutas archivadas en una reunión o guardadas sin reunión: 12 meses desde que llegan; después se eliminan.",
+              "Minutas que esperan en la bandeja: 60 días desde que llegan, o 60 días desde que devuelves una a la bandeja, lo que ocurra más tarde.",
+              "Correos rechazados: solo un recuento diario, el motivo y el dominio del remitente cuando está verificado, durante 30 días; nunca su contenido.",
+              "Las tareas sugeridas forman parte de su minuta y se eliminan con ella. Las tareas que añades son tuyas: se quedan hasta que las eliminas, también después de eliminar la minuta o de desconectar.",
+              "Puedes eliminar cualquier minuta, o todas, cuando quieras. Salen de nuestra base de datos activa en el acto y de nuestras copias de seguridad en un plazo de 21 días. La copia de Postmark caduca a los 45 días de llegar el correo. El correo original se queda en tu propio buzón.",
+              "Cuando desconectas las minutas en la app, tu dirección privada deja de funcionar en el acto y eliges si conservar o eliminar las minutas ya recibidas. Cuando eliminas tu cuenta, se eliminan con ella tu dirección privada, los buzones que indicaste y todas tus minutas.",
+              "Las copias fuera de nuestra base de datos, como un recordatorio en la pantalla de bloqueo, tu chat de WhatsApp o una tarea copiada a Microsoft To Do o Google Tasks, no se ven afectadas cuando eliminas una minuta o desconectas: elimínalas allí."
+            ]
+          ]
+        },
+        {
+          "heading": "Minutas de reuniones desde Fathom",
+          "body": [
+            "Si usas Fathom, puedes conectarlo en lugar de reenviar sus correos: toca Conectar Fathom en Minutas de reuniones y aprueba el acceso en Fathom. Al conectarlo también obtienes tu dirección privada de minutas (consulta \"Minutas de reuniones por correo\"), porque cada minuta se guarda asociada a ella.",
+            "Después de cada reunión que Fathom graba para ti, Fathom envía a nuestro servidor (Google Cloud Functions) el título de esa reunión, sus horarios, su enlace de videollamada, la minuta de Fathom y sus tareas, con los nombres y las direcciones de correo de las personas a las que están asignadas. Nuestro servidor también puede pedirle a Fathom tus grabaciones de los últimos 7 días, para recuperar alguna que no haya llegado. Solo recibimos tus propias grabaciones, y nunca la grabación en sí, su video ni su transcripción.",
+            "Para mantener la conexión, guardamos las claves que Fathom nos da para tu cuenta (una clave de acceso, una clave para renovarla y la clave que firma los envíos de Fathom), cifradas con nuestra propia clave guardada en Google Secret Manager, junto con cuándo te conectaste y cuándo llegó la última minuta. Después, una minuta de Fathom se guarda, se cifra, se archiva y se conserva exactamente igual que una minuta por correo, con las mismas reglas y durante el mismo tiempo.",
+            "Puedes desconectar Fathom cuando quieras en Minutas de reuniones: le pedimos a Fathom que deje de enviar minutas y eliminamos las claves de inmediato. Desconectar las minutas de reuniones o eliminar tu cuenta también desconecta Fathom. Si en ese momento no se puede contactar con Fathom, puedes quitar la conexión en tu configuración de Fathom. Fathom trata tus reuniones según su propia política de privacidad."
+          ]
+        },
+        {
           "heading": "Notificaciones",
           "body": [
             "El sistema operativo programa en tu dispositivo los avisos de reuniones, los recordatorios de tareas, el aviso de seguimiento cuando termina una reunión y, si lo activas, el resumen diario, según tus reuniones, tus tareas y tus ajustes de avisos. Muestran datos como el título y la hora de la reunión o de la tarea, también en la pantalla de bloqueo según los ajustes de notificaciones de tu teléfono. No enviamos notificaciones push desde un servidor ni usamos las notificaciones con fines comerciales."
@@ -513,7 +580,9 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
             "Solo compartimos información personal con:",
             [
               "Google (Firebase Authentication, Cloud Firestore y Cloud Functions), que aloja tu cuenta y tus datos y ejecuta el código de nuestro servidor.",
-              "OpenAI, que procesa tus consultas al asistente de IA.",
+              "OpenAI, que procesa tus consultas al asistente de IA y, cuando las pides, las tareas sugeridas de una minuta.",
+              "Postmark, nuestro proveedor de correo, cuando activas las minutas de reuniones: recibe los correos enviados a tu dirección privada de minutas, los trata en Estados Unidos y conserva su copia durante 45 días.",
+              "Fathom, cuando lo conectas: recibimos tus minutas de reuniones desde Fathom y solo le enviamos las solicitudes necesarias para mantener esa conexión, nunca otros datos de tu cuenta de Meeting Guard AI.",
               "Microsoft, cuando inicias sesión con Microsoft o conectas Outlook o To Do.",
               "Apple, cuando inicias sesión con Apple.",
               "El servicio de reconocimiento de voz de tu teléfono (Apple en un iPhone y, normalmente, Google en Android), cuando usas la entrada por voz: puede recibir el audio para convertirlo en texto.",
@@ -526,7 +595,7 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "Las personas que invitas: cuando pides a la app que envíe invitaciones o comparta una reunión, los destinatarios reciben los datos de la reunión.",
               "Las autoridades, cuando la ley lo exige, o una empresa que se haga cargo del servicio, que deberá respetar esta política."
             ],
-            "Nuestros proveedores de servicios (Google Cloud y Firebase, OpenAI, RevenueCat, Sentry, Expo, Zoom y, para los mensajes de WhatsApp, Meta) solo pueden usar tu información para prestarnos su servicio y deben protegerla al menos como describe esta política. Cuando inicias sesión con Google, Apple o Microsoft, conectas uno de sus servicios o usas el reconocimiento de voz de tu teléfono, esa empresa aplica además sus propios términos y su política de privacidad."
+            "Nuestros proveedores de servicios (Google Cloud y Firebase, OpenAI, Postmark, RevenueCat, Sentry, Expo, Zoom y, para los mensajes de WhatsApp, Meta) solo pueden usar tu información para prestarnos su servicio y deben protegerla al menos como describe esta política. Cuando inicias sesión con Google, Apple o Microsoft, conectas uno de sus servicios o usas el reconocimiento de voz de tu teléfono, esa empresa aplica además sus propios términos y su política de privacidad."
           ]
         },
         {
@@ -540,11 +609,12 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
           "body": [
             "Guardamos tu información mientras tu cuenta exista.",
             [
-              "Puedes eliminar tu cuenta en cualquier momento desde la app: Ajustes > Cuenta > Eliminar cuenta. Así se borran para siempre de nuestros servidores tu cuenta, reuniones, tareas, notas, preferencias, registros de uso del asistente, estado de suscripción, vínculo de WhatsApp y registro de inicio de sesión con Microsoft, se cierra tu sesión y se retira el acceso de la app a tu cuenta de Google o a tu cuenta de Apple. Eliminar tu cuenta no cancela una suscripción comprada en App Store o Google Play: cancélala allí.",
+              "Puedes eliminar tu cuenta en cualquier momento desde la app: Ajustes > Cuenta > Eliminar cuenta. Así se borran para siempre de nuestros servidores tu cuenta, reuniones, tareas, notas, preferencias, minutas de reuniones y dirección privada de minutas, conexión con Fathom, registros de uso del asistente, estado de suscripción, vínculo de WhatsApp y registro de inicio de sesión con Microsoft, se cierra tu sesión y se retira el acceso de la app a tu cuenta de Google o a tu cuenta de Apple. Eliminar tu cuenta no cancela una suscripción comprada en App Store o Google Play: cancélala allí.",
               "Si ya no puedes iniciar sesión, escribe a support@meetingguard.ai desde el correo de tu cuenta y pídenos que la eliminemos.",
               "Cuando borras una reunión, se conserva hasta 60 días un registro mínimo sin su contenido (identificadores y hora) para que el borrado llegue a tus otros dispositivos y calendarios; después nuestro servidor lo elimina automáticamente.",
               "Los eventos que la app añadió a Google Calendar, a Outlook o al calendario de tu teléfono, y las tareas que añadió a Google Tasks o a Microsoft To Do, siguen allí hasta que los borres.",
               "Las reuniones de Zoom que la app creó para ti (con su título, su hora y su enlace) no se borran automáticamente cuando eliminas tu cuenta: se quedan en nuestra cuenta de Zoom hasta que nos pidas que las borremos en support@meetingguard.ai.",
+              "Las minutas de reuniones se conservan 12 meses cuando están archivadas en una reunión o guardadas sin reunión, y 60 días mientras esperan en tu bandeja de minutas; Postmark conserva su copia de cada correo durante 45 días (consulta \"Minutas de reuniones por correo\").",
               "El vínculo de WhatsApp (tu número de teléfono y tu nombre de perfil de WhatsApp) se conserva hasta que lo desvincules o elimines tu cuenta. El estado de la conversación deja de usarse tras 15 minutos sin mensajes y se borra cuando pasan 30 días sin mensajes.",
               "Si compraste una suscripción, los registros de sus eventos en la tienda (compras, renovaciones, cambios de plan, cancelaciones y vencimiento, con tu identificador de usuario anónimo, el plan, la tienda, el producto, el precio y la moneda y las fechas) se conservan en nuestros servidores después de que elimines tu cuenta, como parte de nuestros registros de ingresos.",
               "RevenueCat conserva su propio registro de tu identificador de usuario anónimo, y de tus compras si las hiciste, después de que elimines tu cuenta.",
@@ -569,12 +639,12 @@ export const legalDocs: Record<Lang, Record<LegalDocKey, LegalDoc>> = {
               "Acceder a tus datos personales y obtener una copia.",
               "Corregir datos inexactos. Puedes editar tus reuniones, tareas, notas y ajustes en la app.",
               "Borrar tus datos (consulta el apartado anterior).",
-              "Oponerte a algunos tratamientos o limitarlos, y retirar tu consentimiento en cualquier momento, por ejemplo desconectando Google Calendar, Google Tasks, Outlook o Microsoft To Do, desvinculando WhatsApp, desactivando el acceso al calendario o dejando de usar el asistente de IA.",
+              "Oponerte a algunos tratamientos o limitarlos, y retirar tu consentimiento en cualquier momento, por ejemplo desconectando Google Calendar, Google Tasks, Outlook o Microsoft To Do, desvinculando WhatsApp, desconectando Fathom o las minutas de reuniones, desactivando el acceso al calendario o dejando de usar el asistente de IA.",
               "Recibir tus datos en un formato portable.",
               "Presentar una reclamación ante la autoridad de protección de datos de tu país."
             ],
             "Para ejercer estos derechos, escribe a support@meetingguard.ai. Te responderemos en el plazo que marca la ley.",
-            "Tratamos tus datos para prestarte el servicio que pediste (ejecución de un contrato), con tu consentimiento (conexión de calendarios y tareas, WhatsApp y asistente de IA) y por nuestro interés legítimo (seguridad y corrección de errores)."
+            "Tratamos tus datos para prestarte el servicio que pediste (ejecución de un contrato), con tu consentimiento (conexión de calendarios y tareas, WhatsApp, minutas de reuniones y asistente de IA) y por nuestro interés legítimo (seguridad y corrección de errores)."
           ]
         },
         {
